@@ -1032,6 +1032,7 @@
             gap: 0.5rem;
             border-bottom: 2px solid var(--border-color);
             margin-bottom: 2rem;
+            overflow-x: auto;
         }
 
         .tab-btn {
@@ -1045,6 +1046,7 @@
             position: relative;
             top: 2px;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .tab-btn.active {
@@ -1265,6 +1267,42 @@
             margin-bottom: 0.25rem;
         }
 
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary);
+        }
+
+        .kpi-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-card-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        
+        .chart-container {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-top: 2rem;
+        }
+
         @media (max-width: 768px) {
             .hero-section h1 {
                 font-size: 2.5rem;
@@ -1389,9 +1427,50 @@
                     </div>
 
                     <div class="admin-tabs">
-                        <button id="tabPedidos" class="tab-btn active" onclick="mostrarVistaAdmin('pedidos')">Pedidos</button>
+                        <button id="tabDashboard" class="tab-btn active" onclick="mostrarVistaAdmin('dashboard')">Dashboard</button>
+                        <button id="tabPedidos" class="tab-btn" onclick="mostrarVistaAdmin('pedidos')">Pedidos</button>
                         <button id="tabProductos" class="tab-btn" onclick="mostrarVistaAdmin('productos')">Productos</button>
                         <button id="tabCategorias" class="tab-btn" onclick="mostrarVistaAdmin('categorias')">Categorías</button>
+                        <button id="tabClientes" class="tab-btn" onclick="mostrarVistaAdmin('clientes')">Clientes</button>
+                    </div>
+
+                    <div id="adminDashboardView">
+                        <div class="date-filter-container">
+                            <div class="date-filter-group">
+                                <label for="dashboardStartDate">Desde</label>
+                                <input type="date" id="dashboardStartDate" onchange="renderizarDashboard()">
+                            </div>
+                            <div class="date-filter-group">
+                                <label for="dashboardEndDate">Hasta</label>
+                                <input type="date" id="dashboardEndDate" onchange="renderizarDashboard()">
+                            </div>
+                             <div class="admin-actions">
+                                <button class="btn-secondary" onclick="setDashboardDateRange('today')">Hoy</button>
+                                <button class="btn-secondary" onclick="setDashboardDateRange('week')">Últimos 7 días</button>
+                                <button class="btn-secondary" onclick="setDashboardDateRange('month')">Este Mes</button>
+                            </div>
+                        </div>
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-card-title">Ingresos Totales</div>
+                                <div class="kpi-card-value" id="kpiIngresosTotales">S/ 0.00</div>
+                            </div>
+                             <div class="kpi-card" style="border-left-color: var(--warning-border);">
+                                <div class="kpi-card-title">Ingresos Pendientes</div>
+                                <div class="kpi-card-value" id="kpiIngresosPendientes">S/ 0.00</div>
+                            </div>
+                             <div class="kpi-card" style="border-left-color: var(--secondary);">
+                                <div class="kpi-card-title">Pedidos Totales</div>
+                                <div class="kpi-card-value" id="kpiPedidosTotales">0</div>
+                            </div>
+                             <div class="kpi-card" style="border-left-color: var(--accent);">
+                                <div class="kpi-card-title">Ticket Promedio</div>
+                                <div class="kpi-card-value" id="kpiTicketPromedio">S/ 0.00</div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
                     </div>
 
                     <div id="adminProductosView" style="display:none;">
@@ -1458,7 +1537,7 @@
                          <div id="loadingAdminCategorias" class="loading" style="display:none;">Cargando categorías...</div>
                     </div>
 
-                    <div id="adminPedidosView">
+                    <div id="adminPedidosView" style="display:none;">
                          <div class="date-filter-container">
                             <div class="date-filter-group">
                                 <label for="startDate">Desde</label>
@@ -1506,6 +1585,27 @@
                         </div>
 
                         <div id="loadingAdminPedidos" class="loading" style="display:none;">Cargando pedidos...</div>
+                    </div>
+
+                    <div id="adminClientesView" style="display:none;">
+                        <h3>Listado de Clientes</h3>
+                        <p style="color: #666; margin-bottom: 1.5rem;">Aquí se agrupan los clientes por su número de teléfono.</p>
+                        <div style="overflow-x: auto;">
+                            <table class="products-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre Cliente</th>
+                                        <th>Teléfono</th>
+                                        <th>Email</th>
+                                        <th>Nº Pedidos</th>
+                                        <th>Gasto Total</th>
+                                        <th>Último Pedido</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminClientsTable"></tbody>
+                            </table>
+                        </div>
+                        <div id="loadingAdminClients" class="loading" style="display:none;">Cargando clientes...</div>
                     </div>
                 </div>
             </div>
@@ -1730,6 +1830,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const SUPABASE_URL = 'https://zejzrujrspeoszpfbjce.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplanpydWpyc3Blb3N6cGZiamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2MDMyNDMsImV4cCI6MjA3NTE3OTI0M30.UAi4jQ0BH1hphW7OEh4JWP4hdVJ4CmvX6x4CyP2ak-U';
@@ -1749,6 +1850,7 @@
         let currentOrderStatusFilter = 'todos';
         let isProcessing = false; // Flag to prevent double submission
         let pedidosChannel = null; // Channel for realtime updates
+        let salesChartInstance = null;
         
         const estadoPedidoConfig = {
             'pendiente_pago': { nombre: 'Pendiente de Pago', clase: 'status-pendiente_pago' },
@@ -1807,7 +1909,7 @@
             cargarProductosAdmin();
             cargarPedidosAdmin();
             cargarCategoriasAdmin();
-            mostrarVistaAdmin('pedidos'); // Default to pedidos view
+            mostrarVistaAdmin('dashboard'); // Default to dashboard view
             suscribirACambiosPedidos();
         }
 
@@ -1841,16 +1943,24 @@
         }
 
         async function mostrarVistaAdmin(vista) {
+            document.getElementById('adminDashboardView').style.display = vista === 'dashboard' ? 'block' : 'none';
             document.getElementById('adminProductosView').style.display = vista === 'productos' ? 'block' : 'none';
             document.getElementById('adminCategoriasView').style.display = vista === 'categorias' ? 'block' : 'none';
             document.getElementById('adminPedidosView').style.display = vista === 'pedidos' ? 'block' : 'none';
+            document.getElementById('adminClientesView').style.display = vista === 'clientes' ? 'block' : 'none';
             
+            document.getElementById('tabDashboard').classList.toggle('active', vista === 'dashboard');
             document.getElementById('tabProductos').classList.toggle('active', vista === 'productos');
             document.getElementById('tabCategorias').classList.toggle('active', vista === 'categorias');
             document.getElementById('tabPedidos').classList.toggle('active', vista === 'pedidos');
-            
+            document.getElementById('tabClientes').classList.toggle('active', vista === 'clientes');
+
             if (vista === 'productos') {
                 renderizarListaCategoriasImportacion();
+            } else if (vista === 'dashboard') {
+                renderizarDashboard();
+            } else if (vista === 'clientes') {
+                renderizarClientes();
             }
         }
 
@@ -2372,6 +2482,8 @@
                 }
 
                 renderizarPedidosAdmin();
+                renderizarDashboard();
+                renderizarClientes();
             } catch (error) {
                 console.error('Error al cargar pedidos:', error);
                 document.getElementById('adminOrdersTable').innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--danger);">Error: ${error.message}</td></tr>`;
@@ -2413,6 +2525,8 @@
                         }
 
                         renderizarPedidosAdmin();
+                        renderizarDashboard();
+                        renderizarClientes();
                     }
                 )
                 .subscribe((status, err) => {
@@ -2439,35 +2553,38 @@
             renderizarPedidosAdmin();
         }
 
-        function aplicarFiltrosPedidos() {
+        function aplicarFiltrosPedidos(source = 'pedidos') {
             let pedidosFiltrados = [...pedidosAdmin];
 
-            // 1. Filtrar por estado
-            if (currentOrderStatusFilter !== 'todos') {
-                pedidosFiltrados = pedidosFiltrados.filter(p => p.estado === currentOrderStatusFilter);
-            }
-
-            // 2. Filtrar por rango de fechas
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
+            const startDateEl = document.getElementById(source === 'dashboard' ? 'dashboardStartDate' : 'startDate');
+            const endDateEl = document.getElementById(source === 'dashboard' ? 'dashboardEndDate' : 'endDate');
+            const startDate = startDateEl.value;
+            const endDate = endDateEl.value;
 
             if (startDate) {
                 const start = new Date(startDate);
-                start.setHours(0, 0, 0, 0); // Considerar desde el inicio del día
+                start.setHours(0, 0, 0, 0);
                 pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.fecha_pedido) >= start);
             }
 
             if (endDate) {
                 const end = new Date(endDate);
-                end.setHours(23, 59, 59, 999); // Considerar hasta el final del día
+                end.setHours(23, 59, 59, 999);
                 pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.fecha_pedido) <= end);
+            }
+
+            if (source === 'pedidos') {
+                if (currentOrderStatusFilter !== 'todos') {
+                    pedidosFiltrados = pedidosFiltrados.filter(p => p.estado === currentOrderStatusFilter);
+                }
             }
             
             return pedidosFiltrados;
         }
 
+
         function renderizarPedidosAdmin() {
-            const pedidosFiltrados = aplicarFiltrosPedidos();
+            const pedidosFiltrados = aplicarFiltrosPedidos('pedidos');
 
             if (currentOrderView === 'list') {
                 renderizarPedidosLista(pedidosFiltrados);
@@ -2718,7 +2835,7 @@
         }
 
         function exportarPedidosExcel() {
-            const pedidosAExportar = aplicarFiltrosPedidos();
+            const pedidosAExportar = aplicarFiltrosPedidos('pedidos');
             
             if (pedidosAExportar.length === 0) {
                 alert('No hay pedidos que coincidan con los filtros seleccionados para exportar.');
@@ -2761,6 +2878,167 @@
             XLSX.writeFile(workbook, fileName, { bookType: 'xlsx', type: 'binary' });
         }
         // --- END PEDIDOS ADMIN ---
+
+        // --- START DASHBOARD ---
+        function setDashboardDateRange(range) {
+            const endDate = new Date();
+            let startDate = new Date();
+
+            if (range === 'today') {
+                // startDate is already today
+            } else if (range === 'week') {
+                startDate.setDate(endDate.getDate() - 6);
+            } else if (range === 'month') {
+                startDate.setDate(1);
+            }
+
+            document.getElementById('dashboardStartDate').value = startDate.toISOString().split('T')[0];
+            document.getElementById('dashboardEndDate').value = endDate.toISOString().split('T')[0];
+            renderizarDashboard();
+        }
+
+        function renderizarDashboard() {
+            if (!pedidosAdmin || pedidosAdmin.length === 0) {
+                 // Initialize chart with empty data if no orders yet
+                initOrUpdateChart([], []);
+                return;
+            }
+
+            const pedidosFiltrados = aplicarFiltrosPedidos('dashboard');
+            
+            let ingresosTotales = 0;
+            let ingresosPendientes = 0;
+            let pedidosTotales = 0;
+            
+            const ventasPorDia = {};
+
+            pedidosFiltrados.forEach(pedido => {
+                if (pedido.estado !== 'cancelado') {
+                    ingresosTotales += pedido.total;
+                    pedidosTotales++;
+
+                    if (pedido.estado === 'pendiente_pago') {
+                        ingresosPendientes += pedido.total;
+                    }
+
+                    const fecha = new Date(pedido.fecha_pedido).toISOString().split('T')[0];
+                    if (!ventasPorDia[fecha]) {
+                        ventasPorDia[fecha] = 0;
+                    }
+                    ventasPorDia[fecha] += pedido.total;
+                }
+            });
+
+            const ticketPromedio = pedidosTotales > 0 ? ingresosTotales / pedidosTotales : 0;
+
+            document.getElementById('kpiIngresosTotales').textContent = `S/ ${ingresosTotales.toFixed(2)}`;
+            document.getElementById('kpiIngresosPendientes').textContent = `S/ ${ingresosPendientes.toFixed(2)}`;
+            document.getElementById('kpiPedidosTotales').textContent = pedidosTotales;
+            document.getElementById('kpiTicketPromedio').textContent = `S/ ${ticketPromedio.toFixed(2)}`;
+
+            const sortedDates = Object.keys(ventasPorDia).sort((a, b) => new Date(a) - new Date(b));
+            const chartLabels = sortedDates.map(date => new Date(date).toLocaleDateString('es-PE', {day: 'numeric', month: 'short'}));
+            const chartData = sortedDates.map(date => ventasPorDia[date]);
+            
+            initOrUpdateChart(chartLabels, chartData);
+        }
+
+        function initOrUpdateChart(labels, data) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if (salesChartInstance) {
+                salesChartInstance.data.labels = labels;
+                salesChartInstance.data.datasets[0].data = data;
+                salesChartInstance.update();
+            } else {
+                salesChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Ingresos por Día',
+                            data: data,
+                            borderColor: 'rgba(123, 92, 126, 1)',
+                            backgroundColor: 'rgba(123, 92, 126, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'S/ ' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        // --- END DASHBOARD ---
+
+        // --- START CLIENTES ---
+        function renderizarClientes() {
+            document.getElementById('loadingAdminClients').style.display = 'block';
+            const tbody = document.getElementById('adminClientsTable');
+
+            if (!pedidosAdmin || pedidosAdmin.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Aún no hay clientes.</td></tr>';
+                document.getElementById('loadingAdminClients').style.display = 'none';
+                return;
+            }
+
+            const clientesMap = new Map();
+
+            pedidosAdmin.forEach(pedido => {
+                const idCliente = pedido.telefono_cliente;
+                if (!idCliente) return; // Skip orders without phone number
+
+                if (!clientesMap.has(idCliente)) {
+                    clientesMap.set(idCliente, {
+                        nombre: pedido.nombre_cliente,
+                        telefono: pedido.telefono_cliente,
+                        email: pedido.email_cliente,
+                        pedidos: 0,
+                        gastoTotal: 0,
+                        ultimoPedido: new Date(0)
+                    });
+                }
+
+                const cliente = clientesMap.get(idCliente);
+                cliente.pedidos++;
+                cliente.gastoTotal += pedido.total;
+                const fechaPedido = new Date(pedido.fecha_pedido);
+                if (fechaPedido > cliente.ultimoPedido) {
+                    cliente.ultimoPedido = fechaPedido;
+                    // Update name and email with the latest one, in case it changes
+                    cliente.nombre = pedido.nombre_cliente;
+                    cliente.email = pedido.email_cliente;
+                }
+            });
+
+            const clientesArray = Array.from(clientesMap.values());
+            clientesArray.sort((a, b) => b.gastoTotal - a.gastoTotal); // Sort by total spent
+
+            tbody.innerHTML = clientesArray.map(cliente => `
+                <tr>
+                    <td>${cliente.nombre}</td>
+                    <td>${cliente.telefono}</td>
+                    <td>${cliente.email || 'N/A'}</td>
+                    <td>${cliente.pedidos}</td>
+                    <td>S/ ${cliente.gastoTotal.toFixed(2)}</td>
+                    <td>${cliente.ultimoPedido.toLocaleDateString('es-PE')}</td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('loadingAdminClients').style.display = 'none';
+        }
+        // --- END CLIENTES ---
 
         function abrirModalProducto() {
             document.getElementById('productoModalTitle').textContent = 'Agregar Producto';
