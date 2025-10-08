@@ -1599,6 +1599,7 @@
         let pedidosAdmin = [];
         let currentOrderView = 'list';
         let currentOrderStatusFilter = 'todos';
+        let isProcessing = false; // Flag to prevent double submission
         
         const estadoPedidoConfig = {
             'pendiente_pago': { nombre: 'Pendiente de Pago', clase: 'status-pendiente_pago' },
@@ -2020,6 +2021,9 @@
         async function realizarPedido(event) {
             event.preventDefault();
             
+            if (isProcessing) return; // Prevent double submission
+            isProcessing = true;
+
             const btnPedido = document.getElementById('btnRealizarPedido');
             btnPedido.disabled = true;
             btnPedido.textContent = 'Procesando pedido...';
@@ -2040,7 +2044,6 @@
                 subtotal: parseFloat(item.precio) * item.cantidad
             }));
 
-            // Generar un numero de pedido unico en el cliente para evitar problemas con el trigger de DB
             const uniqueId = Math.random().toString(36).substring(2, 7).toUpperCase();
             const timestamp = Date.now().toString().slice(-6);
             const numero_pedido_generado = `R51-${timestamp}-${uniqueId}`;
@@ -2090,6 +2093,8 @@
                 alert('Error al realizar el pedido. Por favor, intenta nuevamente. Detalles: ' + error.message);
                 btnPedido.disabled = false;
                 btnPedido.textContent = 'Realizar Pedido';
+            } finally {
+                isProcessing = false; // Release the lock
             }
         }
 
