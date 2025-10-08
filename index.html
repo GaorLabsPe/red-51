@@ -2040,7 +2040,13 @@
                 subtotal: parseFloat(item.precio) * item.cantidad
             }));
 
+            // Generar un numero de pedido unico en el cliente para evitar problemas con el trigger de DB
+            const uniqueId = Math.random().toString(36).substring(2, 7).toUpperCase();
+            const timestamp = Date.now().toString().slice(-6);
+            const numero_pedido_generado = `R51-${timestamp}-${uniqueId}`;
+
             const pedidoDB = {
+                numero_pedido: numero_pedido_generado,
                 nombre_cliente: nombre,
                 telefono_cliente: telefono,
                 email_cliente: email || null,
