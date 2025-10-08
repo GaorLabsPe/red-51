@@ -2058,7 +2058,7 @@
 
                 if (supabaseError) {
                     console.error('Error al guardar pedido en Supabase:', supabaseError);
-                    throw new Error('Error al guardar el pedido en la base de datos.');
+                    throw supabaseError;
                 }
                 
                 const pedidoN8N = {
@@ -2081,7 +2081,7 @@
                 
             } catch (error) {
                 console.error('Error al procesar el pedido:', error);
-                alert('Error al realizar el pedido. Por favor, intenta nuevamente. ' + error.message);
+                alert('Error al realizar el pedido. Por favor, intenta nuevamente. Detalles: ' + error.message);
                 btnPedido.disabled = false;
                 btnPedido.textContent = 'Realizar Pedido';
             }
