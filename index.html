@@ -1407,12 +1407,13 @@
                          <div class="date-filter-container">
                             <div class="date-filter-group">
                                 <label for="startDate">Desde</label>
-                                <input type="date" id="startDate">
+                                <input type="date" id="startDate" onchange="renderizarPedidosAdmin()">
                             </div>
                             <div class="date-filter-group">
                                 <label for="endDate">Hasta</label>
-                                <input type="date" id="endDate">
+                                <input type="date" id="endDate" onchange="renderizarPedidosAdmin()">
                             </div>
+                            <button class="btn-secondary" onclick="resetearFiltrosPedidos()" style="padding: 0.5rem 1rem;">Limpiar Filtros</button>
                             <button class="btn-export" onclick="exportarPedidosXLS()">📊 Exportar a Excel</button>
                         </div>
 
@@ -2312,10 +2313,35 @@
             renderizarPedidosAdmin();
         }
 
+        function aplicarFiltrosPedidos() {
+            let pedidosFiltrados = [...pedidosAdmin];
+
+            // 1. Filtrar por estado
+            if (currentOrderStatusFilter !== 'todos') {
+                pedidosFiltrados = pedidosFiltrados.filter(p => p.estado === currentOrderStatusFilter);
+            }
+
+            // 2. Filtrar por rango de fechas
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (startDate) {
+                const start = new Date(startDate);
+                start.setHours(0, 0, 0, 0); // Considerar desde el inicio del día
+                pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.fecha_pedido) >= start);
+            }
+
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999); // Considerar hasta el final del día
+                pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.fecha_pedido) <= end);
+            }
+            
+            return pedidosFiltrados;
+        }
+
         function renderizarPedidosAdmin() {
-            const pedidosFiltrados = currentOrderStatusFilter === 'todos'
-                ? pedidosAdmin
-                : pedidosAdmin.filter(p => p.estado === currentOrderStatusFilter);
+            const pedidosFiltrados = aplicarFiltrosPedidos();
 
             if (currentOrderView === 'list') {
                 renderizarPedidosLista(pedidosFiltrados);
@@ -2323,11 +2349,20 @@
                 renderizarPedidosKanban(pedidosFiltrados);
             }
         }
+        
+        function resetearFiltrosPedidos() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('orderStatusFilter').value = 'todos';
+            currentOrderStatusFilter = 'todos';
+            renderizarPedidosAdmin();
+        }
+
 
         function renderizarPedidosLista(pedidos) {
             const tbody = document.getElementById('adminOrdersTable');
             if (!pedidos || pedidos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">No hay pedidos para este filtro.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">No hay pedidos que coincidan con los filtros.</td></tr>';
                 return;
             }
 
@@ -2387,7 +2422,7 @@
             });
 
             if (pedidos.length === 0) {
-                 kanbanBoard.innerHTML = '<div class="empty-cart"><p>No hay pedidos para este filtro.</p></div>';
+                 kanbanBoard.innerHTML = '<div class="empty-cart" style="width: 100%;"><p>No hay pedidos que coincidan con los filtros.</p></div>';
             } else {
                 configurarDragAndDrop();
             }
@@ -2553,54 +2588,51 @@
             document.getElementById('orderDetailsModal').style.display = 'none';
         }
 
+        function formatearProductosParaCSV(productos) {
+            if (!productos || productos.length === 0) return '';
+            return productos.map(p => 
+                `${p.cantidad} x ${p.producto || ''} (${p.marca || ''}) @ S/${(p.precio_unitario || 0).toFixed(2)} = S/${(p.subtotal || 0).toFixed(2)}`
+            ).join('; ');
+        }
+
         function exportarPedidosXLS() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            let pedidosFiltrados = pedidosAdmin;
-
-            if (startDate) {
-                const start = new Date(startDate);
-                start.setHours(0, 0, 0, 0);
-                pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.fecha_pedido) >= start);
-            }
-
-            if (endDate) {
-                const end = new Date(endDate);
-                end.setHours(23, 59, 59, 999);
-                pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.fecha_pedido) <= end);
-            }
-
-            if (pedidosFiltrados.length === 0) {
-                alert('No hay pedidos en el rango de fechas seleccionado.');
+            const pedidosAExportar = aplicarFiltrosPedidos();
+            
+            if (pedidosAExportar.length === 0) {
+                alert('No hay pedidos que coincidan con los filtros seleccionados para exportar.');
                 return;
             }
             
             const headers = ['Numero Pedido', 'Fecha', 'Cliente', 'Telefono', 'Email', 'Direccion', 'Estado', 'Total', 'Cantidad Items', 'Productos'];
             const csvRows = [headers.join(',')];
 
-            for (const pedido of pedidosFiltrados) {
+            for (const pedido of pedidosAExportar) {
+                const productosFormateados = formatearProductosParaCSV(pedido.productos);
                 const values = [
                     pedido.numero_pedido || '',
                     new Date(pedido.fecha_pedido).toLocaleString('es-PE'),
-                    `"${pedido.nombre_cliente.replace(/"/g, '""')}"`,
+                    `"${(pedido.nombre_cliente || '').replace(/"/g, '""')}"`,
                     pedido.telefono_cliente,
                     pedido.email_cliente || '',
                     `"${(pedido.direccion || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
                     estadoPedidoConfig[pedido.estado]?.nombre || pedido.estado,
                     pedido.total,
                     pedido.cantidad_items,
-                    `"${JSON.stringify(pedido.productos).replace(/"/g, '""')}"`
+                    `"${productosFormateados.replace(/"/g, '""')}"`
                 ];
                 csvRows.push(values.join(','));
             }
             
             const csvContent = csvRows.join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.setAttribute('href', url);
-            const fileName = `Reporte_Pedidos_${startDate || 'inicio'}_a_${endDate || 'fin'}.xls`;
+            
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const fileName = `Reporte_Pedidos_${startDate || 'inicio'}_a_${endDate || 'hoy'}.xls`;
+
             link.setAttribute('download', fileName);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
