@@ -1140,13 +1140,7 @@
                     </div>
                     <div class="form-group">
                         <label>Categoria</label>
-                        <select id="productoCategoria" required>
-                            <option value="moviles">Smartphones & Tablets</option>
-                            <option value="audio">Audio</option>
-                            <option value="hogar">Hogar Inteligente</option>
-                            <option value="computacion">Computacion</option>
-                            <option value="entretenimiento">Entretenimiento</option>
-                        </select>
+                        <select id="productoCategoria" required></select>
                     </div>
                     <div class="form-group">
                         <label>Descripcion</label>
@@ -1231,6 +1225,7 @@
         let supabaseClient = null;
         let categoriaActual = 'todos';
         let productos = [];
+        let categorias = [];
         let usuarioActual = null;
         
         const estadoPedidoConfig = {
@@ -1324,6 +1319,34 @@
             document.getElementById('tabPedidos').classList.toggle('active', vista === 'pedidos');
         }
 
+        async function cargarCategorias() {
+            if (!supabaseClient) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('categorias')
+                    .select('*')
+                    .order('nombre');
+
+                if (error) throw error;
+
+                categorias = data || [];
+                popularDropdownCategorias();
+                renderizarCategorias(); 
+            } catch (error) {
+                console.error('Error al cargar categorias:', error);
+                document.getElementById('categoryFilter').innerHTML = `<p style="color: var(--danger);">Error al cargar categorías.</p>`;
+            }
+        }
+
+        function popularDropdownCategorias() {
+            const select = document.getElementById('productoCategoria');
+            if (!select) return;
+
+            select.innerHTML = categorias.map(cat =>
+                `<option value="${cat.slug}">${cat.nombre}</option>`
+            ).join('');
+        }
+
         async function cargarProductos() {
             if (!supabaseClient) {
                 console.error('Supabase no inicializado');
@@ -1335,35 +1358,25 @@
             document.getElementById('loadingProducts').style.display = 'block';
 
             try {
-                console.log('Intentando cargar productos...');
-                
                 const { data, error } = await supabaseClient
                     .from('productos')
                     .select('*')
                     .eq('activo', true)
                     .order('nombre');
 
-                console.log('Respuesta de Supabase:', { data, error });
-
-                if (error) {
-                    console.error('Error de Supabase:', error);
-                    throw error;
-                }
+                if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    console.warn('No se encontraron productos activos');
                     document.getElementById('productsGrid').innerHTML = 
                         '<div class="empty-cart"><p>No hay productos disponibles. Ve al panel Admin para agregar productos.</p></div>';
                     return;
                 }
 
                 productos = data;
-                console.log('Productos cargados:', productos.length);
-                renderizarCategorias();
                 renderizarProductos();
 
             } catch (error) {
-                console.error('Error completo:', error);
+                console.error('Error al cargar productos:', error);
                 document.getElementById('productsGrid').innerHTML = 
                     `<div class="empty-cart">
                         <p>Error al cargar productos: ${error.message}</p>
@@ -1375,24 +1388,22 @@
         }
 
         function renderizarCategorias() {
-            if (productos.length === 0) {
-                document.getElementById('categoryFilter').innerHTML = '';
-                return;
-            }
-            
-            const categorias = ['todos', ...new Set(productos.map(p => p.categoria))];
             const filterContainer = document.getElementById('categoryFilter');
             
-            filterContainer.innerHTML = categorias.map(cat => `
-                <button class="filter-btn ${cat === categoriaActual ? 'active' : ''}" 
-                        onclick="filtrarCategoria('${cat}')">
-                    ${getCategoriaName(cat)}
+            const todosBtn = `<button class="filter-btn ${'todos' === categoriaActual ? 'active' : ''}" onclick="filtrarCategoria('todos')">Todos</button>`;
+            
+            const categoriasBtns = categorias.map(cat => `
+                <button class="filter-btn ${cat.slug === categoriaActual ? 'active' : ''}" 
+                        onclick="filtrarCategoria('${cat.slug}')">
+                    ${cat.nombre}
                 </button>
             `).join('');
+
+            filterContainer.innerHTML = todosBtn + categoriasBtns;
         }
 
-        function filtrarCategoria(categoria) {
-            categoriaActual = categoria;
+        function filtrarCategoria(categoriaSlug) {
+            categoriaActual = categoriaSlug;
             renderizarCategorias();
             renderizarProductos();
         }
@@ -1428,16 +1439,10 @@
             `).join('');
         }
 
-        function getCategoriaName(categoria) {
-            const nombres = {
-                'todos': 'Todos',
-                'moviles': 'Smartphones & Tablets',
-                'audio': 'Audio',
-                'hogar': 'Hogar Inteligente',
-                'computacion': 'Computacion',
-                'entretenimiento': 'Entretenimiento'
-            };
-            return nombres[categoria] || categoria;
+        function getCategoriaName(slug) {
+            if (slug === 'todos') return 'Todos';
+            const categoria = categorias.find(cat => cat.slug === slug);
+            return categoria ? categoria.nombre : slug;
         }
 
         function mostrarDetalleProducto(productoId) {
@@ -2236,8 +2241,13 @@ PlayStation 5,Sony,entretenimiento,Consola de videojuegos de última generación
             }
         }
 
-        inicializarSupabase();
-        cargarProductos();
+        async function inicializarApp() {
+            inicializarSupabase();
+            await cargarCategorias();
+            await cargarProductos();
+        }
+
+        inicializarApp();
     </script>
 </body>
 </html>
