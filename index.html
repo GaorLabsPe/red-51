@@ -22,6 +22,9 @@
             --text-light: #4a4a4a;
             --success: #1B9AA8;
             --danger: #e94560;
+            --warning-bg: #fffbeb;
+            --warning-border: #f59e0b;
+            --warning-text: #b45309;
             --border-color: #e0e0e0;
             --shadow: 0 4px 25px rgba(0,0,0,0.06);
         }
@@ -417,6 +420,8 @@
             border-radius: 20px;
             max-height: 90vh;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
             animation: slideIn 0.4s ease-out;
         }
 
@@ -453,6 +458,17 @@
         
         .modal-body {
             padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background: #fafafa;
+            border-radius: 0 0 20px 20px;
         }
 
         .product-detail-layout {
@@ -892,6 +908,7 @@
             padding: 1rem;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
         }
         
         .products-table th {
@@ -1213,6 +1230,40 @@
             font-size: 0.8rem;
             color: #666;
         }
+        
+        .import-preview-table-container {
+            overflow-x: auto;
+        }
+        
+        .import-preview-table tr.import-error {
+            background-color: #fee2e2;
+        }
+        .import-preview-table tr.import-error td {
+            color: #991b1b;
+        }
+        
+        .status-cell-ok {
+            color: #15803d;
+            font-weight: bold;
+        }
+        
+        .status-cell-error {
+            color: #991b1b;
+            font-weight: bold;
+        }
+        
+        #import-categories-list {
+            max-height: 150px;
+            overflow-y: auto;
+            background: #f8fafc;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        #import-categories-list li {
+            list-style-type: none;
+            margin-bottom: 0.25rem;
+        }
 
         @media (max-width: 768px) {
             .hero-section h1 {
@@ -1354,15 +1405,17 @@
                             <p style="color: #1e40af; font-weight: 600; margin-bottom: 0.5rem;">
                                 ¿Cómo importar productos?
                             </p>
-                            <ol style="font-size: 0.9rem; margin-left: 1.5rem; color: #1d4ed8;">
+                            <ol style="font-size: 0.9rem; margin-left: 1.5rem; color: #1d4ed8; padding-left: 1rem;">
                                 <li><strong>Descarga la plantilla Excel.</strong> Esto te dará el formato correcto.</li>
-                                <li><strong>Llena la plantilla</strong> con tus productos. Asegúrate de que la columna <code>categoria_id</code> contenga el número de ID correcto de una categoría ya existente.</li>
+                                <li><strong>Llena la plantilla</strong> con tus productos. Usa el ID correcto de la categoría de la lista de abajo.</li>
                                 <li>Guarda tu archivo en formato <strong>.xlsx</strong>.</li>
-                                <li>Haz clic en <strong>"Importar Excel"</strong> y selecciona tu archivo. ¡Listo!</li>
+                                <li>Haz clic en <strong>"Importar Excel"</strong>. Se abrirá una previsualización.</li>
+                                <li>Verifica los datos y confirma la importación.</li>
                             </ol>
-                            <p style="font-size: 0.85rem; color: #1e40af; margin-top: 0.75rem;">
-                                <strong>Columnas obligatorias:</strong> <code>nombre</code>, <code>marca</code>, <code>categoria_id</code>, <code>descripcion</code>, <code>precio</code>, <code>activo</code> (escribe TRUE o FALSE).
+                            <p style="font-size: 0.85rem; color: #1e40af; margin-top: 1rem; margin-bottom: 0.5rem;">
+                                <strong>IDs de Categorías Disponibles:</strong>
                             </p>
+                            <ul id="import-categories-list"></ul>
                         </div>
                         <div style="overflow-x: auto;">
                             <table class="products-table">
@@ -1607,6 +1660,37 @@
             </div>
         </div>
     </div>
+    
+    <div id="importPreviewModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h2>Previsualización de Importación</h2>
+                <button class="close-btn" onclick="cerrarModalPrevisualizacion()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="importSummary" class="auth-info" style="margin-bottom: 1.5rem;"></div>
+                <div class="import-preview-table-container">
+                    <table class="products-table import-preview-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Marca</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                                <th>Comentarios</th>
+                            </tr>
+                        </thead>
+                        <tbody id="importPreviewTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="cerrarModalPrevisualizacion()">Cancelar</button>
+                <button id="confirmImportBtn" class="btn-import" onclick="confirmarImportacionProductos()">Confirmar Importación</button>
+            </div>
+        </div>
+    </div>
 
     <footer class="footer">
         <div class="footer-container">
@@ -1660,6 +1744,7 @@
         let categorias = [];
         let usuarioActual = null;
         let pedidosAdmin = [];
+        let productosParaImportar = [];
         let currentOrderView = 'list';
         let currentOrderStatusFilter = 'todos';
         let isProcessing = false; // Flag to prevent double submission
@@ -1749,7 +1834,7 @@
             }
         }
 
-        function mostrarVistaAdmin(vista) {
+        async function mostrarVistaAdmin(vista) {
             document.getElementById('adminProductosView').style.display = vista === 'productos' ? 'block' : 'none';
             document.getElementById('adminCategoriasView').style.display = vista === 'categorias' ? 'block' : 'none';
             document.getElementById('adminPedidosView').style.display = vista === 'pedidos' ? 'block' : 'none';
@@ -1757,6 +1842,10 @@
             document.getElementById('tabProductos').classList.toggle('active', vista === 'productos');
             document.getElementById('tabCategorias').classList.toggle('active', vista === 'categorias');
             document.getElementById('tabPedidos').classList.toggle('active', vista === 'pedidos');
+            
+            if (vista === 'productos') {
+                renderizarListaCategoriasImportacion();
+            }
         }
 
         async function cargarCategorias() {
@@ -2224,7 +2313,9 @@
                     .order('nombre');
 
                 if (error) throw error;
-
+                
+                categorias = data || []; // Make sure global categories are up-to-date
+                
                 const tbody = document.getElementById('adminCategoriesTable');
                 tbody.innerHTML = (data || []).map(cat => `
                     <tr>
@@ -2790,8 +2881,9 @@
 
                 mostrarNotificacion(id ? 'Categoría actualizada' : 'Categoría creada');
                 cerrarModalCategoria();
-                cargarCategoriasAdmin();
-                cargarCategorias();
+                await cargarCategoriasAdmin();
+                await cargarCategorias();
+                renderizarListaCategoriasImportacion();
 
             } catch (error) {
                 console.error('Error al guardar categoría:', error);
@@ -2805,8 +2897,9 @@
                 const { error } = await supabaseClient.from('categorias').delete().eq('id', id);
                 if (error) throw error;
                 mostrarNotificacion('Categoría eliminada');
-                cargarCategoriasAdmin();
-                cargarCategorias();
+                await cargarCategoriasAdmin();
+                await cargarCategorias();
+                renderizarListaCategoriasImportacion();
             } catch (error) {
                 console.error('Error al eliminar categoría:', error);
                 alert('Error al eliminar categoría: ' + error.message);
@@ -2921,7 +3014,6 @@
                 categoria_id: 1,
                 descripcion: "Smartphone premium con chip A17 Pro y cámara profesional",
                 precio: 4599.00,
-                icon: "📱",
                 badge: "Nuevo",
                 imagen_url: "https://ejemplo.com/iphone15.jpg",
                 activo: true
@@ -2946,44 +3038,128 @@
                     const worksheet = workbook.Sheets[sheetName];
                     const productosImportadosRaw = XLSX.utils.sheet_to_json(worksheet);
 
-                    const productosImportados = productosImportadosRaw.map(producto => ({
-                        nombre: producto.nombre,
-                        marca: producto.marca,
-                        categoria_id: parseInt(producto.categoria_id),
-                        descripcion: producto.descripcion,
-                        precio: parseFloat(producto.precio),
-                        activo: String(producto.activo).toLowerCase() === 'true',
-                        icon: producto.icon || '📦',
-                        badge: producto.badge || null,
-                        imagen_url: producto.imagen_url || null
-                    })).filter(p => p.nombre && p.marca && !isNaN(p.categoria_id) && !isNaN(p.precio));
+                    const categoryMap = new Map(categorias.map(c => [c.id, c.nombre]));
+
+                    productosParaImportar = productosImportadosRaw.map(producto => {
+                        const categoria_id = parseInt(producto.categoria_id);
+                        const isValidCategory = categoryMap.has(categoria_id);
+                        return {
+                            raw: producto, // Keep original data
+                            processed: {
+                                nombre: producto.nombre,
+                                marca: producto.marca,
+                                categoria_id: categoria_id,
+                                descripcion: producto.descripcion,
+                                precio: parseFloat(producto.precio),
+                                activo: String(producto.activo).toLowerCase() === 'true',
+                                badge: producto.badge || null,
+                                imagen_url: producto.imagen_url || null
+                            },
+                            validation: {
+                                isValid: isValidCategory && producto.nombre && producto.marca && !isNaN(parseFloat(producto.precio)),
+                                categoryName: isValidCategory ? categoryMap.get(categoria_id) : 'ID Inválido',
+                                message: isValidCategory ? 'OK' : 'El ID de categoría no existe.'
+                            }
+                        };
+                    });
                     
-                    if (productosImportados.length === 0) {
-                        alert('No se encontraron productos válidos en el archivo Excel. Asegúrate que las columnas "nombre", "marca", "categoria_id" y "precio" estén completas.');
-                        return;
-                    }
-                    
-                    if (!confirm(`Se importarán ${productosImportados.length} productos. ¿Continuar?`)) return;
-                    
-                    document.getElementById('loadingAdmin').style.display = 'block';
-                    const { error } = await supabaseClient.from('productos').insert(productosImportados);
-                    if (error) throw error;
-                    
-                    mostrarNotificacion(`${productosImportados.length} productos importados con éxito`);
-                    cargarProductosAdmin();
-                    cargarProductos();
+                    renderizarPrevisualizacionImportacion();
                     
                 } catch (error) {
-                    console.error('Error al importar productos:', error);
-                    alert('Error al importar productos: ' + error.message);
+                    console.error('Error al procesar archivo:', error);
+                    alert('Error al procesar el archivo Excel: ' + error.message);
                 } finally {
-                    document.getElementById('loadingAdmin').style.display = 'none';
-                    event.target.value = '';
+                    event.target.value = ''; // Reset file input
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
+        function renderizarPrevisualizacionImportacion() {
+            const modal = document.getElementById('importPreviewModal');
+            const tableBody = document.getElementById('importPreviewTableBody');
+            const summaryDiv = document.getElementById('importSummary');
+            const confirmBtn = document.getElementById('confirmImportBtn');
+            
+            tableBody.innerHTML = '';
+            
+            let validCount = 0;
+            productosParaImportar.forEach(item => {
+                const tr = document.createElement('tr');
+                if (!item.validation.isValid) {
+                    tr.classList.add('import-error');
+                } else {
+                    validCount++;
+                }
+
+                tr.innerHTML = `
+                    <td>${item.processed.nombre || ''}</td>
+                    <td>${item.processed.marca || ''}</td>
+                    <td>${item.validation.categoryName} (ID: ${item.processed.categoria_id || 'N/A'})</td>
+                    <td>S/ ${item.processed.precio ? parseFloat(item.processed.precio).toFixed(2) : '0.00'}</td>
+                    <td>${item.processed.activo ? 'Activo' : 'Inactivo'}</td>
+                    <td class="${item.validation.isValid ? 'status-cell-ok' : 'status-cell-error'}">${item.validation.message}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            summaryDiv.innerHTML = `Se encontraron <strong>${productosParaImportar.length}</strong> productos en el archivo.
+                <strong>${validCount}</strong> productos son válidos y están listos para ser importados.`;
+
+            confirmBtn.disabled = validCount === 0;
+            confirmBtn.textContent = `Confirmar Importación (${validCount})`;
+            modal.style.display = 'block';
+        }
+        
+        async function confirmarImportacionProductos() {
+            const productosValidos = productosParaImportar
+                .filter(item => item.validation.isValid)
+                .map(item => item.processed);
+
+            if (productosValidos.length === 0) {
+                alert('No hay productos válidos para importar.');
+                return;
+            }
+            
+            const confirmBtn = document.getElementById('confirmImportBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Importando...';
+
+            try {
+                const { error } = await supabaseClient.from('productos').insert(productosValidos);
+                if (error) throw error;
+
+                mostrarNotificacion(`${productosValidos.length} productos importados con éxito.`);
+                cerrarModalPrevisualizacion();
+                cargarProductosAdmin();
+                cargarProductos();
+
+            } catch (error) {
+                console.error('Error al importar productos:', error);
+                alert('Error al importar productos: ' + error.message);
+            } finally {
+                 confirmBtn.disabled = false;
+            }
+        }
+        
+        function cerrarModalPrevisualizacion() {
+            document.getElementById('importPreviewModal').style.display = 'none';
+            productosParaImportar = [];
+        }
+
+        function renderizarListaCategoriasImportacion() {
+            const listEl = document.getElementById('import-categories-list');
+            if (!listEl) return;
+            
+            if (categorias.length === 0) {
+                 listEl.innerHTML = '<li>No hay categorías creadas. Ve a la pestaña "Categorías" para agregar una.</li>';
+                 return;
+            }
+            
+            listEl.innerHTML = categorias.map(cat => 
+                `<li><strong>ID: ${cat.id}</strong> - ${cat.nombre}</li>`
+            ).join('');
+        }
 
         function mostrarNotificacion(mensaje) {
             const notif = document.createElement('div');
@@ -3015,7 +3191,7 @@
         }
 
         window.onclick = function(event) {
-            const modals = ['cartModal', 'productoModal', 'categoriaModal', 'orderDetailsModal', 'productDetailModal'];
+            const modals = ['cartModal', 'productoModal', 'categoriaModal', 'orderDetailsModal', 'productDetailModal', 'importPreviewModal'];
             modals.forEach(id => {
                 const modalEl = document.getElementById(id);
                 if (event.target == modalEl) {
