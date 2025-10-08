@@ -1214,18 +1214,6 @@
             color: #666;
         }
 
-        #plantillaCsvContent {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-family: 'Courier New', Courier, monospace;
-            resize: vertical;
-            white-space: pre;
-        }
-
-
         @media (max-width: 768px) {
             .hero-section h1 {
                 font-size: 2.5rem;
@@ -1357,9 +1345,9 @@
 
                     <div id="adminProductosView" style="display:none;">
                         <div class="admin-actions" style="margin-bottom: 2rem;">
-                            <button class="btn-export" onclick="descargarPlantilla()">📥 Descargar Plantilla CSV</button>
-                            <button class="btn-import" onclick="document.getElementById('importFile').click()">📤 Importar CSV</button>
-                            <input type="file" id="importFile" accept=".csv" style="display:none;" onchange="importarProductos(event)">
+                            <button class="btn-export" onclick="descargarPlantillaExcel()">📥 Descargar Plantilla Excel</button>
+                            <button class="btn-import" onclick="document.getElementById('importFile').click()">📤 Importar Excel</button>
+                            <input type="file" id="importFile" accept=".xlsx, .xls, .csv" style="display:none;" onchange="importarProductos(event)">
                             <button class="btn-secondary" onclick="abrirModalProducto()">+ Agregar Producto</button>
                         </div>
                         <div style="overflow-x: auto;">
@@ -1414,7 +1402,7 @@
                                 <input type="date" id="endDate" onchange="renderizarPedidosAdmin()">
                             </div>
                             <button class="btn-secondary" onclick="resetearFiltrosPedidos()" style="padding: 0.5rem 1rem;">Limpiar Filtros</button>
-                            <button class="btn-export" onclick="exportarPedidosXLS()">📊 Exportar a Excel</button>
+                            <button class="btn-export" onclick="exportarPedidosExcel()">📊 Exportar a Excel</button>
                         </div>
 
                         <div class="admin-view-controls">
@@ -1606,25 +1594,6 @@
         </div>
     </div>
 
-    <div id="plantillaModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h2>Plantilla CSV de Productos</h2>
-                <button class="close-btn" onclick="cerrarPlantillaModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p style="margin-bottom: 1rem; color: #666;">Puedes copiar el siguiente texto y pegarlo en un archivo de texto (guardado como .csv), o usar los botones de abajo.</p>
-                <div class="form-group">
-                    <textarea id="plantillaCsvContent" readonly style="height: 200px;"></textarea>
-                </div>
-                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                     <button class="btn-secondary" onclick="copiarPlantilla()">Copiar al Portapapeles</button>
-                     <a id="downloadPlantillaLink" class="btn-primary" style="padding: 0.75rem 1.5rem; width: auto; text-transform: none;">Descargar Archivo</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-column">
@@ -1662,6 +1631,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script>
         const SUPABASE_URL = 'https://zejzrujrspeoszpfbjce.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplanpydWpyc3Blb3N6cGZiamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2MDMyNDMsImV4cCI6MjA3NTE3OTI0M30.UAi4jQ0BH1hphW7OEh4JWP4hdVJ4CmvX6x4CyP2ak-U';
@@ -2591,53 +2561,44 @@
         function formatearProductosParaCSV(productos) {
             if (!productos || productos.length === 0) return '';
             return productos.map(p => 
-                `${p.cantidad} x ${p.producto || ''} (${p.marca || ''}) @ S/${(p.precio_unitario || 0).toFixed(2)} = S/${(p.subtotal || 0).toFixed(2)}`
+                `${p.cantidad} x ${p.producto || ''} (${p.marca || ''}) @ S/${(p.precio_unitario || 0).toFixed(2)}`
             ).join('; ');
         }
 
-        function exportarPedidosXLS() {
+        function exportarPedidosExcel() {
             const pedidosAExportar = aplicarFiltrosPedidos();
             
             if (pedidosAExportar.length === 0) {
                 alert('No hay pedidos que coincidan con los filtros seleccionados para exportar.');
                 return;
             }
-            
-            const headers = ['Numero Pedido', 'Fecha', 'Cliente', 'Telefono', 'Email', 'Direccion', 'Estado', 'Total', 'Cantidad Items', 'Productos'];
-            const csvRows = [headers.join(',')];
 
-            for (const pedido of pedidosAExportar) {
-                const productosFormateados = formatearProductosParaCSV(pedido.productos);
-                const values = [
-                    pedido.numero_pedido || '',
-                    new Date(pedido.fecha_pedido).toLocaleString('es-PE'),
-                    `"${(pedido.nombre_cliente || '').replace(/"/g, '""')}"`,
-                    pedido.telefono_cliente,
-                    pedido.email_cliente || '',
-                    `"${(pedido.direccion || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
-                    estadoPedidoConfig[pedido.estado]?.nombre || pedido.estado,
-                    pedido.total,
-                    pedido.cantidad_items,
-                    `"${productosFormateados.replace(/"/g, '""')}"`
-                ];
-                csvRows.push(values.join(','));
-            }
+            const dataToExport = pedidosAExportar.map(pedido => ({
+                'Numero Pedido': pedido.numero_pedido || '',
+                'Fecha': new Date(pedido.fecha_pedido).toLocaleString('es-PE'),
+                'Cliente': pedido.nombre_cliente || '',
+                'Telefono': pedido.telefono_cliente,
+                'Email': pedido.email_cliente || '',
+                'Direccion': (pedido.direccion || '').replace(/\n/g, ' '),
+                'Estado': estadoPedidoConfig[pedido.estado]?.nombre || pedido.estado,
+                'Total': pedido.total,
+                'Cantidad Items': pedido.cantidad_items,
+                'Productos': formatearProductosParaCSV(pedido.productos)
+            }));
             
-            const csvContent = csvRows.join('\n');
-            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedidos');
+
+            // Auto-ajustar columnas (opcional pero recomendado)
+            const max_width = dataToExport.reduce((w, r) => Math.max(w, ...Object.values(r).map(val => String(val).length)), 10);
+            worksheet["!cols"] = Object.keys(dataToExport[0]).map(() => ({ wch: max_width }));
+
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-            const fileName = `Reporte_Pedidos_${startDate || 'inicio'}_a_${endDate || 'hoy'}.xls`;
+            const fileName = `Reporte_Pedidos_${startDate || 'inicio'}_a_${endDate || 'hoy'}.xlsx`;
 
-            link.setAttribute('download', fileName);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            XLSX.writeFile(workbook, fileName);
         }
         // --- END PEDIDOS ADMIN ---
 
@@ -2931,62 +2892,52 @@
             return url;
         }
 
-        function descargarPlantilla() {
-            const csvContent = `nombre,marca,categoria_id,descripcion,precio,icon,badge,imagen_url,activo
-iPhone 15 Pro,Apple,1,Smartphone premium con chip A17 Pro y cámara profesional,4599.00,📱,Nuevo,https://ejemplo.com/iphone15.jpg,true
-AirPods Pro,Apple,2,Auriculares con cancelación de ruido adaptativa,999.00,🎧,Popular,https://ejemplo.com/airpods.jpg,true`;
+        function descargarPlantillaExcel() {
+            const data = [{
+                nombre: "iPhone 15 Pro",
+                marca: "Apple",
+                categoria_id: 1,
+                descripcion: "Smartphone premium con chip A17 Pro y cámara profesional",
+                precio: 4599.00,
+                icon: "📱",
+                badge: "Nuevo",
+                imagen_url: "https://ejemplo.com/iphone15.jpg",
+                activo: true
+            }];
 
-            document.getElementById('plantillaCsvContent').value = csvContent;
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.getElementById('downloadPlantillaLink');
-            link.href = url;
-            link.download = 'plantilla_productos_red51.csv';
-            
-            document.getElementById('plantillaModal').style.display = 'block';
-        }
-
-        function cerrarPlantillaModal() {
-            document.getElementById('plantillaModal').style.display = 'none';
-        }
-
-        function copiarPlantilla() {
-            const content = document.getElementById('plantillaCsvContent').value;
-            navigator.clipboard.writeText(content).then(() => {
-                mostrarNotificacion('Contenido copiado al portapapeles');
-            }, (err) => {
-                alert('No se pudo copiar el texto: ' + err);
-                console.error('Error al copiar:', err);
-            });
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos');
+            XLSX.writeFile(workbook, 'plantilla_productos_red51.xlsx');
         }
 
         async function importarProductos(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
             const reader = new FileReader();
             reader.onload = async function(e) {
                 try {
-                    const text = e.target.result;
-                    const lines = text.split('\n').filter(line => line.trim() !== '');
-                    const headers = lines.shift().split(',').map(h => h.trim());
-                    
-                    const productosImportados = lines.map(line => {
-                        const values = line.split(',').map(v => v.trim());
-                        let producto = {};
-                        headers.forEach((header, i) => producto[header] = values[i]);
-                        return {
-                            ...producto,
-                            categoria_id: parseInt(producto.categoria_id),
-                            precio: parseFloat(producto.precio),
-                            activo: producto.activo?.toLowerCase() === 'true',
-                            icon: producto.icon || '📦',
-                        };
-                    }).filter(p => p.nombre && p.marca && p.categoria_id && p.precio);
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const productosImportadosRaw = XLSX.utils.sheet_to_json(worksheet);
+
+                    const productosImportados = productosImportadosRaw.map(producto => ({
+                        nombre: producto.nombre,
+                        marca: producto.marca,
+                        categoria_id: parseInt(producto.categoria_id),
+                        descripcion: producto.descripcion,
+                        precio: parseFloat(producto.precio),
+                        activo: String(producto.activo).toLowerCase() === 'true',
+                        icon: producto.icon || '📦',
+                        badge: producto.badge || null,
+                        imagen_url: producto.imagen_url || null
+                    })).filter(p => p.nombre && p.marca && !isNaN(p.categoria_id) && !isNaN(p.precio));
                     
                     if (productosImportados.length === 0) {
-                        alert('No se encontraron productos válidos en el archivo CSV');
+                        alert('No se encontraron productos válidos en el archivo Excel. Asegúrate que las columnas "nombre", "marca", "categoria_id" y "precio" estén completas.');
                         return;
                     }
                     
@@ -2996,20 +2947,21 @@ AirPods Pro,Apple,2,Auriculares con cancelación de ruido adaptativa,999.00,🎧
                     const { error } = await supabaseClient.from('productos').insert(productosImportados);
                     if (error) throw error;
                     
-                    alert(`${productosImportados.length} productos importados`);
+                    mostrarNotificacion(`${productosImportados.length} productos importados con éxito`);
                     cargarProductosAdmin();
                     cargarProductos();
                     
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.error('Error al importar productos:', error);
                     alert('Error al importar productos: ' + error.message);
                 } finally {
                     document.getElementById('loadingAdmin').style.display = 'none';
                     event.target.value = '';
                 }
             };
-            reader.readAsText(file);
+            reader.readAsArrayBuffer(file);
         }
+
 
         function mostrarNotificacion(mensaje) {
             const notif = document.createElement('div');
@@ -3041,7 +2993,7 @@ AirPods Pro,Apple,2,Auriculares con cancelación de ruido adaptativa,999.00,🎧
         }
 
         window.onclick = function(event) {
-            const modals = ['cartModal', 'productoModal', 'categoriaModal', 'orderDetailsModal', 'productDetailModal', 'plantillaModal'];
+            const modals = ['cartModal', 'productoModal', 'categoriaModal', 'orderDetailsModal', 'productDetailModal'];
             modals.forEach(id => {
                 const modalEl = document.getElementById(id);
                 if (event.target == modalEl) {
