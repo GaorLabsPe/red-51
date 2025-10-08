@@ -705,6 +705,10 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
         }
         
         .btn-secondary:hover {
@@ -1177,6 +1181,17 @@
             color: #666;
         }
 
+        #plantillaCsvContent {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: 'Courier New', Courier, monospace;
+            resize: vertical;
+            white-space: pre;
+        }
+
 
         @media (max-width: 768px) {
             .hero-section h1 {
@@ -1542,6 +1557,25 @@
             </div>
             <div class="modal-body" id="productDetailContent">
                 <!-- Contenido se carga dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <div id="plantillaModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>Plantilla CSV de Productos</h2>
+                <button class="close-btn" onclick="cerrarPlantillaModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1rem; color: #666;">Puedes copiar el siguiente texto y pegarlo en un archivo de texto (guardado como .csv), o usar los botones de abajo.</p>
+                <div class="form-group">
+                    <textarea id="plantillaCsvContent" readonly style="height: 200px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                     <button class="btn-secondary" onclick="copiarPlantilla()">Copiar al Portapapeles</button>
+                     <a id="downloadPlantillaLink" class="btn-primary" style="padding: 0.75rem 1.5rem; width: auto; text-transform: none;">Descargar Archivo</a>
+                </div>
             </div>
         </div>
     </div>
@@ -2744,7 +2778,7 @@
         }
 
         function generarThumbnail(publicId, format) {
-            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/c_thumb,g_face,q_auto,f_auto,w_200,h_200/${publicId}.${format}`;
+            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/c_thumb,g_face,q_auto,f_auto,w_200,h_200}/${publicId}.${format}`;
         }
 
         function optimizarImagenUrl(url, width = 600) {
@@ -2763,18 +2797,29 @@
 iPhone 15 Pro,Apple,1,Smartphone premium con chip A17 Pro y cámara profesional,4599.00,📱,Nuevo,https://ejemplo.com/iphone15.jpg,true
 AirPods Pro,Apple,2,Auriculares con cancelación de ruido adaptativa,999.00,🎧,Popular,https://ejemplo.com/airpods.jpg,true`;
 
+            document.getElementById('plantillaCsvContent').value = csvContent;
+            
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
+            const link = document.getElementById('downloadPlantillaLink');
+            link.href = url;
+            link.download = 'plantilla_productos_red51.csv';
             
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'plantilla_productos_red51.csv');
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            mostrarNotificacion('Plantilla CSV descargada.');
+            document.getElementById('plantillaModal').style.display = 'block';
+        }
+
+        function cerrarPlantillaModal() {
+            document.getElementById('plantillaModal').style.display = 'none';
+        }
+
+        function copiarPlantilla() {
+            const content = document.getElementById('plantillaCsvContent').value;
+            navigator.clipboard.writeText(content).then(() => {
+                mostrarNotificacion('Contenido copiado al portapapeles');
+            }, (err) => {
+                alert('No se pudo copiar el texto: ' + err);
+                console.error('Error al copiar:', err);
+            });
         }
 
         async function importarProductos(event) {
@@ -2857,10 +2902,11 @@ AirPods Pro,Apple,2,Auriculares con cancelación de ruido adaptativa,999.00,🎧
         }
 
         window.onclick = function(event) {
-            const modals = ['cartModal', 'productoModal', 'categoriaModal', 'orderDetailsModal', 'productDetailModal'];
+            const modals = ['cartModal', 'productoModal', 'categoriaModal', 'orderDetailsModal', 'productDetailModal', 'plantillaModal'];
             modals.forEach(id => {
-                if (event.target == document.getElementById(id)) {
-                    document.getElementById(id).style.display = 'none';
+                const modalEl = document.getElementById(id);
+                if (event.target == modalEl) {
+                    modalEl.style.display = 'none';
                 }
             });
         }
