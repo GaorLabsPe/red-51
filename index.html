@@ -1748,6 +1748,7 @@
         let currentOrderView = 'list';
         let currentOrderStatusFilter = 'todos';
         let isProcessing = false; // Flag to prevent double submission
+        let pedidosChannel = null; // Channel for realtime updates
         
         const estadoPedidoConfig = {
             'pendiente_pago': { nombre: 'Pendiente de Pago', clase: 'status-pendiente_pago' },
@@ -1807,9 +1808,14 @@
             cargarPedidosAdmin();
             cargarCategoriasAdmin();
             mostrarVistaAdmin('pedidos'); // Default to pedidos view
+            suscribirACambiosPedidos();
         }
 
         async function cerrarSesion() {
+            if (pedidosChannel) {
+                supabaseClient.removeChannel(pedidosChannel);
+                pedidosChannel = null;
+            }
             await supabaseClient.auth.signOut();
             usuarioActual = null;
             document.getElementById('loginSection').style.display = 'block';
@@ -2373,6 +2379,51 @@
                 document.getElementById('loadingAdminPedidos').style.display = 'none';
             }
         }
+
+        function suscribirACambiosPedidos() {
+            if (pedidosChannel || !supabaseClient) return;
+
+            pedidosChannel = supabaseClient.channel('pedidos-db-changes')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'pedidos' },
+                    (payload) => {
+                        console.log('Cambio en pedidos recibido:', payload);
+
+                        switch(payload.eventType) {
+                            case 'INSERT':
+                                pedidosAdmin.unshift(payload.new);
+                                mostrarNotificacion(`¡Nuevo pedido! #${(payload.new.numero_pedido || '').substring(0, 8)} de ${payload.new.nombre_cliente}`);
+                                break;
+                            case 'UPDATE':
+                                const index = pedidosAdmin.findIndex(p => p.id === payload.new.id);
+                                if (index !== -1) {
+                                    pedidosAdmin[index] = payload.new;
+                                    const oldStatus = estadoPedidoConfig[payload.old.estado]?.nombre || payload.old.estado;
+                                    const newStatus = estadoPedidoConfig[payload.new.estado]?.nombre || payload.new.estado;
+                                    if (oldStatus !== newStatus) {
+                                        mostrarNotificacion(`Pedido #${(payload.new.numero_pedido || '').substring(0, 8)}: ${oldStatus} → ${newStatus}`);
+                                    }
+                                }
+                                break;
+                             case 'DELETE':
+                                pedidosAdmin = pedidosAdmin.filter(p => p.id !== payload.old.id);
+                                mostrarNotificacion(`Pedido #${(payload.old.numero_pedido || '').substring(0, 8)} eliminado.`);
+                                break;
+                        }
+
+                        renderizarPedidosAdmin();
+                    }
+                )
+                .subscribe((status, err) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log('Conectado a las actualizaciones de pedidos en tiempo real.');
+                    }
+                    if (err) {
+                        console.error('Error en la suscripción a pedidos:', err);
+                    }
+                });
+        }
         
         function filtrarPedidosPorEstado(estado) {
             currentOrderStatusFilter = estado;
@@ -2570,24 +2621,20 @@
 
                 if (error) throw error;
                 
-                const pedidoIndex = pedidosAdmin.findIndex(p => p.id === pedidoId);
-                if(pedidoIndex !== -1) {
-                    pedidosAdmin[pedidoIndex].estado = nuevoEstado;
-                    renderizarPedidosAdmin(); // Re-render to reflect the change
-                    
-                    const orderDetailsModal = document.getElementById('orderDetailsModal');
-                    if (orderDetailsModal.style.display === 'block') {
-                        // If modal is open, refresh its content
-                        mostrarDetallesPedido(pedidoId);
-                    }
-                    
-                    mostrarNotificacion(`Pedido movido a "${estadoPedidoConfig[nuevoEstado].nombre}"`);
+                // The realtime update will handle the UI refresh. We can leave a notification here for user-initiated changes.
+                // Note: The realtime listener will also fire, potentially causing two notifications. 
+                // A more advanced implementation might add a flag to prevent this, but for now it's acceptable.
+                
+                const orderDetailsModal = document.getElementById('orderDetailsModal');
+                if (orderDetailsModal.style.display === 'block') {
+                    // If modal is open, refresh its content immediately
+                    mostrarDetallesPedido(pedidoId);
                 }
 
             } catch (error) {
                 console.error('Error al actualizar estado:', error);
                 alert('Error al actualizar el estado: ' + error.message);
-                cargarPedidosAdmin();
+                cargarPedidosAdmin(); // Fallback to full reload on error
             }
         }
 
@@ -3187,7 +3234,7 @@
             setTimeout(() => {
                 notif.style.transform = 'translateX(calc(100% + 20px))';
                 notif.addEventListener('transitionend', () => notif.remove());
-            }, 3000);
+            }, 4000);
         }
 
         window.onclick = function(event) {
