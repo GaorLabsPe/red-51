@@ -129,6 +129,17 @@
             justify-content: center;
             font-size: 0.75rem;
             font-weight: 700;
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .cart-count.pop {
+            animation: pop 0.3s ease-in-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
         }
         
         .hero {
@@ -208,6 +219,7 @@
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: all 0.3s;
+            cursor: pointer;
         }
         
         .product-card:hover {
@@ -231,6 +243,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
         }
         
         .product-badge {
@@ -247,6 +264,7 @@
         
         .product-info {
             padding: 1.5rem;
+            text-align: center;
         }
         
         .product-category {
@@ -267,39 +285,13 @@
         .product-brand {
             color: #666;
             font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .product-description {
-            color: #666;
-            font-size: 0.9rem;
             margin-bottom: 1rem;
-            line-height: 1.5;
         }
         
         .product-price {
             font-size: 1.8rem;
             font-weight: 800;
             color: var(--primary);
-            margin-bottom: 1rem;
-        }
-        
-        .add-to-cart-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--white);
-            padding: 1rem;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .add-to-cart-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(27, 154, 168, 0.3);
         }
         
         .modal {
@@ -312,6 +304,12 @@
             background: rgba(0,0,0,0.7);
             z-index: 1000;
             backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .modal-content {
@@ -321,6 +319,12 @@
             border-radius: 20px;
             max-height: 90vh;
             overflow-y: auto;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         
         .modal-header {
@@ -352,6 +356,93 @@
         .modal-body {
             padding: 2rem;
         }
+
+        .product-detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: flex-start;
+        }
+
+        .product-detail-image img {
+            width: 100%;
+            border-radius: 16px;
+            background: var(--light);
+            box-shadow: var(--shadow);
+        }
+
+        .product-detail-info .product-category {
+            text-align: left;
+        }
+
+        .product-detail-info .product-name {
+            font-size: 2rem;
+            text-align: left;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-detail-info .product-brand {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-detail-info .product-description {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-detail-info .product-price {
+            text-align: left;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .quantity-selector label {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .quantity-selector button, .quantity-selector input {
+            width: 48px;
+            height: 48px;
+            text-align: center;
+            border-radius: 8px;
+            border: 2px solid var(--light);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .quantity-selector button {
+            cursor: pointer;
+            background: var(--light);
+            transition: all 0.2s;
+        }
+        .quantity-selector button:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        .quantity-selector input {
+            -moz-appearance: textfield;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            padding: 0.5rem;
+        }
+        .quantity-selector input::-webkit-outer-spin-button,
+        .quantity-selector input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
         
         .cart-item {
             display: flex;
@@ -503,6 +594,7 @@
             font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s;
+            text-transform: uppercase;
         }
         
         .btn-primary:hover {
@@ -864,6 +956,10 @@
             .products-table {
                 font-size: 0.85rem;
             }
+
+            .product-detail-layout {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -1100,6 +1196,18 @@
         </div>
     </div>
 
+    <div id="productDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="productDetailTitle">Detalles del Producto</h2>
+                <button class="close-btn" onclick="cerrarDetalleProducto()">&times;</button>
+            </div>
+            <div class="modal-body" id="productDetailContent">
+                <!-- Contenido se carga dinamicamente -->
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="footer-logo">Red51 TECHNOLOGY</div>
         <p>2025 Red51 Technology. Todos los derechos reservados.</p>
@@ -1286,10 +1394,10 @@
             }
 
             grid.innerHTML = productosFiltrados.map(producto => `
-                <div class="product-card">
+                <div class="product-card" onclick="mostrarDetalleProducto(${producto.id})">
                     <div class="product-image">
                         ${producto.imagen_url 
-                            ? `<img src="${optimizarImagenUrl(producto.imagen_url)}" alt="${producto.nombre}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                            ? `<img src="${optimizarImagenUrl(producto.imagen_url)}" alt="${producto.nombre}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
                                <span style="display:none">${producto.icon || '📦'}</span>`
                             : `<span>${producto.icon || '📦'}</span>`
                         }
@@ -1299,11 +1407,7 @@
                         <div class="product-category">${getCategoriaName(producto.categoria)}</div>
                         <h3 class="product-name">${producto.nombre}</h3>
                         <div class="product-brand">${producto.marca}</div>
-                        <p class="product-description">${producto.descripcion}</p>
                         <div class="product-price">S/ ${parseFloat(producto.precio).toFixed(2)}</div>
-                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(${producto.id})">
-                            Agregar al Carrito
-                        </button>
                     </div>
                 </div>
             `).join('');
@@ -1321,14 +1425,79 @@
             return nombres[categoria] || categoria;
         }
 
-        function agregarAlCarrito(productoId) {
+        function mostrarDetalleProducto(productoId) {
             const producto = productos.find(p => p.id === productoId);
+            if (!producto) return;
+
+            const modalContent = document.getElementById('productDetailContent');
+            const modalTitle = document.getElementById('productDetailTitle');
+            
+            modalTitle.textContent = producto.nombre;
+
+            modalContent.innerHTML = `
+                <div class="product-detail-layout">
+                    <div class="product-detail-image">
+                        ${producto.imagen_url 
+                            ? `<img src="${optimizarImagenUrl(producto.imagen_url, 800)}" alt="${producto.nombre}">`
+                            : `<div class="product-image" style="height: 400px; border-radius: 16px;"><span>${producto.icon || '📦'}</span></div>`
+                        }
+                    </div>
+                    <div class="product-detail-info">
+                        <div class="product-category">${getCategoriaName(producto.categoria)}</div>
+                        <h3 class="product-name">${producto.nombre}</h3>
+                        <div class="product-brand">${producto.marca}</div>
+                        <p class="product-description">${producto.descripcion}</p>
+                        <div class="product-price">S/ ${parseFloat(producto.precio).toFixed(2)}</div>
+                        <div class="quantity-selector">
+                            <label for="quantityInput">Cantidad:</label>
+                            <button onclick="cambiarCantidadDetalle(-1)">-</button>
+                            <input type="number" id="quantityInput" value="1" min="1" oninput="validarCantidad()">
+                            <button onclick="cambiarCantidadDetalle(1)">+</button>
+                        </div>
+                        <button class="btn-primary" onclick="agregarAlCarritoDesdeDetalle(${producto.id})">
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('productDetailModal').style.display = 'block';
+        }
+
+        function cambiarCantidadDetalle(cambio) {
+            const input = document.getElementById('quantityInput');
+            let valor = parseInt(input.value) + cambio;
+            if (valor < 1) valor = 1;
+            input.value = valor;
+        }
+
+        function validarCantidad() {
+            const input = document.getElementById('quantityInput');
+            if (parseInt(input.value) < 1 || isNaN(parseInt(input.value))) {
+                input.value = 1;
+            }
+        }
+
+        function cerrarDetalleProducto() {
+            document.getElementById('productDetailModal').style.display = 'none';
+        }
+
+        function agregarAlCarritoDesdeDetalle(productoId) {
+            const cantidad = parseInt(document.getElementById('quantityInput').value);
+            agregarAlCarrito(productoId, cantidad);
+            cerrarDetalleProducto();
+        }
+
+        function agregarAlCarrito(productoId, cantidad = 1) {
+            const producto = productos.find(p => p.id === productoId);
+            if (!producto) return;
+
             const itemExistente = carrito.find(item => item.id === productoId);
             
             if (itemExistente) {
-                itemExistente.cantidad++;
+                itemExistente.cantidad += cantidad;
             } else {
-                carrito.push({ ...producto, cantidad: 1 });
+                carrito.push({ ...producto, cantidad: cantidad });
             }
             
             actualizarContadorCarrito();
@@ -1337,7 +1506,10 @@
 
         function actualizarContadorCarrito() {
             const total = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-            document.getElementById('cartCount').textContent = total;
+            const cartCountEl = document.getElementById('cartCount');
+            cartCountEl.textContent = total;
+            cartCountEl.classList.add('pop');
+            setTimeout(() => cartCountEl.classList.remove('pop'), 300);
         }
 
         function abrirCarrito() {
@@ -1452,20 +1624,6 @@
                 subtotal: parseFloat(item.precio) * item.cantidad
             }));
 
-            // --- Guardar en Supabase ---
-            // IMPORTANTE: Debes crear una tabla `pedidos` en tu Supabase.
-            // Ve a Table Editor -> Create a new table. Nómbrala 'pedidos'.
-            // Desactiva 'Row Level Security (RLS)' para esta tabla por ahora para que funcione.
-            // Columnas:
-            // - id (bigint, primary key, auto-increment)
-            // - created_at (timestamp with time zone, default now())
-            // - nombre_cliente (text)
-            // - telefono_cliente (text)
-            // - email_cliente (text, nullable)
-            // - direccion_cliente (text)
-            // - productos (jsonb)
-            // - total (numeric)
-            // - estado (text, default 'Pendiente')
             const pedidoDB = {
                 nombre_cliente: nombre,
                 telefono_cliente: telefono,
@@ -1486,7 +1644,6 @@
                     throw new Error('Error al guardar el pedido en la base de datos.');
                 }
                 
-                // --- Enviar a n8n (si Supabase tuvo éxito) ---
                 const pedidoN8N = {
                     ...pedidoDB,
                     fecha: new Date().toISOString()
@@ -1499,7 +1656,6 @@
                 });
                 
                 if (!response.ok) {
-                    // Aunque n8n falle, el pedido ya está en Supabase, así que no es un error crítico para el usuario.
                     console.warn('El pedido se guardó en la base de datos, pero falló el envío al webhook n8n.');
                 }
                 
@@ -1625,7 +1781,7 @@
             } catch (error) {
                 console.error('Error al actualizar estado:', error);
                 alert('Error al actualizar el estado: ' + error.message);
-                cargarPedidosAdmin(); // Recargar para revertir el cambio visual
+                cargarPedidosAdmin();
             }
         }
 
@@ -1900,11 +2056,12 @@
             return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/c_thumb,g_face,q_auto,f_auto,w_200,h_200/${publicId}.${format}`;
         }
 
-        function optimizarImagenUrl(url) {
+        function optimizarImagenUrl(url, width = 600) {
             if (url && url.includes('res.cloudinary.com') && !url.includes('/upload/c_')) {
                 const parts = url.split('/upload/');
                 if (parts.length === 2) {
-                    return parts[0] + '/upload/c_fill,g_auto,q_auto,f_auto,w_600,h_450/' + parts[1];
+                    const height = Math.round(width * 0.75);
+                    return `${parts[0]}/upload/c_fill,g_auto,q_auto,f_auto,w_${width},h_${height}/${parts[1]}`;
                 }
             }
             return url;
@@ -2016,9 +2173,19 @@ PlayStation 5,Sony,entretenimiento,Consola de videojuegos de última generación
                 box-shadow: var(--shadow);
                 z-index: 10000;
                 font-weight: 600;
+                transform: translateX(calc(100% + 20px));
+                transition: transform 0.4s ease-in-out;
             `;
             document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 3000);
+            
+            setTimeout(() => {
+                notif.style.transform = 'translateX(0)';
+            }, 10);
+
+            setTimeout(() => {
+                notif.style.transform = 'translateX(calc(100% + 20px))';
+                notif.addEventListener('transitionend', () => notif.remove());
+            }, 3000);
         }
 
         window.onclick = function(event) {
@@ -2030,6 +2197,9 @@ PlayStation 5,Sony,entretenimiento,Consola de videojuegos de última generación
             }
             if (event.target == document.getElementById('orderDetailsModal')) {
                 cerrarDetallesPedido();
+            }
+            if (event.target == document.getElementById('productDetailModal')) {
+                cerrarDetalleProducto();
             }
         }
 
