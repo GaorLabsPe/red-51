@@ -1104,6 +1104,11 @@
             border-radius: 12px;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.2s;
+        }
+
+        .kanban-column.drag-over {
+            background-color: #e0e7ff;
         }
 
         .kanban-column-header {
@@ -1129,7 +1134,7 @@
             padding: 1rem;
             margin-bottom: 0.75rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            cursor: pointer;
+            cursor: grab;
             transition: all 0.2s;
             border-left: 4px solid var(--secondary);
         }
@@ -1137,6 +1142,12 @@
         .kanban-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .kanban-card.dragging {
+            opacity: 0.5;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transform: scale(1.05);
         }
 
         .kanban-card-header {
@@ -2271,7 +2282,7 @@
             pedidos.forEach(pedido => {
                 if (columns[pedido.estado]) {
                     const cardHTML = `
-                        <div class="kanban-card" onclick="mostrarDetallesPedido('${pedido.id}')" title="Click para ver detalles">
+                        <div class="kanban-card" draggable="true" data-id="${pedido.id}" onclick="mostrarDetallesPedido('${pedido.id}')" title="Arrastra para cambiar estado. Click para ver detalles.">
                             <div class="kanban-card-header">
                                 <strong>${pedido.numero_pedido || `#${pedido.id.substring(0,6)}`}</strong>
                                 <span class="kanban-card-total">S/ ${parseFloat(pedido.total).toFixed(2)}</span>
@@ -2287,11 +2298,57 @@
                     countSpan.textContent = parseInt(countSpan.textContent) + 1;
                 }
             });
+
             if (pedidos.length === 0) {
                  kanbanBoard.innerHTML = '<div class="empty-cart"><p>No hay pedidos para este filtro.</p></div>';
+            } else {
+                configurarDragAndDrop();
             }
         }
 
+        function configurarDragAndDrop() {
+            const cards = document.querySelectorAll('.kanban-card');
+            const columns = document.querySelectorAll('.kanban-column');
+            
+            cards.forEach(card => {
+                card.addEventListener('dragstart', e => {
+                    card.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', card.dataset.id);
+                });
+
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
+            });
+
+            columns.forEach(column => {
+                column.addEventListener('dragover', e => {
+                    e.preventDefault();
+                });
+
+                column.addEventListener('dragenter', e => {
+                    e.preventDefault();
+                    column.classList.add('drag-over');
+                });
+
+                column.addEventListener('dragleave', () => {
+                    column.classList.remove('drag-over');
+                });
+
+                column.addEventListener('drop', async e => {
+                    e.preventDefault();
+                    column.classList.remove('drag-over');
+                    
+                    const pedidoId = e.dataTransfer.getData('text/plain');
+                    const nuevoEstado = column.dataset.estado;
+                    const pedido = pedidosAdmin.find(p => p.id === pedidoId);
+
+                    if (pedido && pedido.estado !== nuevoEstado) {
+                        await actualizarEstadoPedido(pedidoId, nuevoEstado);
+                    }
+                });
+            });
+        }
 
         function renderEstado(estado, pedidoId) {
             const config = estadoPedidoConfig[estado] || { nombre: estado, clase: '' };
@@ -2315,14 +2372,13 @@
                     .eq('id', pedidoId);
 
                 if (error) throw error;
-                mostrarNotificacion(`Estado del pedido actualizado a "${estadoPedidoConfig[nuevoEstado].nombre}"`);
                 
-                // Actualizar la data local y re-renderizar
                 const pedidoIndex = pedidosAdmin.findIndex(p => p.id === pedidoId);
-                if(pedidoIndex > -1) {
+                if(pedidoIndex !== -1) {
                     pedidosAdmin[pedidoIndex].estado = nuevoEstado;
+                    renderizarPedidosAdmin(); // Re-render to reflect the change
+                    mostrarNotificacion(`Pedido movido a "${estadoPedidoConfig[nuevoEstado].nombre}"`);
                 }
-                renderizarPedidosAdmin();
 
             } catch (error) {
                 console.error('Error al actualizar estado:', error);
