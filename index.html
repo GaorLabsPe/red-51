@@ -903,6 +903,10 @@
         .products-table tr:hover {
             background: var(--light);
         }
+
+        .products-table tr[onclick] {
+            cursor: pointer;
+        }
         
         .table-actions {
             display: flex;
@@ -1091,6 +1095,35 @@
             background: var(--white);
             color: var(--primary);
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .date-filter-container {
+            background-color: var(--light);
+            padding: 1rem;
+            border-radius: 12px;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .date-filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .date-filter-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .date-filter-group input {
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
         }
 
         .kanban-board-container {
@@ -1317,12 +1350,12 @@
                     </div>
 
                     <div class="admin-tabs">
-                        <button id="tabProductos" class="tab-btn active" onclick="mostrarVistaAdmin('productos')">Productos</button>
+                        <button id="tabPedidos" class="tab-btn active" onclick="mostrarVistaAdmin('pedidos')">Pedidos</button>
+                        <button id="tabProductos" class="tab-btn" onclick="mostrarVistaAdmin('productos')">Productos</button>
                         <button id="tabCategorias" class="tab-btn" onclick="mostrarVistaAdmin('categorias')">Categorías</button>
-                        <button id="tabPedidos" class="tab-btn" onclick="mostrarVistaAdmin('pedidos')">Pedidos</button>
                     </div>
 
-                    <div id="adminProductosView">
+                    <div id="adminProductosView" style="display:none;">
                         <div class="admin-actions" style="margin-bottom: 2rem;">
                             <button class="btn-export" onclick="descargarPlantilla()">📥 Descargar Plantilla CSV</button>
                             <button class="btn-import" onclick="document.getElementById('importFile').click()">📤 Importar CSV</button>
@@ -1370,7 +1403,19 @@
                          <div id="loadingAdminCategorias" class="loading" style="display:none;">Cargando categorías...</div>
                     </div>
 
-                    <div id="adminPedidosView" style="display:none;">
+                    <div id="adminPedidosView">
+                         <div class="date-filter-container">
+                            <div class="date-filter-group">
+                                <label for="startDate">Desde</label>
+                                <input type="date" id="startDate">
+                            </div>
+                            <div class="date-filter-group">
+                                <label for="endDate">Hasta</label>
+                                <input type="date" id="endDate">
+                            </div>
+                            <button class="btn-export" onclick="exportarPedidosXLS()">📊 Exportar a Excel</button>
+                        </div>
+
                         <div class="admin-view-controls">
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label for="orderStatusFilter" style="margin-bottom: 0.25rem; font-size: 0.9rem;">Filtrar por estado:</label>
@@ -1392,7 +1437,6 @@
                                             <th>Telefono</th>
                                             <th>Total</th>
                                             <th>Estado</th>
-                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody id="adminOrdersTable"></tbody>
@@ -1692,6 +1736,7 @@
             cargarProductosAdmin();
             cargarPedidosAdmin();
             cargarCategoriasAdmin();
+            mostrarVistaAdmin('pedidos'); // Default to pedidos view
         }
 
         async function cerrarSesion() {
@@ -2282,12 +2327,12 @@
         function renderizarPedidosLista(pedidos) {
             const tbody = document.getElementById('adminOrdersTable');
             if (!pedidos || pedidos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">No hay pedidos para este filtro.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">No hay pedidos para este filtro.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = pedidos.map(pedido => `
-                <tr>
+                <tr onclick="mostrarDetallesPedido('${pedido.id}')" style="cursor: pointer;">
                     <td>
                         <strong>${pedido.numero_pedido || `#${pedido.id.toString().substring(0,6)}`}</strong>
                         <br>
@@ -2297,9 +2342,6 @@
                     <td>${pedido.telefono_cliente}</td>
                     <td>S/ ${parseFloat(pedido.total).toFixed(2)}</td>
                     <td>${renderEstado(pedido.estado, pedido.id)}</td>
-                    <td class="table-actions">
-                        <button class="btn-secondary" onclick="mostrarDetallesPedido('${pedido.id}')">Ver Detalles</button>
-                    </td>
                 </tr>
             `).join('');
         }
@@ -2399,7 +2441,7 @@
             const config = estadoPedidoConfig[estado] || { nombre: estado, clase: '' };
             const estados = Object.keys(estadoPedidoConfig);
             return `
-                <select class="status-select ${config.clase}" onchange="actualizarEstadoPedido('${pedidoId}', this.value)">
+                <select class="status-select ${config.clase}" onchange="event.stopPropagation(); actualizarEstadoPedido('${pedidoId}', this.value)">
                     ${estados.map(key => `
                         <option value="${key}" ${key === estado ? 'selected' : ''}>
                             ${estadoPedidoConfig[key].nombre}
@@ -2422,6 +2464,13 @@
                 if(pedidoIndex !== -1) {
                     pedidosAdmin[pedidoIndex].estado = nuevoEstado;
                     renderizarPedidosAdmin(); // Re-render to reflect the change
+                    
+                    const orderDetailsModal = document.getElementById('orderDetailsModal');
+                    if (orderDetailsModal.style.display === 'block') {
+                        // If modal is open, refresh its content
+                        mostrarDetallesPedido(pedidoId);
+                    }
+                    
                     mostrarNotificacion(`Pedido movido a "${estadoPedidoConfig[nuevoEstado].nombre}"`);
                 }
 
@@ -2459,7 +2508,10 @@
                             <h4>Resumen del Pedido</h4>
                             <p><strong>Nº Pedido:</strong> ${data.numero_pedido || 'N/A'}</p>
                             <p><strong>Fecha:</strong> ${new Date(data.fecha_pedido).toLocaleString()}</p>
-                            <p><strong>Estado:</strong> ${estadoPedidoConfig[data.estado]?.nombre || data.estado}</p>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <strong>Estado:</strong> 
+                                ${renderEstado(data.estado, data.id)}
+                            </div>
                             <p><strong>Total Items:</strong> ${data.cantidad_items || 'N/A'}</p>
                             <p><strong>Total:</strong> <strong style="font-size: 1.2rem; color: var(--primary);">S/ ${parseFloat(data.total).toFixed(2)}</strong></p>
                         </div>
@@ -2499,6 +2551,61 @@
 
         function cerrarDetallesPedido() {
             document.getElementById('orderDetailsModal').style.display = 'none';
+        }
+
+        function exportarPedidosXLS() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            let pedidosFiltrados = pedidosAdmin;
+
+            if (startDate) {
+                const start = new Date(startDate);
+                start.setHours(0, 0, 0, 0);
+                pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.fecha_pedido) >= start);
+            }
+
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+                pedidosFiltrados = pedidosFiltrados.filter(p => new Date(p.fecha_pedido) <= end);
+            }
+
+            if (pedidosFiltrados.length === 0) {
+                alert('No hay pedidos en el rango de fechas seleccionado.');
+                return;
+            }
+            
+            const headers = ['Numero Pedido', 'Fecha', 'Cliente', 'Telefono', 'Email', 'Direccion', 'Estado', 'Total', 'Cantidad Items', 'Productos'];
+            const csvRows = [headers.join(',')];
+
+            for (const pedido of pedidosFiltrados) {
+                const values = [
+                    pedido.numero_pedido || '',
+                    new Date(pedido.fecha_pedido).toLocaleString('es-PE'),
+                    `"${pedido.nombre_cliente.replace(/"/g, '""')}"`,
+                    pedido.telefono_cliente,
+                    pedido.email_cliente || '',
+                    `"${(pedido.direccion || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+                    estadoPedidoConfig[pedido.estado]?.nombre || pedido.estado,
+                    pedido.total,
+                    pedido.cantidad_items,
+                    `"${JSON.stringify(pedido.productos).replace(/"/g, '""')}"`
+                ];
+                csvRows.push(values.join(','));
+            }
+            
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            const fileName = `Reporte_Pedidos_${startDate || 'inicio'}_a_${endDate || 'fin'}.xls`;
+            link.setAttribute('download', fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
         // --- END PEDIDOS ADMIN ---
 
