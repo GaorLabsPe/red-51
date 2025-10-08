@@ -1343,7 +1343,7 @@
             if (!select) return;
 
             select.innerHTML = categorias.map(cat =>
-                `<option value="${cat.slug}">${cat.nombre}</option>`
+                `<option value="${cat.id}">${cat.nombre}</option>`
             ).join('');
         }
 
@@ -1360,7 +1360,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('productos')
-                    .select('*')
+                    .select('*, categorias(id, nombre, slug)')
                     .eq('activo', true)
                     .order('nombre');
 
@@ -1412,7 +1412,7 @@
             const grid = document.getElementById('productsGrid');
             const productosFiltrados = categoriaActual === 'todos' 
                 ? productos 
-                : productos.filter(p => p.categoria === categoriaActual);
+                : productos.filter(p => p.categorias && p.categorias.slug === categoriaActual);
             
             if (productosFiltrados.length === 0) {
                 grid.innerHTML = '<div class="empty-cart"><p>No hay productos en esta categoria.</p></div>';
@@ -1430,19 +1430,13 @@
                         ${producto.badge ? `<span class="product-badge">${producto.badge}</span>` : ''}
                     </div>
                     <div class="product-info">
-                        <div class="product-category">${getCategoriaName(producto.categoria)}</div>
+                        <div class="product-category">${producto.categorias ? producto.categorias.nombre : 'Sin Categoria'}</div>
                         <h3 class="product-name">${producto.nombre}</h3>
                         <div class="product-brand">${producto.marca}</div>
                         <div class="product-price">S/ ${parseFloat(producto.precio).toFixed(2)}</div>
                     </div>
                 </div>
             `).join('');
-        }
-
-        function getCategoriaName(slug) {
-            if (slug === 'todos') return 'Todos';
-            const categoria = categorias.find(cat => cat.slug === slug);
-            return categoria ? categoria.nombre : slug;
         }
 
         function mostrarDetalleProducto(productoId) {
@@ -1463,7 +1457,7 @@
                         }
                     </div>
                     <div class="product-detail-info">
-                        <div class="product-category">${getCategoriaName(producto.categoria)}</div>
+                        <div class="product-category">${producto.categorias ? producto.categorias.nombre : 'Sin Categoria'}</div>
                         <h3 class="product-name">${producto.nombre}</h3>
                         <div class="product-brand">${producto.marca}</div>
                         <p class="product-description">${producto.descripcion}</p>
@@ -1707,7 +1701,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('productos')
-                    .select('*')
+                    .select('*, categorias(id, nombre, slug)')
                     .order('nombre');
 
                 if (error) throw error;
@@ -1724,7 +1718,7 @@
                         <td style="font-size: 1.5rem;">${producto.icon || '📦'}</td>
                         <td>${producto.nombre}</td>
                         <td>${producto.marca}</td>
-                        <td>${getCategoriaName(producto.categoria)}</td>
+                        <td>${producto.categorias ? producto.categorias.nombre : 'Sin Categoria'}</td>
                         <td>S/ ${parseFloat(producto.precio).toFixed(2)}</td>
                         <td>${producto.activo ? 'Activo' : 'Inactivo'}</td>
                         <td class="table-actions">
@@ -1907,7 +1901,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('productos')
-                    .select('*')
+                    .select('*, categorias(*)')
                     .eq('id', id)
                     .single();
 
@@ -1917,7 +1911,7 @@
                 document.getElementById('productoId').value = data.id;
                 document.getElementById('productoNombre').value = data.nombre;
                 document.getElementById('productoMarca').value = data.marca;
-                document.getElementById('productoCategoria').value = data.categoria;
+                document.getElementById('productoCategoria').value = data.categorias ? data.categorias.id : '';
                 document.getElementById('productoDescripcion').value = data.descripcion;
                 document.getElementById('productoPrecio').value = data.precio;
                 document.getElementById('productoIcon').value = data.icon || '';
@@ -1940,7 +1934,7 @@
             const producto = {
                 nombre: document.getElementById('productoNombre').value,
                 marca: document.getElementById('productoMarca').value,
-                categoria: document.getElementById('productoCategoria').value,
+                categoria_id: parseInt(document.getElementById('productoCategoria').value),
                 descripcion: document.getElementById('productoDescripcion').value,
                 precio: parseFloat(document.getElementById('productoPrecio').value),
                 icon: document.getElementById('productoIcon').value || '📦',
@@ -1950,29 +1944,31 @@
             };
 
             try {
+                let query;
                 if (id) {
-                    const { error } = await supabaseClient
+                    query = supabaseClient
                         .from('productos')
                         .update(producto)
                         .eq('id', id);
-                    
-                    if (error) throw error;
-                    alert('Producto actualizado exitosamente');
                 } else {
-                    const { error } = await supabaseClient
+                    // Remove id field for insertion if it exists
+                    delete producto.id;
+                    query = supabaseClient
                         .from('productos')
                         .insert([producto]);
-                    
-                    if (error) throw error;
-                    alert('Producto creado exitosamente');
                 }
+
+                const { error } = await query;
+                if (error) throw error;
+
+                alert(id ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente');
 
                 cerrarModalProducto();
                 cargarProductosAdmin();
                 cargarProductos();
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al guardar producto:', error);
                 alert('Error al guardar producto: ' + error.message);
             }
         }
@@ -2106,12 +2102,12 @@
         }
 
         function descargarPlantilla() {
-            const csvContent = `nombre,marca,categoria,descripcion,precio,icon,badge,imagen_url,activo
-iPhone 15 Pro,Apple,moviles,Smartphone premium con chip A17 Pro y cámara profesional,4599.00,📱,Nuevo,https://ejemplo.com/iphone15.jpg,true
-AirPods Pro,Apple,audio,Auriculares con cancelación de ruido adaptativa,999.00,🎧,Popular,https://ejemplo.com/airpods.jpg,true
-Echo Dot,Amazon,hogar,Altavoz inteligente con Alexa,199.00,🏠,,https://ejemplo.com/echo.jpg,true
-MacBook Pro M3,Apple,computacion,Laptop profesional con chip M3 y pantalla Retina,7999.00,💻,Nuevo,https://ejemplo.com/macbook.jpg,true
-PlayStation 5,Sony,entretenimiento,Consola de videojuegos de última generación,2499.00,🎮,Oferta,https://ejemplo.com/ps5.jpg,true`;
+            const csvContent = `nombre,marca,categoria_id,descripcion,precio,icon,badge,imagen_url,activo
+iPhone 15 Pro,Apple,1,Smartphone premium con chip A17 Pro y cámara profesional,4599.00,📱,Nuevo,https://ejemplo.com/iphone15.jpg,true
+AirPods Pro,Apple,2,Auriculares con cancelación de ruido adaptativa,999.00,🎧,Popular,https://ejemplo.com/airpods.jpg,true
+Echo Dot,Amazon,3,Altavoz inteligente con Alexa,199.00,🏠,,https://ejemplo.com/echo.jpg,true
+MacBook Pro M3,Apple,4,Laptop profesional con chip M3 y pantalla Retina,7999.00,💻,Nuevo,https://ejemplo.com/macbook.jpg,true
+PlayStation 5,Sony,5,Consola de videojuegos de última generación,2499.00,🎮,Oferta,https://ejemplo.com/ps5.jpg,true`;
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -2150,7 +2146,7 @@ PlayStation 5,Sony,entretenimiento,Consola de videojuegos de última generación
                         const producto = {
                             nombre: values[0],
                             marca: values[1],
-                            categoria: values[2],
+                            categoria_id: parseInt(values[2]),
                             descripcion: values[3],
                             precio: parseFloat(values[4]),
                             icon: values[5] || '📦',
@@ -2159,7 +2155,7 @@ PlayStation 5,Sony,entretenimiento,Consola de videojuegos de última generación
                             activo: values[8]?.toLowerCase() === 'true'
                         };
                         
-                        if (producto.nombre && producto.marca && producto.categoria && producto.precio) {
+                        if (producto.nombre && producto.marca && producto.categoria_id && producto.precio) {
                             productosImportados.push(producto);
                         }
                     }
