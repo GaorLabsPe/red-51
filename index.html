@@ -1588,8 +1588,11 @@
                     </div>
 
                     <div id="adminClientesView" style="display:none;">
-                        <h3>Listado de Clientes</h3>
-                        <p style="color: #666; margin-bottom: 1.5rem;">Aquí se agrupan los clientes por su número de teléfono.</p>
+                        <div class="admin-header" style="margin-bottom: 1rem;">
+                            <h3>Listado de Clientes</h3>
+                            <button class="btn-export" onclick="exportarClientesExcel()">📊 Exportar a Excel</button>
+                        </div>
+                        <p style="color: #666; margin-bottom: 1.5rem;">Aquí se agrupan los clientes por su número de teléfono. Haz clic en el nombre para ver su historial de pedidos.</p>
                         <div style="overflow-x: auto;">
                             <table class="products-table">
                                 <thead>
@@ -1792,6 +1795,16 @@
         </div>
     </div>
 
+    <div id="clientHistoryModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="clientHistoryTitle">Historial del Cliente</h2>
+                <button class="close-btn" onclick="cerrarHistorialCliente()">&times;</button>
+            </div>
+            <div class="modal-body" id="clientHistoryContent"></div>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-column">
@@ -1851,6 +1864,7 @@
         let isProcessing = false; // Flag to prevent double submission
         let pedidosChannel = null; // Channel for realtime updates
         let salesChartInstance = null;
+        let clientesMap = new Map();
         
         const estadoPedidoConfig = {
             'pendiente_pago': { nombre: 'Pendiente de Pago', clase: 'status-pendiente_pago' },
@@ -2993,7 +3007,7 @@
                 return;
             }
 
-            const clientesMap = new Map();
+            clientesMap.clear();
 
             pedidosAdmin.forEach(pedido => {
                 const idCliente = pedido.telefono_cliente;
@@ -3011,12 +3025,13 @@
                 }
 
                 const cliente = clientesMap.get(idCliente);
-                cliente.pedidos++;
-                cliente.gastoTotal += pedido.total;
+                if (pedido.estado !== 'cancelado') {
+                    cliente.pedidos++;
+                    cliente.gastoTotal += pedido.total;
+                }
                 const fechaPedido = new Date(pedido.fecha_pedido);
                 if (fechaPedido > cliente.ultimoPedido) {
                     cliente.ultimoPedido = fechaPedido;
-                    // Update name and email with the latest one, in case it changes
                     cliente.nombre = pedido.nombre_cliente;
                     cliente.email = pedido.email_cliente;
                 }
@@ -3027,16 +3042,121 @@
 
             tbody.innerHTML = clientesArray.map(cliente => `
                 <tr>
-                    <td>${cliente.nombre}</td>
+                    <td style="cursor: pointer; color: var(--primary); font-weight: 600; text-decoration: underline;" onclick="mostrarHistorialCliente('${cliente.telefono}')">${cliente.nombre}</td>
                     <td>${cliente.telefono}</td>
                     <td>${cliente.email || 'N/A'}</td>
                     <td>${cliente.pedidos}</td>
                     <td>S/ ${cliente.gastoTotal.toFixed(2)}</td>
-                    <td>${cliente.ultimoPedido.toLocaleDateString('es-PE')}</td>
+                    <td>${cliente.ultimoPedido > new Date(0) ? cliente.ultimoPedido.toLocaleDateString('es-PE') : 'N/A'}</td>
                 </tr>
             `).join('');
             
             document.getElementById('loadingAdminClients').style.display = 'none';
+        }
+        
+        function mostrarHistorialCliente(telefonoCliente) {
+            const cliente = clientesMap.get(telefonoCliente);
+            const pedidosCliente = pedidosAdmin
+                .filter(p => p.telefono_cliente === telefonoCliente)
+                .sort((a, b) => new Date(b.fecha_pedido) - new Date(a.fecha_pedido));
+
+            if (!cliente) {
+                alert('No se pudo encontrar la información del cliente.');
+                return;
+            }
+
+            const modalTitle = document.getElementById('clientHistoryTitle');
+            const modalContent = document.getElementById('clientHistoryContent');
+            const modal = document.getElementById('clientHistoryModal');
+
+            modalTitle.textContent = `Historial de ${cliente.nombre}`;
+            
+            modalContent.innerHTML = `
+                <div class="kpi-grid" style="margin-bottom: 2rem; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                    <div class="kpi-card">
+                        <div class="kpi-card-title">Gasto Total</div>
+                        <div class="kpi-card-value">S/ ${cliente.gastoTotal.toFixed(2)}</div>
+                    </div>
+                    <div class="kpi-card" style="border-left-color: var(--secondary);">
+                        <div class="kpi-card-title">Pedidos Realizados</div>
+                        <div class="kpi-card-value">${cliente.pedidos}</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-card-title">Última Compra</div>
+                        <div class="kpi-card-value" style="font-size: 1.5rem;">${cliente.ultimoPedido > new Date(0) ? cliente.ultimoPedido.toLocaleDateString('es-PE') : 'N/A'}</div>
+                    </div>
+                </div>
+                
+                <h4>Historial de Pedidos</h4>
+                <div style="overflow-x: auto;">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>Nº Pedido</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${pedidosCliente.map(pedido => `
+                                <tr onclick="mostrarDetallesPedido('${pedido.id}')" style="cursor:pointer;">
+                                    <td><strong>${pedido.numero_pedido || `#${pedido.id.substring(0,6)}`}</strong></td>
+                                    <td>${new Date(pedido.fecha_pedido).toLocaleString('es-PE')}</td>
+                                    <td>S/ ${pedido.total.toFixed(2)}</td>
+                                    <td>
+                                        <span class="status-select ${estadoPedidoConfig[pedido.estado]?.clase || ''}" style="padding: 0.25rem 0.5rem; display: inline-block;">
+                                            ${estadoPedidoConfig[pedido.estado]?.nombre || pedido.estado}
+                                        </span>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function cerrarHistorialCliente() {
+            document.getElementById('clientHistoryModal').style.display = 'none';
+        }
+
+        function exportarClientesExcel() {
+            const clientesArray = Array.from(clientesMap.values());
+            
+            if (clientesArray.length === 0) {
+                alert('No hay clientes para exportar.');
+                return;
+            }
+
+            const dataToExport = clientesArray.map(c => ({
+                'Nombre Cliente': c.nombre,
+                'Teléfono': c.telefono,
+                'Email': c.email || 'N/A',
+                'Nº Pedidos': c.pedidos,
+                'Gasto Total': c.gastoTotal,
+                'Último Pedido': c.ultimoPedido > new Date(0) ? c.ultimoPedido.toLocaleDateString('es-PE') : 'N/A'
+            }));
+            
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Clientes');
+
+            const objectMaxLength = [];
+            dataToExport.forEach(obj => {
+                Object.keys(obj).forEach((key, i) => {
+                    const value = obj[key] === null ? '' : obj[key];
+                    const len = String(value).length;
+                    if (objectMaxLength[i] === undefined || objectMaxLength[i] < len) {
+                        objectMaxLength[i] = len;
+                    }
+                });
+            });
+            worksheet["!cols"] = objectMaxLength.map(w => ({ width: Math.max(w, 18) }));
+
+            XLSX.writeFile(workbook, 'Reporte_Clientes.xlsx', { bookType: 'xlsx', type: 'binary' });
         }
         // --- END CLIENTES ---
 
@@ -3516,7 +3636,7 @@
         }
 
         window.onclick = function(event) {
-            const modals = ['cartModal', 'productoModal', 'categoriaModal', 'orderDetailsModal', 'productDetailModal', 'importPreviewModal'];
+            const modals = ['cartModal', 'productoModal', 'categoriaModal', 'orderDetailsModal', 'productDetailModal', 'importPreviewModal', 'clientHistoryModal'];
             modals.forEach(id => {
                 const modalEl = document.getElementById(id);
                 if (event.target == modalEl) {
