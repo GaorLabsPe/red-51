@@ -830,11 +830,23 @@
         .status-select {
             padding: 0.5rem;
             border-radius: 6px;
-            border: 1px solid #ccc;
+            border: 2px solid #ccc;
             background: #fff;
             font-weight: 600;
             font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
         }
+        .status-select:focus {
+            outline-color: var(--primary);
+        }
+
+        .status-pendiente_pago { background-color: #fffbeb; border-color: #f59e0b; color: #b45309; }
+        .status-pago_confirmado { background-color: #f0fdf4; border-color: #22c55e; color: #15803d; }
+        .status-en_preparacion { background-color: #eff6ff; border-color: #3b82f6; color: #1d4ed8; }
+        .status-enviado { background-color: #f5f3ff; border-color: #8b5cf6; color: #5b21b6; }
+        .status-entregado { background-color: #ecfdf5; border-color: #10b981; color: #047857; }
+        .status-cancelado { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
         
         .loading {
             text-align: center;
@@ -848,12 +860,6 @@
             text-align: center;
             padding: 2.5rem 2rem;
             margin-top: 4rem;
-        }
-        
-        .footer-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
         }
         
         .login-section {
@@ -901,7 +907,7 @@
 
         .order-details-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -1079,7 +1085,7 @@
                             <table class="products-table">
                                 <thead>
                                     <tr>
-                                        <th>Fecha</th>
+                                        <th>Nº Pedido / Fecha</th>
                                         <th>Cliente</th>
                                         <th>Telefono</th>
                                         <th>Total</th>
@@ -1226,6 +1232,15 @@
         let categoriaActual = 'todos';
         let productos = [];
         let usuarioActual = null;
+        
+        const estadoPedidoConfig = {
+            'pendiente_pago': { nombre: 'Pendiente de Pago', clase: 'status-pendiente_pago' },
+            'pago_confirmado': { nombre: 'Pago Confirmado', clase: 'status-pago_confirmado' },
+            'en_preparacion': { nombre: 'En Preparacion', clase: 'status-en_preparacion' },
+            'enviado': { nombre: 'Enviado', clase: 'status-enviado' },
+            'entregado': { nombre: 'Entregado', clase: 'status-entregado' },
+            'cancelado': { nombre: 'Cancelado', clase: 'status-cancelado' }
+        };
 
         function inicializarSupabase() {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1615,6 +1630,7 @@
             const direccion = document.getElementById('direccionCliente').value;
             
             const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            const cantidadItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
             
             const productosPedido = carrito.map(item => ({
                 producto: item.nombre,
@@ -1628,10 +1644,11 @@
                 nombre_cliente: nombre,
                 telefono_cliente: telefono,
                 email_cliente: email || null,
-                direccion_cliente: direccion,
+                direccion: direccion,
                 productos: productosPedido,
                 total: parseFloat(total),
-                estado: 'Pendiente'
+                cantidad_items: cantidadItems,
+                estado: 'pendiente_pago'
             };
 
             try {
@@ -1646,7 +1663,7 @@
                 
                 const pedidoN8N = {
                     ...pedidoDB,
-                    fecha: new Date().toISOString()
+                    fecha_pedido: new Date().toISOString()
                 };
 
                 const response = await fetch(N8N_WEBHOOK_URL, {
@@ -1729,7 +1746,7 @@
                 const { data, error } = await supabaseClient
                     .from('pedidos')
                     .select('*')
-                    .order('created_at', { ascending: false });
+                    .order('fecha_pedido', { ascending: false });
 
                 if (error) throw error;
 
@@ -1741,13 +1758,17 @@
 
                 tbody.innerHTML = data.map(pedido => `
                     <tr>
-                        <td>${new Date(pedido.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <strong>${pedido.numero_pedido || `#${pedido.id.toString().substring(0,6)}`}</strong>
+                            <br>
+                            <small>${new Date(pedido.fecha_pedido).toLocaleDateString()}</small>
+                        </td>
                         <td>${pedido.nombre_cliente}</td>
                         <td>${pedido.telefono_cliente}</td>
                         <td>S/ ${parseFloat(pedido.total).toFixed(2)}</td>
                         <td>${renderEstado(pedido.estado, pedido.id)}</td>
                         <td class="table-actions">
-                            <button class="btn-secondary" onclick="mostrarDetallesPedido(${pedido.id})">Ver Detalles</button>
+                            <button class="btn-secondary" onclick="mostrarDetallesPedido('${pedido.id}')">Ver Detalles</button>
                         </td>
                     </tr>
                 `).join('');
@@ -1761,10 +1782,15 @@
         }
 
         function renderEstado(estado, pedidoId) {
-            const estados = ['Pendiente', 'En Proceso', 'Completado', 'Cancelado'];
+            const config = estadoPedidoConfig[estado] || { nombre: estado, clase: '' };
+            const estados = Object.keys(estadoPedidoConfig);
             return `
-                <select class="status-select" onchange="actualizarEstadoPedido(${pedidoId}, this.value)">
-                    ${estados.map(e => `<option value="${e}" ${e === estado ? 'selected' : ''}>${e}</option>`).join('')}
+                <select class="status-select ${config.clase}" onchange="actualizarEstadoPedido('${pedidoId}', this.value)">
+                    ${estados.map(key => `
+                        <option value="${key}" ${key === estado ? 'selected' : ''}>
+                            ${estadoPedidoConfig[key].nombre}
+                        </option>
+                    `).join('')}
                 </select>
             `;
         }
@@ -1777,7 +1803,12 @@
                     .eq('id', pedidoId);
 
                 if (error) throw error;
-                mostrarNotificacion(`Estado del pedido #${pedidoId} actualizado a "${nuevoEstado}"`);
+                mostrarNotificacion(`Estado del pedido actualizado a "${estadoPedidoConfig[nuevoEstado].nombre}"`);
+                // Optimistically update UI
+                const select = document.querySelector(`select[onchange="actualizarEstadoPedido('${pedidoId}', this.value)"]`);
+                if (select) {
+                    select.className = `status-select ${estadoPedidoConfig[nuevoEstado].clase}`;
+                }
             } catch (error) {
                 console.error('Error al actualizar estado:', error);
                 alert('Error al actualizar el estado: ' + error.message);
@@ -1797,7 +1828,7 @@
 
                 const modal = document.getElementById('orderDetailsModal');
                 const content = document.getElementById('orderDetailsContent');
-                document.getElementById('orderDetailsTitle').textContent = `Detalles del Pedido #${data.id}`;
+                document.getElementById('orderDetailsTitle').textContent = `Detalles del Pedido ${data.numero_pedido || '#' + data.id.substring(0,6)}`;
 
                 content.innerHTML = `
                     <div class="order-details-grid">
@@ -1806,12 +1837,14 @@
                             <p><strong>Nombre:</strong> ${data.nombre_cliente}</p>
                             <p><strong>Teléfono:</strong> ${data.telefono_cliente}</p>
                             <p><strong>Email:</strong> ${data.email_cliente || 'No provisto'}</p>
-                            <p><strong>Dirección:</strong> ${data.direccion_cliente}</p>
+                            <p><strong>Dirección:</strong> ${data.direccion}</p>
                         </div>
                         <div class="order-details-card">
                             <h4>Resumen del Pedido</h4>
-                            <p><strong>Fecha:</strong> ${new Date(data.created_at).toLocaleString()}</p>
-                            <p><strong>Estado:</strong> ${data.estado}</p>
+                            <p><strong>Nº Pedido:</strong> ${data.numero_pedido || 'N/A'}</p>
+                            <p><strong>Fecha:</strong> ${new Date(data.fecha_pedido).toLocaleString()}</p>
+                            <p><strong>Estado:</strong> ${estadoPedidoConfig[data.estado]?.nombre || data.estado}</p>
+                            <p><strong>Total Items:</strong> ${data.cantidad_items || 'N/A'}</p>
                             <p><strong>Total:</strong> <strong style="font-size: 1.2rem; color: var(--primary);">S/ ${parseFloat(data.total).toFixed(2)}</strong></p>
                         </div>
                     </div>
@@ -1827,7 +1860,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${data.productos.map(p => `
+                            ${(data.productos || []).map(p => `
                                 <tr>
                                     <td>${p.producto}</td>
                                     <td>${p.marca}</td>
