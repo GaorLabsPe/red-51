@@ -1157,7 +1157,7 @@
 
         .kanban-board-container {
             display: flex;
-            gap: 1.5rem;
+            gap: 1rem;
             overflow-x: auto;
             padding: 1rem 0.5rem;
             min-height: 60vh;
@@ -1165,7 +1165,7 @@
 
         .kanban-column {
             flex-shrink: 0;
-            width: 320px;
+            width: 280px;
             background: var(--light);
             border-radius: 12px;
             display: flex;
@@ -1178,7 +1178,7 @@
         }
 
         .kanban-column-header {
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             border-bottom: 3px solid;
             border-radius: 12px 12px 0 0;
         }
@@ -1186,10 +1186,11 @@
         .kanban-column-header h3 {
             font-size: 1.1rem;
             margin: 0;
+            white-space: nowrap;
         }
 
         .kanban-cards {
-            padding: 0.75rem;
+            padding: 0.5rem;
             flex-grow: 1;
             overflow-y: auto;
         }
@@ -1197,8 +1198,8 @@
         .kanban-card {
             background: var(--white);
             border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.07);
             cursor: grab;
             transition: all 0.2s;
@@ -1224,14 +1225,17 @@
         }
         .kanban-card-header strong {
             color: var(--primary);
+            font-size: 0.9rem;
         }
 
         .kanban-card-total {
             font-weight: 700;
+            font-size: 0.9rem;
         }
 
         .kanban-card-cliente {
             font-weight: 500;
+            font-size: 0.9rem;
             margin-bottom: 0.25rem;
             white-space: nowrap;
             overflow: hidden;
@@ -1239,7 +1243,7 @@
         }
 
         .kanban-card-fecha {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #666;
         }
         
@@ -1347,6 +1351,41 @@
             padding: 0.5rem 1.5rem;
             border-radius: 8px;
             border: 1px solid #ccc;
+        }
+        
+        .variants-container {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .variant-row {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr auto;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .variant-row input {
+            padding: 0.75rem;
+        }
+
+        .btn-remove-variant {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            line-height: 1;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+        }
+        .btn-remove-variant:hover {
+            background-color: #fee2e2;
         }
 
         @media (max-width: 768px) {
@@ -1734,9 +1773,12 @@
                         <div class="form-hint">Si usas variantes, este campo se calculará automáticamente como la suma del stock de todas las variantes.</div>
                     </div>
                     <div class="form-group">
-                        <label>Variantes (JSON) - Opcional</label>
-                        <textarea id="productoVariantes" rows="6" placeholder='[{"nombre": "Rojo, Talla S", "precio": 99.90, "stock": 10}, {"nombre": "Azul, Talla S", "precio": 99.90, "stock": 15}]'></textarea>
-                        <div class="form-hint">Si usas variantes, el precio y stock de cada variante anularán los valores base.</div>
+                        <label>Variantes (Opcional)</label>
+                        <div class="variants-container">
+                            <div id="variantesList"></div>
+                            <button type="button" class="btn-secondary" onclick="agregarFilaVariante()" style="margin-top: 1rem;">+ Agregar Variante</button>
+                        </div>
+                        <div class="form-hint">Añade opciones como Talla o Color, cada una con su propio precio y stock.</div>
                     </div>
                     <div class="form-group">
                         <label>Imagen del Producto</label>
@@ -1944,9 +1986,9 @@
         let clientesMap = new Map();
         
         const estadoPedidoConfig = {
-            'pendiente_pago': { nombre: 'Pendiente de Pago', clase: 'status-pendiente_pago' },
-            'pago_confirmado': { nombre: 'Pago Confirmado', clase: 'status-pago_confirmado' },
-            'en_preparacion': { nombre: 'En Preparacion', clase: 'status-en_preparacion' },
+            'pendiente_pago': { nombre: 'Pendiente Pago', clase: 'status-pendiente_pago' },
+            'pago_confirmado': { nombre: 'Confirmado', clase: 'status-pago_confirmado' },
+            'en_preparacion': { nombre: 'En Preparación', clase: 'status-en_preparacion' },
             'enviado': { nombre: 'Enviado', clase: 'status-enviado' },
             'entregado': { nombre: 'Entregado', clase: 'status-entregado' },
             'cancelado': { nombre: 'Cancelado', clase: 'status-cancelado' }
@@ -3395,12 +3437,53 @@
             document.getElementById('productoId').value = '';
             document.getElementById('productoActivo').checked = true;
             document.getElementById('imagePreview').innerHTML = '<span class="image-preview-text">🖼️</span>';
+            renderizarVariantesUI([]); // Limpiar la UI de variantes
             document.getElementById('productoModal').style.display = 'block';
         }
 
         function cerrarModalProducto() {
             document.getElementById('productoModal').style.display = 'none';
         }
+        
+        function agregarFilaVariante(variante = { nombre: '', precio: '', stock: '' }) {
+            const list = document.getElementById('variantesList');
+            const div = document.createElement('div');
+            div.className = 'variant-row';
+            div.innerHTML = `
+                <input type="text" class="variant-nombre" placeholder="Ej: Rojo, Talla M" value="${variante.nombre}" required>
+                <input type="number" class="variant-precio" placeholder="Precio" step="0.01" min="0" value="${variante.precio}" required>
+                <input type="number" class="variant-stock" placeholder="Stock" step="1" min="0" value="${variante.stock}" required oninput="actualizarStockTotalDesdeVariantes()">
+                <button type="button" class="btn-remove-variant" onclick="this.parentElement.remove(); actualizarStockTotalDesdeVariantes();">&times;</button>
+            `;
+            list.appendChild(div);
+            actualizarStockTotalDesdeVariantes();
+        }
+        
+        function renderizarVariantesUI(variantes = []) {
+            const list = document.getElementById('variantesList');
+            list.innerHTML = '';
+            if (Array.isArray(variantes)) {
+                variantes.forEach(v => agregarFilaVariante(v));
+            }
+             actualizarStockTotalDesdeVariantes();
+        }
+
+        function actualizarStockTotalDesdeVariantes() {
+            const stockInput = document.getElementById('productoStock');
+            const variantRows = document.querySelectorAll('#variantesList .variant-row');
+            
+            if (variantRows.length > 0) {
+                let totalStock = 0;
+                document.querySelectorAll('.variant-stock').forEach(input => {
+                    totalStock += parseInt(input.value) || 0;
+                });
+                stockInput.value = totalStock;
+                stockInput.disabled = true;
+            } else {
+                stockInput.disabled = false;
+            }
+        }
+
 
         async function editarProducto(id) {
             try {
@@ -3418,11 +3501,7 @@
                 document.getElementById('productoBadge').value = data.badge || '';
                 document.getElementById('productoActivo').checked = data.activo;
                 document.getElementById('productoImagen').value = data.imagen_url || '';
-                if (data.variantes && Array.isArray(data.variantes)) {
-                    document.getElementById('productoVariantes').value = JSON.stringify(data.variantes, null, 2);
-                } else {
-                    document.getElementById('productoVariantes').value = '';
-                }
+                renderizarVariantesUI(data.variantes || []);
                 previewImagen('imagePreview', data.imagen_url);
                 document.getElementById('productoModal').style.display = 'block';
             } catch (error) {
@@ -3433,23 +3512,27 @@
 
         async function guardarProducto(event) {
             event.preventDefault();
-
-            const variantesRaw = document.getElementById('productoVariantes').value;
+            
+            const variantRows = document.querySelectorAll('#variantesList .variant-row');
             let variantes = null;
             let totalStockFromVariants = 0;
 
-            if (variantesRaw.trim()) {
-                try {
-                    variantes = JSON.parse(variantesRaw);
-                    if (!Array.isArray(variantes)) throw new Error("JSON debe ser un array.");
-                    variantes.forEach(v => {
-                        if (typeof v.nombre !== 'string' || typeof v.precio !== 'number' || typeof v.stock !== 'number') {
-                            throw new Error("Cada variante debe tener 'nombre' (texto), 'precio' (número) y 'stock' (número).");
-                        }
-                        totalStockFromVariants += v.stock;
-                    });
-                } catch (e) {
-                    alert("Error en el formato JSON de las variantes: " + e.message);
+            if (variantRows.length > 0) {
+                variantes = [];
+                let valid = true;
+                variantRows.forEach(row => {
+                    const nombre = row.querySelector('.variant-nombre').value;
+                    const precio = parseFloat(row.querySelector('.variant-precio').value);
+                    const stock = parseInt(row.querySelector('.variant-stock').value);
+
+                    if (!nombre || isNaN(precio) || isNaN(stock)) {
+                        valid = false;
+                    }
+                    variantes.push({ nombre, precio, stock });
+                    totalStockFromVariants += stock;
+                });
+                if (!valid) {
+                    alert("Todos los campos de las variantes (nombre, precio, stock) son obligatorios.");
                     return;
                 }
             }
