@@ -1315,6 +1315,17 @@
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             margin-top: 2rem;
+            max-height: 350px;
+            position: relative;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
         }
 
         .stock-indicator {
@@ -1353,50 +1364,56 @@
             border: 1px solid #ccc;
         }
         
-        .variants-container {
-            background: #f8fafc;
-            padding: 1rem;
+        /* New Variants UI Styles */
+        .variants-manager {
+             background: #f8fafc;
+            padding: 1.5rem;
             border-radius: 8px;
             border: 1px solid var(--border-color);
         }
-        
-        .variant-header {
-            display: grid;
-            grid-template-columns: 3fr 1.2fr 1.2fr auto;
-            gap: 0.75rem;
+        .option-block {
+            background: var(--white);
+            border: 1px solid #d1d5db;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 0.5rem;
-            padding-right: 48px;
-            font-weight: 600;
-            color: var(--primary);
+        }
+        .option-values-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .option-value-tag {
+            background: var(--light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .option-value-tag button {
+            background: none; border: none; cursor: pointer; color: var(--danger); font-size: 1.1rem; line-height: 1;
+        }
+        
+        #generatedVariantsContainer {
+            margin-top: 1rem;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        #generatedVariantsContainer table {
             font-size: 0.9rem;
         }
-
-        .variant-row {
-            display: grid;
-            grid-template-columns: 3fr 1.2fr 1.2fr auto;
-            gap: 0.75rem;
-            align-items: center;
-            margin-bottom: 0.75rem;
-        }
-        
-        .variant-row input {
-            padding: 0.75rem;
-        }
-
-        .btn-remove-variant {
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 1.5rem;
+        #generatedVariantsContainer table input {
             padding: 0.5rem;
-            line-height: 1;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-        }
-        .btn-remove-variant:hover {
-            background-color: #fee2e2;
         }
 
         @media (max-width: 768px) {
@@ -1564,10 +1581,7 @@
                                 <div class="kpi-card-value" id="kpiTicketPromedio">S/ 0.00</div>
                             </div>
                         </div>
-                        <div class="chart-container">
-                            <canvas id="salesChart"></canvas>
-                        </div>
-                        <div class="kpi-grid" style="margin-top: 2rem;">
+                        <div class="kpi-grid">
                             <div class="kpi-card">
                                 <h3 class="kpi-card-title">🏆 Top 5 Productos Vendidos</h3>
                                 <ol id="topProductsWidget" style="padding-left: 1.5rem; font-size: 0.95rem;"></ol>
@@ -1576,6 +1590,15 @@
                                 <h3 class="kpi-card-title">⭐ Top 5 Clientes</h3>
                                 <ol id="topClientsWidget" style="padding-left: 1.5rem; font-size: 0.95rem;"></ol>
                             </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <div class="view-switcher" id="chartTypeSwitcher">
+                                    <button class="view-btn active" data-type="line">Líneas</button>
+                                    <button class="view-btn" data-type="bar">Barras</button>
+                                </div>
+                            </div>
+                            <canvas id="salesChart"></canvas>
                         </div>
                     </div>
 
@@ -1781,20 +1804,17 @@
                      <div class="form-group">
                         <label>Stock Base (Inventario)</label>
                         <input type="number" id="productoStock" step="1" min="0" required placeholder="Cantidad disponible">
-                        <div class="form-hint">Si usas variantes, este campo se calculará automáticamente como la suma del stock de todas las variantes.</div>
+                        <div class="form-hint">Si usas variantes, este campo se calculará automáticamente.</div>
                     </div>
                     <div class="form-group">
                         <label>Variantes (Opcional)</label>
-                        <div class="variants-container">
-                            <div class="variant-header">
-                                <label>Nombre Variante</label>
-                                <label>Precio (S/)</label>
-                                <label>Stock</label>
-                            </div>
-                            <div id="variantesList"></div>
-                            <button type="button" class="btn-secondary" onclick="agregarFilaVariante()" style="margin-top: 1rem;">+ Agregar Variante</button>
+                        <div class="variants-manager">
+                            <div id="productOptionsContainer"></div>
+                            <button type="button" class="btn-secondary" onclick="addOptionUI()" style="margin-top: 1rem;">+ Añadir Opción</button>
+                            <button type="button" class="btn-import" onclick="generateVariantsTable()" style="margin-left: 0.5rem;">Generar Variantes</button>
+                            <div id="generatedVariantsContainer"></div>
                         </div>
-                        <div class="form-hint">Añade opciones como Talla o Color, cada una con su propio precio y stock.</div>
+                        <div class="form-hint">Define opciones (ej. Color, Talla) y sus valores, luego genera las combinaciones.</div>
                     </div>
                     <div class="form-group">
                         <label>Imagen del Producto</label>
@@ -1999,6 +2019,7 @@
         let isProcessing = false; // Flag to prevent double submission
         let pedidosChannel = null; // Channel for realtime updates
         let salesChartInstance = null;
+        let currentChartType = 'line';
         let clientesMap = new Map();
         
         const estadoPedidoConfig = {
@@ -2239,10 +2260,10 @@
 
             grid.innerHTML = productosFiltrados.map(producto => {
                 const isOutOfStock = !producto.stock || producto.stock <= 0;
-                const hasVariants = Array.isArray(producto.variantes) && producto.variantes.length > 0;
+                const hasVariants = producto.variantes && producto.variantes.variants && producto.variantes.variants.length > 0;
                 let priceDisplay = `S/ ${parseFloat(producto.precio).toFixed(2)}`;
                 if (hasVariants) {
-                    const minPrice = Math.min(...producto.variantes.map(v => v.precio));
+                    const minPrice = Math.min(...producto.variantes.variants.map(v => v.precio));
                     priceDisplay = `Desde S/ ${parseFloat(minPrice).toFixed(2)}`;
                 }
                 
@@ -2276,7 +2297,7 @@
         
         function quickAdd(productoId) {
             const producto = productos.find(p => p.id === productoId);
-            const hasVariants = Array.isArray(producto.variantes) && producto.variantes.length > 0;
+            const hasVariants = producto.variantes && producto.variantes.variants && producto.variantes.variants.length > 0;
             if (hasVariants) {
                 mostrarDetalleProducto(productoId);
             } else {
@@ -2292,9 +2313,21 @@
             const modalTitle = document.getElementById('productDetailTitle');
             const stockDisponible = producto.stock || 0;
             const isOutOfStock = stockDisponible <= 0;
-            const hasVariants = Array.isArray(producto.variantes) && producto.variantes.length > 0;
+            const hasVariants = producto.variantes && producto.variantes.options && producto.variantes.options.length > 0;
             
             modalTitle.textContent = producto.nombre;
+
+            let variantSelectorsHTML = '';
+            if(hasVariants) {
+                variantSelectorsHTML = producto.variantes.options.map(option => `
+                    <div class="form-group">
+                        <label for="variantSelector_${option.name}">${option.name}:</label>
+                        <select id="variantSelector_${option.name}" class="form-group variant-selector" onchange="actualizarDetalleVariante(${producto.id})">
+                            ${option.values.map(value => `<option value="${value}">${value}</option>`).join('')}
+                        </select>
+                    </div>
+                `).join('');
+            }
 
             modalContent.innerHTML = `
                 <div class="product-detail-layout">
@@ -2315,12 +2348,7 @@
                             <div class="out-of-stock-badge" style="width: 100%; text-align: center; margin: 2rem 0; font-size: 1rem;">Producto Agotado</div>
                             <button class="btn-primary" disabled>Agregar al Carrito</button>
                         ` : ( hasVariants ? `
-                            <div class="form-group">
-                                <label for="variantSelector">Elige una opción:</label>
-                                <select id="variantSelector" class="form-group" onchange="actualizarDetalleVariante(${producto.id})">
-                                    ${producto.variantes.map((v, index) => `<option value="${index}">${v.nombre}</option>`).join('')}
-                                </select>
-                            </div>
+                            ${variantSelectorsHTML}
                             <p class="form-hint" id="variantStockDisplay" style="margin-top: -1rem; margin-bottom: 1.5rem;"></p>
                             <button id="detailAddToCartBtn" class="btn-primary" onclick="agregarAlCarritoDesdeDetalle(${producto.id})">
                                 Agregar al Carrito
@@ -2350,11 +2378,17 @@
 
         function actualizarDetalleVariante(productoId) {
             const producto = productos.find(p => p.id === productoId);
-            if (!producto || !Array.isArray(producto.variantes)) return;
+            if (!producto || !producto.variantes) return;
 
-            const selector = document.getElementById('variantSelector');
-            const selectedVariantIndex = selector.value;
-            const variant = producto.variantes[selectedVariantIndex];
+            const selectedAttributes = {};
+            producto.variantes.options.forEach(option => {
+                const selector = document.getElementById(`variantSelector_${option.name}`);
+                selectedAttributes[option.name] = selector.value;
+            });
+            
+            const variant = producto.variantes.variants.find(v => {
+                return Object.keys(selectedAttributes).every(key => v.attributes[key] === selectedAttributes[key]);
+            });
 
             const priceEl = document.getElementById('detailPrice');
             const stockEl = document.getElementById('variantStockDisplay');
@@ -2371,6 +2405,11 @@
                     addToCartBtn.disabled = true;
                     addToCartBtn.textContent = 'Agotado';
                 }
+            } else {
+                 priceEl.textContent = `S/ --.--`;
+                 stockEl.textContent = 'Combinación no disponible';
+                 addToCartBtn.disabled = true;
+                 addToCartBtn.textContent = 'No Disponible';
             }
         }
 
@@ -2398,11 +2437,15 @@
 
         function agregarAlCarritoDesdeDetalle(productoId) {
             const producto = productos.find(p => p.id === productoId);
-            const hasVariants = Array.isArray(producto.variantes) && producto.variantes.length > 0;
+            const hasVariants = producto.variantes && producto.variantes.options && producto.variantes.options.length > 0;
             
             if (hasVariants) {
-                const variantIndex = document.getElementById('variantSelector').value;
-                agregarAlCarrito(productoId, 1, variantIndex);
+                const selectedAttributes = {};
+                producto.variantes.options.forEach(option => {
+                    const selector = document.getElementById(`variantSelector_${option.name}`);
+                    selectedAttributes[option.name] = selector.value;
+                });
+                agregarAlCarrito(productoId, 1, selectedAttributes);
             } else {
                 const cantidad = parseInt(document.getElementById('quantityInput').value);
                 agregarAlCarrito(productoId, cantidad);
@@ -2410,16 +2453,31 @@
             cerrarDetalleProducto();
         }
 
-        function agregarAlCarrito(productoId, cantidad = 1, variantIndex = null) {
+        function agregarAlCarrito(productoId, cantidad = 1, attributes = null) {
             const producto = productos.find(p => p.id === productoId);
             if (!producto) return;
 
-            const selectedVariant = variantIndex !== null ? producto.variantes[variantIndex] : null;
+            let selectedVariant = null;
+            let cartItemId = `${producto.id}`;
+            let nameToUse = producto.nombre;
+            let priceToUse = producto.precio;
+            let stockToCheck = producto.stock;
 
-            const stockToCheck = selectedVariant ? selectedVariant.stock : producto.stock;
-            const priceToUse = selectedVariant ? selectedVariant.precio : producto.precio;
-            const cartItemId = selectedVariant ? `${producto.id}-${variantIndex}` : `${producto.id}`;
-            const nameToUse = selectedVariant ? `${producto.nombre} (${selectedVariant.nombre})` : producto.nombre;
+            if (attributes) {
+                selectedVariant = producto.variantes.variants.find(v => 
+                    Object.keys(attributes).every(key => v.attributes[key] === attributes[key])
+                );
+
+                if (!selectedVariant) {
+                    mostrarNotificacion('Esta combinación de producto no está disponible.', 'error');
+                    return;
+                }
+                
+                cartItemId = `${producto.id}-${Object.values(attributes).join('-')}`;
+                nameToUse = `${producto.nombre} (${Object.values(attributes).join(', ')})`;
+                priceToUse = selectedVariant.precio;
+                stockToCheck = selectedVariant.stock;
+            }
 
             if (stockToCheck <= 0) {
                 mostrarNotificacion('Este producto o variante está agotado.', 'error');
@@ -2444,8 +2502,7 @@
                     precio: priceToUse,
                     nombre: nameToUse,
                     stock: stockToCheck,
-                    selectedVariant: selectedVariant,
-                    variantIndex: variantIndex
+                    selectedVariant: selectedVariant
                 };
                 carrito.push(itemToAdd);
             }
@@ -2591,7 +2648,9 @@
 
                     if (productInDB) {
                         if (item.selectedVariant) {
-                            const variantInDB = productInDB.variantes.find(v => v.nombre === item.selectedVariant.nombre);
+                            const variantInDB = productInDB.variantes.variants.find(v => 
+                                JSON.stringify(v.attributes) === JSON.stringify(item.selectedVariant.attributes)
+                            );
                             currentStock = variantInDB ? variantInDB.stock : 0;
                         } else {
                             currentStock = productInDB.stock;
@@ -2635,7 +2694,7 @@
                     cantidad: item.cantidad,
                     precio_unitario: parseFloat(item.precio),
                     subtotal: parseFloat(item.precio) * item.cantidad,
-                    variante: item.selectedVariant ? item.selectedVariant.nombre : null
+                    variante: item.selectedVariant ? item.selectedVariant.attributes : null
                 }));
 
                 const uniqueId = Math.random().toString(36).substring(2, 7).toUpperCase();
@@ -2668,11 +2727,15 @@
                     if (!productInDB) return;
 
                     if (item.selectedVariant) {
-                        const newVariants = productInDB.variantes.map(v => 
-                            v.nombre === item.selectedVariant.nombre ? { ...v, stock: v.stock - item.cantidad } : v
+                        const newVariantsData = { ...productInDB.variantes };
+                        const variantIndex = newVariantsData.variants.findIndex(v => 
+                            JSON.stringify(v.attributes) === JSON.stringify(item.selectedVariant.attributes)
                         );
-                        const newTotalStock = newVariants.reduce((sum, v) => sum + v.stock, 0);
-                        return supabaseClient.from('productos').update({ variantes: newVariants, stock: newTotalStock }).eq('id', item.id);
+                        if (variantIndex !== -1) {
+                            newVariantsData.variants[variantIndex].stock -= item.cantidad;
+                        }
+                        const newTotalStock = newVariantsData.variants.reduce((sum, v) => sum + v.stock, 0);
+                        return supabaseClient.from('productos').update({ variantes: newVariantsData, stock: newTotalStock }).eq('id', item.id);
                     } else {
                         const newStock = productInDB.stock - item.cantidad;
                         return supabaseClient.from('productos').update({ stock: newStock }).eq('id', item.id);
@@ -3156,7 +3219,7 @@
                         <tbody>
                             ${(data.productos || []).map(p => `
                                 <tr>
-                                    <td>${p.producto} ${p.variante ? `(${p.variante})` : ''}</td>
+                                    <td>${p.producto} ${p.variante ? `(${Object.values(p.variante).join(', ')})` : ''}</td>
                                     <td>${p.marca}</td>
                                     <td>${p.cantidad}</td>
                                     <td>S/ ${parseFloat(p.precio_unitario).toFixed(2)}</td>
@@ -3182,7 +3245,7 @@
         function formatearProductosParaCSV(productos) {
             if (!productos || productos.length === 0) return '';
             return productos.map(p => 
-                `${p.cantidad} x ${p.producto || ''} ${p.variante ? `(${p.variante})` : ''} @ S/${(p.precio_unitario || 0).toFixed(2)}`
+                `${p.cantidad} x ${p.producto || ''} ${p.variante ? `(${Object.values(p.variante).join('/')})` : ''} @ S/${(p.precio_unitario || 0).toFixed(2)}`
             ).join('; ');
         }
 
@@ -3247,7 +3310,7 @@
 
         function renderizarDashboard() {
             if (!pedidosAdmin || pedidosAdmin.length === 0) {
-                initOrUpdateChart([], []);
+                initOrUpdateChart([], [], currentChartType);
                 return;
             }
             const pedidosFiltrados = aplicarFiltrosPedidos('dashboard');
@@ -3279,16 +3342,18 @@
             const sortedDates = Object.keys(ventasPorDia).sort((a, b) => new Date(a) - new Date(b));
             const chartLabels = sortedDates.map(date => new Date(date).toLocaleDateString('es-PE', {day: 'numeric', month: 'short'}));
             const chartData = sortedDates.map(date => ventasPorDia[date]);
-            initOrUpdateChart(chartLabels, chartData);
+            initOrUpdateChart(chartLabels, chartData, currentChartType);
 
             // Calculate Top Products
             const productSales = {};
             pedidosFiltrados.forEach(pedido => {
                 if (pedido.estado !== 'cancelado' && Array.isArray(pedido.productos)) {
                     pedido.productos.forEach(p => {
-                        const productName = p.producto;
-                        if (!productSales[productName]) { productSales[productName] = 0; }
-                        productSales[productName] += p.cantidad;
+                        if (p && p.producto) { // Fix for undefined product names
+                            const productName = p.producto.split(' (')[0]; // Get base product name
+                            if (!productSales[productName]) { productSales[productName] = 0; }
+                            productSales[productName] += p.cantidad;
+                        }
                     });
                 }
             });
@@ -3301,7 +3366,7 @@
             // Calculate Top Clients
             const clientSpending = {};
             pedidosFiltrados.forEach(pedido => {
-                if (pedido.estado !== 'cancelado') {
+                if (pedido.estado !== 'cancelado' && pedido.nombre_cliente) {
                     const clientName = pedido.nombre_cliente;
                     if (!clientSpending[clientName]) { clientSpending[clientName] = 0; }
                     clientSpending[clientName] += pedido.total;
@@ -3314,33 +3379,39 @@
                 : '<li>No hay datos de clientes.</li>';
         }
 
-        function initOrUpdateChart(labels, data) {
+        function initOrUpdateChart(labels, data, type = 'line') {
             const ctx = document.getElementById('salesChart').getContext('2d');
             if (salesChartInstance) {
-                salesChartInstance.data.labels = labels;
-                salesChartInstance.data.datasets[0].data = data;
-                salesChartInstance.update();
-            } else {
-                salesChartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Ingresos por Día',
-                            data: data,
-                            borderColor: 'rgba(123, 92, 126, 1)',
-                            backgroundColor: 'rgba(123, 92, 126, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true, ticks: { callback: (value) => 'S/ ' + value } } }
-                    }
-                });
+                if (salesChartInstance.config.type !== type) {
+                    salesChartInstance.destroy();
+                    salesChartInstance = null;
+                } else {
+                    salesChartInstance.data.labels = labels;
+                    salesChartInstance.data.datasets[0].data = data;
+                    salesChartInstance.update();
+                    return;
+                }
             }
+             salesChartInstance = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Ingresos por Día',
+                        data: data,
+                        borderColor: 'rgba(123, 92, 126, 1)',
+                        backgroundColor: 'rgba(123, 92, 126, 0.2)',
+                        fill: type === 'line',
+                        tension: 0.3,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { callback: (value) => 'S/ ' + value } } }
+                }
+            });
         }
         
         function renderizarClientes() {
@@ -3453,7 +3524,7 @@
             document.getElementById('productoId').value = '';
             document.getElementById('productoActivo').checked = true;
             document.getElementById('imagePreview').innerHTML = '<span class="image-preview-text">🖼️</span>';
-            renderizarVariantesUI([]); // Limpiar la UI de variantes
+            renderizarOpcionesUI();
             document.getElementById('productoModal').style.display = 'block';
         }
 
@@ -3461,32 +3532,122 @@
             document.getElementById('productoModal').style.display = 'none';
         }
         
-        function agregarFilaVariante(variante = { nombre: '', precio: '', stock: '' }) {
-            const list = document.getElementById('variantesList');
+        function renderizarOpcionesUI(options = []) {
+            const container = document.getElementById('productOptionsContainer');
+            container.innerHTML = '';
+            options.forEach(option => addOptionUI(option));
+            document.getElementById('generatedVariantsContainer').innerHTML = '';
+        }
+
+        function addOptionUI(option = { name: '', values: [] }) {
+            const container = document.getElementById('productOptionsContainer');
+            const optionId = `option-${Date.now()}`;
             const div = document.createElement('div');
-            div.className = 'variant-row';
+            div.className = 'option-block';
+            div.id = optionId;
             div.innerHTML = `
-                <input type="text" class="variant-nombre" placeholder="Ej: Rojo, Talla M" value="${variante.nombre}" required>
-                <input type="number" class="variant-precio" placeholder="Precio" step="0.01" min="0" value="${variante.precio}" required>
-                <input type="number" class="variant-stock" placeholder="Stock" step="1" min="0" value="${variante.stock}" required oninput="actualizarStockTotalDesdeVariantes()">
-                <button type="button" class="btn-remove-variant" onclick="this.parentElement.remove(); actualizarStockTotalDesdeVariantes();">&times;</button>
+                <div class="option-header">
+                    <input type="text" class="option-name" placeholder="Nombre de la opción (ej. Color)" value="${option.name}" style="flex-grow: 1; padding: 0.5rem;">
+                    <button type="button" class="btn-danger" onclick="document.getElementById('${optionId}').remove()">Eliminar Opción</button>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" class="option-value-input" placeholder="Añadir valor (ej. Rojo)" style="flex-grow: 1; padding: 0.5rem;">
+                    <button type="button" class="btn-secondary" onclick="addOptionValue('${optionId}')">Añadir</button>
+                </div>
+                <div class="option-values-container">
+                    ${option.values.map(val => `
+                        <span class="option-value-tag" data-value="${val}">
+                            ${val}
+                            <button onclick="this.parentElement.remove()">&times;</button>
+                        </span>
+                    `).join('')}
+                </div>
             `;
-            list.appendChild(div);
-            actualizarStockTotalDesdeVariantes();
+            container.appendChild(div);
+        }
+
+        function addOptionValue(optionId) {
+            const optionBlock = document.getElementById(optionId);
+            const input = optionBlock.querySelector('.option-value-input');
+            const value = input.value.trim();
+            if (!value) return;
+
+            const container = optionBlock.querySelector('.option-values-container');
+            const tag = document.createElement('span');
+            tag.className = 'option-value-tag';
+            tag.dataset.value = value;
+            tag.innerHTML = `${value} <button onclick="this.parentElement.remove()">&times;</button>`;
+            container.appendChild(tag);
+            input.value = '';
+        }
+
+        function generateVariantsTable() {
+            const options = readOptionsFromUI();
+            if (options.length === 0) {
+                document.getElementById('generatedVariantsContainer').innerHTML = '';
+                return;
+            }
+
+            const combinations = options.reduce((acc, option) => {
+                if (acc.length === 0) return option.values.map(v => ({ [option.name]: v }));
+                return acc.flatMap(combo => option.values.map(v => ({ ...combo, [option.name]: v })));
+            }, []);
+
+            if(combinations.length === 0) {
+                document.getElementById('generatedVariantsContainer').innerHTML = '<p class="form-hint" style="color: var(--danger)">Añade valores a las opciones para generar variantes.</p>';
+                return;
+            }
+
+            const container = document.getElementById('generatedVariantsContainer');
+            const tableHeaders = options.map(opt => `<th>${opt.name}</th>`).join('');
+            const tableRows = combinations.map(combo => {
+                const rowAttrs = Object.entries(combo).map(([key, value]) => `<td data-attr-${key}="${value}">${value}</td>`).join('');
+                return `
+                    <tr>
+                        ${rowAttrs}
+                        <td><input type="number" class="variant-precio" placeholder="Precio" step="0.01" min="0" required></td>
+                        <td><input type="number" class="variant-stock" placeholder="Stock" step="1" min="0" required oninput="actualizarStockTotalDesdeVariantes()"></td>
+                    </tr>`;
+            }).join('');
+
+            container.innerHTML = `
+                <table class="products-table">
+                    <thead> <tr> ${tableHeaders} <th>Precio (S/)</th> <th>Stock</th> </tr> </thead>
+                    <tbody id="variantsTbody">${tableRows}</tbody>
+                </table>`;
         }
         
-        function renderizarVariantesUI(variantes = []) {
-            const list = document.getElementById('variantesList');
-            list.innerHTML = '';
-            if (Array.isArray(variantes)) {
-                variantes.forEach(v => agregarFilaVariante(v));
-            }
-             actualizarStockTotalDesdeVariantes();
+        function readOptionsFromUI() {
+            const options = [];
+            document.querySelectorAll('.option-block').forEach(block => {
+                const name = block.querySelector('.option-name').value.trim();
+                const values = Array.from(block.querySelectorAll('.option-value-tag')).map(tag => tag.dataset.value);
+                if (name && values.length > 0) {
+                    options.push({ name, values });
+                }
+            });
+            return options;
+        }
+
+        function readGeneratedVariantsFromUI() {
+             const variants = [];
+             const options = readOptionsFromUI();
+             document.querySelectorAll('#variantsTbody tr').forEach(row => {
+                const attributes = {};
+                options.forEach(opt => {
+                    const cell = row.querySelector(`[data-attr-${opt.name}]`);
+                    if (cell) attributes[opt.name] = cell.dataset[`attr${opt.name}`];
+                });
+                const precio = parseFloat(row.querySelector('.variant-precio').value);
+                const stock = parseInt(row.querySelector('.variant-stock').value);
+                variants.push({ attributes, precio, stock });
+             });
+             return variants;
         }
 
         function actualizarStockTotalDesdeVariantes() {
             const stockInput = document.getElementById('productoStock');
-            const variantRows = document.querySelectorAll('#variantesList .variant-row');
+            const variantRows = document.querySelectorAll('#variantsTbody tr');
             
             if (variantRows.length > 0) {
                 let totalStock = 0;
@@ -3499,7 +3660,6 @@
                 stockInput.disabled = false;
             }
         }
-
 
         async function editarProducto(id) {
             try {
@@ -3517,7 +3677,30 @@
                 document.getElementById('productoBadge').value = data.badge || '';
                 document.getElementById('productoActivo').checked = data.activo;
                 document.getElementById('productoImagen').value = data.imagen_url || '';
-                renderizarVariantesUI(data.variantes || []);
+                
+                if (data.variantes && data.variantes.options) {
+                    renderizarOpcionesUI(data.variantes.options);
+                    generateVariantsTable();
+                    // Populate generated table with existing data
+                    const rows = document.querySelectorAll('#variantsTbody tr');
+                    rows.forEach(row => {
+                        const currentAttrs = {};
+                        data.variantes.options.forEach(opt => {
+                            currentAttrs[opt.name] = row.querySelector(`[data-attr-${opt.name}]`).dataset[`attr${opt.name}`];
+                        });
+                        const matchingVariant = data.variantes.variants.find(v => 
+                            JSON.stringify(v.attributes) === JSON.stringify(currentAttrs)
+                        );
+                        if (matchingVariant) {
+                            row.querySelector('.variant-precio').value = matchingVariant.precio;
+                            row.querySelector('.variant-stock').value = matchingVariant.stock;
+                        }
+                    });
+                    actualizarStockTotalDesdeVariantes();
+                } else {
+                    renderizarOpcionesUI([]);
+                }
+                
                 previewImagen('imagePreview', data.imagen_url);
                 document.getElementById('productoModal').style.display = 'block';
             } catch (error) {
@@ -3529,28 +3712,18 @@
         async function guardarProducto(event) {
             event.preventDefault();
             
-            const variantRows = document.querySelectorAll('#variantesList .variant-row');
-            let variantes = null;
-            let totalStockFromVariants = 0;
+            let variantesData = null;
+            let totalStock = parseInt(document.getElementById('productoStock').value) || 0;
+            const generatedVariantRows = document.querySelectorAll('#variantsTbody tr');
 
-            if (variantRows.length > 0) {
-                variantes = [];
+            if (generatedVariantRows.length > 0) {
+                const options = readOptionsFromUI();
+                const variants = readGeneratedVariantsFromUI();
                 let valid = true;
-                variantRows.forEach(row => {
-                    const nombre = row.querySelector('.variant-nombre').value;
-                    const precio = parseFloat(row.querySelector('.variant-precio').value);
-                    const stock = parseInt(row.querySelector('.variant-stock').value);
-
-                    if (!nombre || isNaN(precio) || isNaN(stock)) {
-                        valid = false;
-                    }
-                    variantes.push({ nombre, precio, stock });
-                    totalStockFromVariants += stock;
-                });
-                if (!valid) {
-                    alert("Todos los campos de las variantes (nombre, precio, stock) son obligatorios.");
-                    return;
-                }
+                if (variants.some(v => isNaN(v.precio) || isNaN(v.stock))) valid = false;
+                if (!valid) { alert("Todos los campos de precio y stock en las variantes generadas son obligatorios."); return; }
+                variantesData = { options, variants };
+                totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
             }
 
             const id = document.getElementById('productoId').value;
@@ -3560,12 +3733,12 @@
                 categoria_id: parseInt(document.getElementById('productoCategoria').value),
                 descripcion: document.getElementById('productoDescripcion').value,
                 precio: parseFloat(document.getElementById('productoPrecio').value),
-                stock: variantes ? totalStockFromVariants : (parseInt(document.getElementById('productoStock').value) || 0),
+                stock: totalStock,
                 icon: document.getElementById('productoIcon').value || '📦',
                 badge: document.getElementById('productoBadge').value || null,
                 activo: document.getElementById('productoActivo').checked,
                 imagen_url: document.getElementById('productoImagen').value || null,
-                variantes: variantes
+                variantes: variantesData
             };
 
             try {
@@ -3859,6 +4032,16 @@
 
         async function inicializarApp() {
             inicializarSupabase();
+            
+            document.getElementById('chartTypeSwitcher').addEventListener('click', (e) => {
+                if(e.target.tagName === 'BUTTON') {
+                    currentChartType = e.target.dataset.type;
+                    document.querySelectorAll('#chartTypeSwitcher button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderizarDashboard();
+                }
+            });
+
             await cargarCategorias();
             await cargarProductos();
         }
