@@ -2083,6 +2083,7 @@
         const SUPABASE_URL = 'https://zejzrujrspeoszpfbjce.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplanpydWpyc3Blb3N6cGZiamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2MDMyNDMsImV4cCI6MjA3NTE3OTI0M30.UAi4jQ0BH1hphW7OEh4JWP4hdVJ4CmvX6x4CyP2ak-U';
         const N8N_WEBHOOK_URL = 'https://webhook.red51.site/webhook/pedidos_red51';
+        const N8N_STATUS_UPDATE_WEBHOOK_URL = 'https://webhook.red51.site/webhook/pedidos-webhook'; // URL para tu webhook que maneja actualizaciones de estado
         const CLOUDINARY_CLOUD_NAME = 'dvj68er8s';
         const CLOUDINARY_UPLOAD_PRESET = 'red51_productos';
         
@@ -3231,23 +3232,120 @@
 
         async function actualizarEstadoPedido(pedidoId, nuevoEstado) {
             try {
-                const { error } = await supabaseClient
+                // 1. Obtener el estado anterior del pedido
+                const { data: old_record, error: fetchOldError } = await supabaseClient
+                    .from('pedidos')
+                    .select('*')
+                    .eq('id', pedidoId)
+                    .single();
+                
+                if (fetchOldError) throw new Error('Error al obtener el estado anterior del pedido: ' + fetchOldError.message);
+                
+                // Si el estado no ha cambiado, no hacemos nada más
+                if (old_record.estado === nuevoEstado) {
+                    console.log('El estado no ha cambiado, no se envía notificación.');
+                    return;
+                }
+
+                // 2. Actualizar el estado en Supabase y obtener el registro actualizado
+                const { data: updatedRecords, error: updateError } = await supabaseClient
                     .from('pedidos')
                     .update({ estado: nuevoEstado })
-                    .eq('id', pedidoId);
+                    .eq('id', pedidoId)
+                    .select();
 
-                if (error) throw error;
+                if (updateError) throw new Error('Error al actualizar el estado en Supabase: ' + updateError.message);
+                if (!updatedRecords || updatedRecords.length === 0) throw new Error('No se pudo obtener el registro actualizado tras el update.');
+
+                const new_record = updatedRecords[0];
+
+                // 3. Enviar webhook a n8n
+                const payload = {
+                    type: 'UPDATE',
+                    table: 'pedidos',
+                    record: new_record,
+                    old_record: old_record,
+                    schema: 'public'
+                };
                 
+                fetch(N8N_STATUS_UPDATE_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Webhook de actualización de estado enviado a n8n con éxito.');
+                    } else {
+                        console.error('Error al enviar webhook a n8n. Estado:', response.status);
+                    }
+                })
+                .catch(err => console.error('Error de red al enviar webhook a n8n:', err));
+
+                // 4. Actualizar la UI (si el modal está abierto)
                 const orderDetailsModal = document.getElementById('orderDetailsModal');
                 if (orderDetailsModal.style.display === 'block') {
-                    mostrarDetallesPedido(pedidoId);
+                    renderizarDetallesPedidoConDatos(new_record);
                 }
 
             } catch (error) {
                 console.error('Error al actualizar estado:', error);
                 alert('Error al actualizar el estado: ' + error.message);
-                cargarPedidosAdmin();
             }
+        }
+        
+        function renderizarDetallesPedidoConDatos(data) {
+            const modal = document.getElementById('orderDetailsModal');
+            const content = document.getElementById('orderDetailsContent');
+            document.getElementById('orderDetailsTitle').textContent = `Detalles del Pedido ${data.numero_pedido || '#' + data.id.substring(0,6)}`;
+
+            content.innerHTML = `
+                <div class="order-details-grid">
+                    <div class="order-details-card">
+                        <h4>Datos del Cliente</h4>
+                        <p><strong>Nombre:</strong> ${data.nombre_cliente}</p>
+                        <p><strong>Teléfono:</strong> ${data.telefono_cliente}</p>
+                        <p><strong>Email:</strong> ${data.email_cliente || 'No provisto'}</p>
+                        <p><strong>Dirección:</strong> ${data.direccion}</p>
+                    </div>
+                    <div class="order-details-card">
+                        <h4>Resumen del Pedido</h4>
+                        <p><strong>Nº Pedido:</strong> ${data.numero_pedido || 'N/A'}</p>
+                        <p><strong>Fecha:</strong> ${new Date(data.fecha_pedido).toLocaleString()}</p>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <strong>Estado:</strong> 
+                            ${renderEstado(data.estado, data.id)}
+                        </div>
+                        <p><strong>Total Items:</strong> ${data.cantidad_items || 'N/A'}</p>
+                        <p><strong>Total:</strong> <strong style="font-size: 1.2rem; color: var(--primary);">S/ ${parseFloat(data.total).toFixed(2)}</strong></p>
+                    </div>
+                </div>
+                <h4>Productos</h4>
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Marca</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unit.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${(data.productos || []).map(p => `
+                            <tr>
+                                <td>${p.producto} ${p.variante ? `(${Object.values(p.variante).join(', ')})` : ''}</td>
+                                <td>${p.marca}</td>
+                                <td>${p.cantidad}</td>
+                                <td>S/ ${parseFloat(p.precio_unitario).toFixed(2)}</td>
+                                <td>S/ ${parseFloat(p.subtotal).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            modal.style.display = 'block';
         }
 
         async function mostrarDetallesPedido(id) {
@@ -3259,58 +3357,7 @@
                     .single();
 
                 if (error) throw error;
-
-                const modal = document.getElementById('orderDetailsModal');
-                const content = document.getElementById('orderDetailsContent');
-                document.getElementById('orderDetailsTitle').textContent = `Detalles del Pedido ${data.numero_pedido || '#' + data.id.substring(0,6)}`;
-
-                content.innerHTML = `
-                    <div class="order-details-grid">
-                        <div class="order-details-card">
-                            <h4>Datos del Cliente</h4>
-                            <p><strong>Nombre:</strong> ${data.nombre_cliente}</p>
-                            <p><strong>Teléfono:</strong> ${data.telefono_cliente}</p>
-                            <p><strong>Email:</strong> ${data.email_cliente || 'No provisto'}</p>
-                            <p><strong>Dirección:</strong> ${data.direccion}</p>
-                        </div>
-                        <div class="order-details-card">
-                            <h4>Resumen del Pedido</h4>
-                            <p><strong>Nº Pedido:</strong> ${data.numero_pedido || 'N/A'}</p>
-                            <p><strong>Fecha:</strong> ${new Date(data.fecha_pedido).toLocaleString()}</p>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <strong>Estado:</strong> 
-                                ${renderEstado(data.estado, data.id)}
-                            </div>
-                            <p><strong>Total Items:</strong> ${data.cantidad_items || 'N/A'}</p>
-                            <p><strong>Total:</strong> <strong style="font-size: 1.2rem; color: var(--primary);">S/ ${parseFloat(data.total).toFixed(2)}</strong></p>
-                        </div>
-                    </div>
-                    <h4>Productos</h4>
-                    <table class="products-table">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Marca</th>
-                                <th>Cantidad</th>
-                                <th>Precio Unit.</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${(data.productos || []).map(p => `
-                                <tr>
-                                    <td>${p.producto} ${p.variante ? `(${Object.values(p.variante).join(', ')})` : ''}</td>
-                                    <td>${p.marca}</td>
-                                    <td>${p.cantidad}</td>
-                                    <td>S/ ${parseFloat(p.precio_unitario).toFixed(2)}</td>
-                                    <td>S/ ${parseFloat(p.subtotal).toFixed(2)}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-                
-                modal.style.display = 'block';
+                renderizarDetallesPedidoConDatos(data);
 
             } catch (error) {
                 console.error('Error al cargar detalles del pedido:', error);
