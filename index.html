@@ -2083,7 +2083,7 @@
         const SUPABASE_URL = 'https://zejzrujrspeoszpfbjce.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplanpydWpyc3Blb3N6cGZiamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2MDMyNDMsImV4cCI6MjA3NTE3OTI0M30.UAi4jQ0BH1hphW7OEh4JWP4hdVJ4CmvX6x4CyP2ak-U';
         const N8N_WEBHOOK_URL = 'https://webhook.red51.site/webhook/pedidos_red51';
-        const N8N_STATUS_UPDATE_WEBHOOK_URL = 'https://webhook.red51.site/webhook/pedidos-webhook'; // URL para tu webhook que maneja actualizaciones de estado
+        const N8N_STATUS_UPDATE_WEBHOOK_URL = 'https://webhook.red51.site/webhook/pedidos-webhook';
         const CLOUDINARY_CLOUD_NAME = 'dvj68er8s';
         const CLOUDINARY_UPLOAD_PRESET = 'red51_productos';
         
@@ -3232,34 +3232,30 @@
 
         async function actualizarEstadoPedido(pedidoId, nuevoEstado) {
             try {
-                // 1. Obtener el estado anterior del pedido
                 const { data: old_record, error: fetchOldError } = await supabaseClient
                     .from('pedidos')
                     .select('*')
                     .eq('id', pedidoId)
                     .single();
                 
-                if (fetchOldError) throw new Error('Error al obtener el estado anterior del pedido: ' + fetchOldError.message);
+                if (fetchOldError) throw new Error('Error al obtener el estado anterior: ' + fetchOldError.message);
                 
-                // Si el estado no ha cambiado, no hacemos nada más
                 if (old_record.estado === nuevoEstado) {
-                    console.log('El estado no ha cambiado, no se envía notificación.');
+                    console.log('El estado no ha cambiado.');
                     return;
                 }
 
-                // 2. Actualizar el estado en Supabase y obtener el registro actualizado
                 const { data: updatedRecords, error: updateError } = await supabaseClient
                     .from('pedidos')
                     .update({ estado: nuevoEstado })
                     .eq('id', pedidoId)
                     .select();
 
-                if (updateError) throw new Error('Error al actualizar el estado en Supabase: ' + updateError.message);
-                if (!updatedRecords || updatedRecords.length === 0) throw new Error('No se pudo obtener el registro actualizado tras el update.');
+                if (updateError) throw new Error('Error al actualizar en Supabase: ' + updateError.message);
+                if (!updatedRecords || updatedRecords.length === 0) throw new Error('No se pudo obtener el registro actualizado.');
 
                 const new_record = updatedRecords[0];
 
-                // 3. Enviar webhook a n8n
                 const payload = {
                     type: 'UPDATE',
                     table: 'pedidos',
@@ -3275,21 +3271,23 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        console.log('Webhook de actualización de estado enviado a n8n con éxito.');
+                        console.log('Webhook de actualización de estado enviado a N8N.');
                     } else {
-                        console.error('Error al enviar webhook a n8n. Estado:', response.status);
+                        console.error('Error al enviar webhook a N8N. Estado:', response.status);
                     }
                 })
-                .catch(err => console.error('Error de red al enviar webhook a n8n:', err));
-
-                // 4. Actualizar la UI (si el modal está abierto)
+                .catch(err => console.error('Error de red al enviar webhook a N8N:', err));
+                
                 const orderDetailsModal = document.getElementById('orderDetailsModal');
                 if (orderDetailsModal.style.display === 'block') {
-                    renderizarDetallesPedidoConDatos(new_record);
+                    const currentTitle = document.getElementById('orderDetailsTitle').textContent;
+                    if (currentTitle.includes(new_record.numero_pedido) || currentTitle.includes(new_record.id.substring(0, 6))) {
+                        renderizarDetallesPedidoConDatos(new_record);
+                    }
                 }
 
             } catch (error) {
-                console.error('Error al actualizar estado:', error);
+                console.error('Error al actualizar estado del pedido:', error);
                 alert('Error al actualizar el estado: ' + error.message);
             }
         }
@@ -3348,20 +3346,13 @@
             modal.style.display = 'block';
         }
 
-        async function mostrarDetallesPedido(id) {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('pedidos')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-
-                if (error) throw error;
+        function mostrarDetallesPedido(id) {
+            const data = pedidosAdmin.find(p => p.id === id);
+            if (data) {
                 renderizarDetallesPedidoConDatos(data);
-
-            } catch (error) {
-                console.error('Error al cargar detalles del pedido:', error);
-                alert('Error al cargar detalles del pedido: ' + error.message);
+            } else {
+                console.error('No se pudo encontrar el pedido con ID:', id);
+                alert('Error al cargar detalles del pedido. Intente recargar la página.');
             }
         }
 
