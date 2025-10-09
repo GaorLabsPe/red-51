@@ -1287,6 +1287,83 @@
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
+        
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .widget-card {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .widget-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .top-widget-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .top-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background-color: var(--light);
+            border-radius: 8px;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .top-item:hover {
+            background-color: #e9e9e9;
+            transform: translateX(5px);
+        }
+
+        .top-item-rank {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary);
+            background-color: #f5f3ff;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .top-item-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .top-item-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .top-item-metric {
+            font-size: 0.85rem;
+            color: #666;
+        }
 
         .kpi-card {
             background-color: var(--white);
@@ -1315,7 +1392,7 @@
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             margin-top: 2rem;
-            max-height: 350px;
+            max-height: 300px; /* Reduced height */
             position: relative;
         }
         
@@ -1389,6 +1466,8 @@
             flex-wrap: wrap;
             gap: 0.5rem;
             margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            min-height: 38px;
         }
         .option-value-tag {
             background: var(--light);
@@ -1398,14 +1477,15 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            border: 1px solid var(--border-color);
         }
         .option-value-tag button {
             background: none; border: none; cursor: pointer; color: var(--danger); font-size: 1.1rem; line-height: 1;
         }
         
         #generatedVariantsContainer {
-            margin-top: 1rem;
-            max-height: 250px;
+            margin-top: 1.5rem;
+            max-height: 300px;
             overflow-y: auto;
         }
 
@@ -1414,6 +1494,7 @@
         }
         #generatedVariantsContainer table input {
             padding: 0.5rem;
+            max-width: 100px;
         }
 
         @media (max-width: 768px) {
@@ -1581,14 +1662,14 @@
                                 <div class="kpi-card-value" id="kpiTicketPromedio">S/ 0.00</div>
                             </div>
                         </div>
-                        <div class="kpi-grid">
-                            <div class="kpi-card">
-                                <h3 class="kpi-card-title">🏆 Top 5 Productos Vendidos</h3>
-                                <ol id="topProductsWidget" style="padding-left: 1.5rem; font-size: 0.95rem;"></ol>
+                         <div class="widgets-grid">
+                            <div class="widget-card">
+                                <h3 class="widget-card-title">🏆 Top 5 Productos Vendidos</h3>
+                                <ul id="topProductsWidget" class="top-widget-list"></ul>
                             </div>
-                            <div class="kpi-card">
-                                <h3 class="kpi-card-title">⭐ Top 5 Clientes</h3>
-                                <ol id="topClientsWidget" style="padding-left: 1.5rem; font-size: 0.95rem;"></ol>
+                            <div class="widget-card">
+                                <h3 class="widget-card-title">⭐ Top 5 Clientes</h3>
+                                <ul id="topClientsWidget" class="top-widget-list"></ul>
                             </div>
                         </div>
                         <div class="chart-container">
@@ -1809,12 +1890,11 @@
                     <div class="form-group">
                         <label>Variantes (Opcional)</label>
                         <div class="variants-manager">
+                            <p class="form-hint" style="margin-top: 0; margin-bottom: 1rem;">Define opciones como 'Talla' o 'Color', añade sus valores y la tabla de combinaciones se generará automáticamente.</p>
                             <div id="productOptionsContainer"></div>
                             <button type="button" class="btn-secondary" onclick="addOptionUI()" style="margin-top: 1rem;">+ Añadir Opción</button>
-                            <button type="button" class="btn-import" onclick="generateVariantsTable()" style="margin-left: 0.5rem;">Generar Variantes</button>
                             <div id="generatedVariantsContainer"></div>
                         </div>
-                        <div class="form-hint">Define opciones (ej. Color, Talla) y sus valores, luego genera las combinaciones.</div>
                     </div>
                     <div class="form-group">
                         <label>Imagen del Producto</label>
@@ -3349,18 +3429,29 @@
             pedidosFiltrados.forEach(pedido => {
                 if (pedido.estado !== 'cancelado' && Array.isArray(pedido.productos)) {
                     pedido.productos.forEach(p => {
-                        if (p && p.producto) { // Fix for undefined product names
-                            const productName = p.producto.split(' (')[0]; // Get base product name
+                        if (p && p.producto) {
+                            const productName = p.producto.split(' (')[0];
                             if (!productSales[productName]) { productSales[productName] = 0; }
                             productSales[productName] += p.cantidad;
                         }
                     });
                 }
             });
-            const topProducts = Object.entries(productSales).sort(([, a], [, b]) => b - a).slice(0, 5);
+            const topProducts = Object.entries(productSales)
+                .filter(([name]) => name && name !== 'undefined')
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5);
             const topProductsWidget = document.getElementById('topProductsWidget');
             topProductsWidget.innerHTML = topProducts.length > 0
-                ? topProducts.map(([name, qty]) => `<li>${name} <span style="color: #666;">(${qty} vendidos)</span></li>`).join('')
+                ? topProducts.map(([name, qty], index) => `
+                    <li class="top-item">
+                        <span class="top-item-rank">${index + 1}</span>
+                        <div class="top-item-info">
+                            <span class="top-item-name">${name}</span>
+                            <span class="top-item-metric">${qty} vendidos</span>
+                        </div>
+                    </li>
+                `).join('')
                 : '<li>No hay datos de ventas.</li>';
 
             // Calculate Top Clients
@@ -3375,7 +3466,15 @@
             const topClients = Object.entries(clientSpending).sort(([, a], [, b]) => b - a).slice(0, 5);
             const topClientsWidget = document.getElementById('topClientsWidget');
             topClientsWidget.innerHTML = topClients.length > 0
-                ? topClients.map(([name, total]) => `<li>${name} <span style="color: #666;">(S/ ${total.toFixed(2)})</span></li>`).join('')
+                ? topClients.map(([name, total], index) => `
+                    <li class="top-item">
+                        <span class="top-item-rank">${index + 1}</span>
+                        <div class="top-item-info">
+                            <span class="top-item-name">${name}</span>
+                            <span class="top-item-metric">S/ ${total.toFixed(2)}</span>
+                        </div>
+                    </li>
+                `).join('')
                 : '<li>No hay datos de clientes.</li>';
         }
 
@@ -3536,29 +3635,28 @@
             const container = document.getElementById('productOptionsContainer');
             container.innerHTML = '';
             options.forEach(option => addOptionUI(option));
-            document.getElementById('generatedVariantsContainer').innerHTML = '';
+            generateVariantsTable();
         }
 
         function addOptionUI(option = { name: '', values: [] }) {
             const container = document.getElementById('productOptionsContainer');
-            const optionId = `option-${Date.now()}`;
+            const optionId = `option-${Date.now()}${Math.random()}`;
             const div = document.createElement('div');
             div.className = 'option-block';
             div.id = optionId;
             div.innerHTML = `
                 <div class="option-header">
-                    <input type="text" class="option-name" placeholder="Nombre de la opción (ej. Color)" value="${option.name}" style="flex-grow: 1; padding: 0.5rem;">
-                    <button type="button" class="btn-danger" onclick="document.getElementById('${optionId}').remove()">Eliminar Opción</button>
+                    <input type="text" class="option-name" placeholder="Nombre de la opción (ej. Color)" value="${option.name}" style="flex-grow: 1; padding: 0.5rem;" oninput="generateVariantsTable()">
+                    <button type="button" class="btn-danger" onclick="this.closest('.option-block').remove(); generateVariantsTable();">Eliminar Opción</button>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" class="option-value-input" placeholder="Añadir valor (ej. Rojo)" style="flex-grow: 1; padding: 0.5rem;">
-                    <button type="button" class="btn-secondary" onclick="addOptionValue('${optionId}')">Añadir</button>
+                    <input type="text" class="option-value-input" placeholder="Añadir valor y presionar Enter" style="flex-grow: 1; padding: 0.5rem;" onkeydown="addOptionValue(event, '${optionId}')">
                 </div>
                 <div class="option-values-container">
                     ${option.values.map(val => `
                         <span class="option-value-tag" data-value="${val}">
                             ${val}
-                            <button onclick="this.parentElement.remove()">&times;</button>
+                            <button onclick="this.parentElement.remove(); generateVariantsTable();">&times;</button>
                         </span>
                     `).join('')}
                 </div>
@@ -3566,7 +3664,10 @@
             container.appendChild(div);
         }
 
-        function addOptionValue(optionId) {
+        function addOptionValue(event, optionId) {
+             if (event.key !== 'Enter') return;
+             event.preventDefault();
+
             const optionBlock = document.getElementById(optionId);
             const input = optionBlock.querySelector('.option-value-input');
             const value = input.value.trim();
@@ -3576,15 +3677,29 @@
             const tag = document.createElement('span');
             tag.className = 'option-value-tag';
             tag.dataset.value = value;
-            tag.innerHTML = `${value} <button onclick="this.parentElement.remove()">&times;</button>`;
+            tag.innerHTML = `${value} <button onclick="this.parentElement.remove(); generateVariantsTable();">&times;</button>`;
             container.appendChild(tag);
             input.value = '';
+            generateVariantsTable();
         }
-
+        
         function generateVariantsTable() {
+            const existingData = new Map();
+            document.querySelectorAll('#variantsTbody tr').forEach(row => {
+                const key = Array.from(row.cells).slice(0, -2).map(cell => cell.textContent).join('||');
+                const precio = row.querySelector('.variant-precio').value;
+                const stock = row.querySelector('.variant-stock').value;
+                if(precio || stock) {
+                    existingData.set(key, { precio, stock });
+                }
+            });
+
             const options = readOptionsFromUI();
-            if (options.length === 0) {
-                document.getElementById('generatedVariantsContainer').innerHTML = '';
+            const container = document.getElementById('generatedVariantsContainer');
+
+            if (options.length === 0 || options.some(opt => opt.values.length === 0)) {
+                container.innerHTML = '';
+                actualizarStockTotalDesdeVariantes();
                 return;
             }
 
@@ -3594,19 +3709,21 @@
             }, []);
 
             if(combinations.length === 0) {
-                document.getElementById('generatedVariantsContainer').innerHTML = '<p class="form-hint" style="color: var(--danger)">Añade valores a las opciones para generar variantes.</p>';
-                return;
+                 container.innerHTML = '';
+                 actualizarStockTotalDesdeVariantes();
+                 return;
             }
 
-            const container = document.getElementById('generatedVariantsContainer');
             const tableHeaders = options.map(opt => `<th>${opt.name}</th>`).join('');
             const tableRows = combinations.map(combo => {
-                const rowAttrs = Object.entries(combo).map(([key, value]) => `<td data-attr-${key}="${value}">${value}</td>`).join('');
+                const key = Object.values(combo).join('||');
+                const oldData = existingData.get(key) || { precio: '', stock: '' };
+                const rowAttrs = Object.entries(combo).map(([key, value]) => `<td>${value}</td>`).join('');
                 return `
                     <tr>
                         ${rowAttrs}
-                        <td><input type="number" class="variant-precio" placeholder="Precio" step="0.01" min="0" required></td>
-                        <td><input type="number" class="variant-stock" placeholder="Stock" step="1" min="0" required oninput="actualizarStockTotalDesdeVariantes()"></td>
+                        <td><input type="number" class="variant-precio" placeholder="Precio" step="0.01" min="0" required value="${oldData.precio}"></td>
+                        <td><input type="number" class="variant-stock" placeholder="Stock" step="1" min="0" required oninput="actualizarStockTotalDesdeVariantes()" value="${oldData.stock}"></td>
                     </tr>`;
             }).join('');
 
@@ -3615,6 +3732,7 @@
                     <thead> <tr> ${tableHeaders} <th>Precio (S/)</th> <th>Stock</th> </tr> </thead>
                     <tbody id="variantsTbody">${tableRows}</tbody>
                 </table>`;
+            actualizarStockTotalDesdeVariantes();
         }
         
         function readOptionsFromUI() {
@@ -3632,15 +3750,29 @@
         function readGeneratedVariantsFromUI() {
              const variants = [];
              const options = readOptionsFromUI();
+             if (options.length === 0) return [];
              document.querySelectorAll('#variantsTbody tr').forEach(row => {
                 const attributes = {};
+                let i = 0;
                 options.forEach(opt => {
-                    const cell = row.querySelector(`[data-attr-${opt.name}]`);
-                    if (cell) attributes[opt.name] = cell.dataset[`attr${opt.name}`];
+                    opt.values.forEach(() => {
+                        if (row.cells[i]) {
+                            attributes[opt.name] = row.cells[i].textContent;
+                        }
+                    });
+                    i++;
                 });
+
+                const combo = {};
+                Array.from(row.cells).slice(0, -2).forEach((cell, index) => {
+                    combo[options[index].name] = cell.textContent;
+                });
+                
                 const precio = parseFloat(row.querySelector('.variant-precio').value);
                 const stock = parseInt(row.querySelector('.variant-stock').value);
-                variants.push({ attributes, precio, stock });
+                if (Object.keys(combo).length > 0) {
+                     variants.push({ attributes: combo, precio, stock });
+                }
              });
              return variants;
         }
@@ -3665,6 +3797,7 @@
             try {
                 const { data, error } = await supabaseClient.from('productos').select('*, categorias(*)').eq('id', id).single();
                 if (error) throw error;
+                abrirModalProducto(); // Resets the form
                 document.getElementById('productoModalTitle').textContent = 'Editar Producto';
                 document.getElementById('productoId').value = data.id;
                 document.getElementById('productoNombre').value = data.nombre;
@@ -3680,14 +3813,15 @@
                 
                 if (data.variantes && data.variantes.options) {
                     renderizarOpcionesUI(data.variantes.options);
-                    generateVariantsTable();
                     // Populate generated table with existing data
                     const rows = document.querySelectorAll('#variantsTbody tr');
                     rows.forEach(row => {
                         const currentAttrs = {};
+                        let i = 0;
                         data.variantes.options.forEach(opt => {
-                            currentAttrs[opt.name] = row.querySelector(`[data-attr-${opt.name}]`).dataset[`attr${opt.name}`];
+                           currentAttrs[opt.name] = row.cells[i++].textContent;
                         });
+                        
                         const matchingVariant = data.variantes.variants.find(v => 
                             JSON.stringify(v.attributes) === JSON.stringify(currentAttrs)
                         );
@@ -3702,7 +3836,7 @@
                 }
                 
                 previewImagen('imagePreview', data.imagen_url);
-                document.getElementById('productoModal').style.display = 'block';
+
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error al cargar producto: ' + error.message);
