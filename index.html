@@ -1441,7 +1441,7 @@
             border: 1px solid #ccc;
         }
         
-        /* New Variants UI Styles */
+        /* Variants UI Styles */
         .variants-manager {
             background: #f8fafc;
             padding: 1.5rem;
@@ -1484,6 +1484,111 @@
         }
         .variant-group-block .products-table td {
             padding: 0.25rem;
+        }
+
+        .variant-image-cell {
+            min-width: 250px;
+        }
+        .variant-image-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .variant-image-input-wrapper input {
+            flex-grow: 1;
+        }
+        .variant-image-preview {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            background: var(--light);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-size: 1.5rem;
+        }
+        
+        /* Admin Stock Breakdown Styles */
+        .stock-details-container {
+            position: relative;
+        }
+        .stock-summary {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        .stock-summary:hover {
+            background-color: #e9ecef;
+        }
+        .stock-toggle-icon {
+            transition: transform 0.2s;
+            display: inline-block;
+            margin-left: 8px;
+        }
+        .stock-summary.open .stock-toggle-icon {
+            transform: rotate(180deg);
+        }
+        .stock-details-breakdown {
+            position: absolute;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+            width: max-content;
+            min-width: 250px;
+            margin-top: 5px;
+            right: 0;
+            animation: fadeInBreakdown 0.2s ease-out;
+        }
+
+        @keyframes fadeInBreakdown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stock-details-header {
+            font-weight: 700;
+            color: var(--primary);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stock-details-breakdown ul {
+            list-style: none;
+            padding: 0.5rem;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .stock-details-breakdown li {
+            padding: 0.5rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .stock-details-breakdown li:hover {
+            background-color: var(--light);
+        }
+        .stock-details-breakdown .variant-name {
+            color: var(--text-dark);
+        }
+        .stock-details-breakdown .variant-stock {
+            font-weight: 700;
+            background-color: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
         }
 
         @media (max-width: 768px) {
@@ -2434,7 +2539,7 @@
 
             modalContent.innerHTML = `
                 <div class="product-detail-layout">
-                    <div class="product-detail-image">
+                    <div class="product-detail-image" data-main-image-url="${producto.imagen_url || ''}">
                         ${producto.imagen_url 
                             ? `<img src="${optimizarImagenUrl(producto.imagen_url, 800)}" alt="${producto.nombre}">`
                             : `<div class="product-image" style="height: 400px; border-radius: 16px;"><span>${producto.icon || '📦'}</span></div>`
@@ -2503,6 +2608,8 @@
             const priceEl = document.getElementById('detailPrice');
             const stockEl = document.getElementById('variantStockDisplay');
             const addToCartBtn = document.getElementById('detailAddToCartBtn');
+            const detailImageContainer = document.querySelector('.product-detail-image');
+            const detailImageEl = detailImageContainer ? detailImageContainer.querySelector('img') : null;
 
             if (variant) {
                 priceEl.textContent = `S/ ${parseFloat(variant.precio).toFixed(2)}`;
@@ -2515,11 +2622,21 @@
                     addToCartBtn.disabled = true;
                     addToCartBtn.textContent = 'Agotado';
                 }
+                if (detailImageEl) {
+                    if (variant.imagen_url) {
+                        detailImageEl.src = optimizarImagenUrl(variant.imagen_url, 800);
+                    } else {
+                        detailImageEl.src = optimizarImagenUrl(detailImageContainer.dataset.mainImageUrl, 800);
+                    }
+                }
             } else {
                  priceEl.textContent = `S/ --.--`;
                  stockEl.textContent = 'Combinación no disponible';
                  addToCartBtn.disabled = true;
                  addToCartBtn.textContent = 'No Disponible';
+                 if (detailImageEl) {
+                     detailImageEl.src = optimizarImagenUrl(detailImageContainer.dataset.mainImageUrl, 800);
+                 }
             }
         }
 
@@ -2900,6 +3017,23 @@
             }
         }
 
+        function toggleStockDetails(summaryElement, event) {
+            event.stopPropagation();
+            const container = summaryElement.parentElement;
+            const breakdown = container.querySelector('.stock-details-breakdown');
+            
+            const isVisible = breakdown.style.display === 'block';
+
+            // Close all other dropdowns
+            document.querySelectorAll('.stock-details-breakdown').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.stock-summary.open').forEach(el => el.classList.remove('open'));
+            
+            if (!isVisible) {
+                breakdown.style.display = 'block';
+                summaryElement.classList.add('open');
+            }
+        }
+
         async function cargarProductosAdmin() {
             if (!supabaseClient) return;
             document.getElementById('loadingAdmin').style.display = 'block';
@@ -2921,7 +3055,29 @@
                 }
 
                 const tbody = document.getElementById('adminProductsTable');
-                tbody.innerHTML = productosFiltrados.map(producto => `
+                tbody.innerHTML = productosFiltrados.map(producto => {
+                    const hasVariants = producto.variantes && producto.variantes.groups && producto.variantes.groups.length > 0;
+                    const stockCellContent = hasVariants ? `
+                        <div class="stock-details-container">
+                            <div class="stock-summary" onclick="toggleStockDetails(this, event)">
+                                ${renderStockIndicator(producto.stock)}
+                                <span class="stock-toggle-icon">▾</span>
+                            </div>
+                            <div class="stock-details-breakdown" style="display:none;" onclick="event.stopPropagation()">
+                                <div class="stock-details-header">Desglose de Stock</div>
+                                <ul>
+                                    ${producto.variantes.groups.map(group =>
+                                        group.variants.map(variant => `<li>
+                                            <span class="variant-name">${group.primaryValue} / ${variant.secondaryValue}</span>
+                                            <span class="variant-stock">${variant.stock}</span>
+                                        </li>`).join('')
+                                    ).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    ` : renderStockIndicator(producto.stock);
+
+                    return `
                     <tr>
                         <td>
                             ${producto.imagen_url 
@@ -2934,14 +3090,14 @@
                         <td>${producto.marca}</td>
                         <td>${producto.categorias ? producto.categorias.nombre : 'Sin Categoria'}</td>
                         <td>S/ ${parseFloat(producto.precio).toFixed(2)}</td>
-                        <td>${renderStockIndicator(producto.stock)}</td>
+                        <td>${stockCellContent}</td>
                         <td>${producto.activo ? 'Activo' : 'Inactivo'}</td>
                         <td class="table-actions">
                             <button class="btn-edit" onclick="editarProducto(${producto.id})">Editar</button>
                             <button class="btn-danger" onclick="eliminarProducto(${producto.id})">Eliminar</button>
                         </td>
                     </tr>
-                `).join('');
+                `}).join('');
 
             } catch (error) {
                 console.error('Error:', error);
@@ -3735,6 +3891,7 @@
                                 <th class="secondary-option-header">Variante</th>
                                 <th>Precio (S/)</th>
                                 <th>Stock</th>
+                                <th style="min-width: 250px;">Imagen URL (Opcional)</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -3755,7 +3912,17 @@
             actualizarStockTotalDesdeVariantes();
         }
 
-        function addSecondaryVariantRow(groupId, variant = { secondaryValue: '', precio: '', stock: '' }) {
+        function previewVariantImage(inputElement) {
+            const previewContainer = inputElement.nextElementSibling;
+            const url = inputElement.value.trim();
+            if (url) {
+                previewContainer.innerHTML = `<img src="${url}" alt="preview" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML = '🖼️';"/>`;
+            } else {
+                previewContainer.innerHTML = '🖼️';
+            }
+        }
+
+        function addSecondaryVariantRow(groupId, variant = { secondaryValue: '', precio: '', stock: '', imagen_url: '' }) {
             const groupBlock = document.getElementById(groupId);
             if (!groupBlock) return;
             const tbody = groupBlock.querySelector('tbody');
@@ -3767,6 +3934,14 @@
                 <td><input type="text" class="form-group" placeholder="${secondaryOptionName}" value="${variant.secondaryValue || ''}"></td>
                 <td><input type="number" class="form-group" placeholder="Precio" step="0.01" min="0" value="${variant.precio || ''}"></td>
                 <td><input type="number" class="form-group" placeholder="Stock" step="1" min="0" oninput="actualizarStockTotalDesdeVariantes()" value="${variant.stock || ''}"></td>
+                <td class="variant-image-cell">
+                    <div class="variant-image-input-wrapper">
+                        <input type="url" class="form-group" placeholder="URL de Imagen" value="${variant.imagen_url || ''}" oninput="previewVariantImage(this)">
+                        <div class="variant-image-preview">
+                            ${variant.imagen_url ? `<img src="${variant.imagen_url}" alt="preview" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML = '🖼️';"/>` : '🖼️'}
+                        </div>
+                    </div>
+                </td>
                 <td><button type="button" class="btn-danger" style="padding: 0.25rem 0.5rem;" onclick="this.closest('tr').remove(); actualizarStockTotalDesdeVariantes();">&times;</button></td>
             `;
             tbody.appendChild(tr);
@@ -3844,8 +4019,9 @@
                         const secondaryValue = row.cells[0].querySelector('input').value.trim();
                         const precio = parseFloat(row.cells[1].querySelector('input').value);
                         const stock = parseInt(row.cells[2].querySelector('input').value);
+                        const imagen_url = row.cells[3].querySelector('input').value.trim() || null;
                         if (secondaryValue && !isNaN(precio) && !isNaN(stock)) {
-                            variants.push({ secondaryValue, precio, stock });
+                            variants.push({ secondaryValue, precio, stock, imagen_url });
                         }
                     });
                     if (variants.length > 0) {
@@ -4172,6 +4348,13 @@
                     document.querySelectorAll('#chartTypeSwitcher button').forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
                     renderizarDashboard();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.stock-details-container')) {
+                    document.querySelectorAll('.stock-details-breakdown').forEach(el => el.style.display = 'none');
+                    document.querySelectorAll('.stock-summary.open').forEach(el => el.classList.remove('open'));
                 }
             });
 
