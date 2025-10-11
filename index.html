@@ -1443,58 +1443,47 @@
         
         /* New Variants UI Styles */
         .variants-manager {
-             background: #f8fafc;
+            background: #f8fafc;
             padding: 1.5rem;
             border-radius: 8px;
             border: 1px solid var(--border-color);
         }
-        .option-block {
+
+        .variant-group-block {
             background: var(--white);
             border: 1px solid #d1d5db;
             padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
+            border-radius: 8px;
         }
-        .option-header {
+        
+        .variant-group-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        .option-values-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            min-height: 38px;
-        }
-        .option-value-tag {
-            background: var(--light);
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border: 1px solid var(--border-color);
-        }
-        .option-value-tag button {
-            background: none; border: none; cursor: pointer; color: var(--danger); font-size: 1.1rem; line-height: 1;
-        }
-        
-        #generatedVariantsContainer {
-            margin-top: 1.5rem;
-            max-height: 300px;
-            overflow-y: auto;
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        #generatedVariantsContainer table {
+        .variant-group-header h4 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .variant-group-block .products-table {
             font-size: 0.9rem;
         }
-        #generatedVariantsContainer table input {
+        .variant-group-block .products-table input {
             padding: 0.5rem;
-            max-width: 100px;
+            width: 100%;
+            min-width: 80px;
+        }
+        .variant-group-block .products-table th {
+            padding: 0.5rem;
+        }
+        .variant-group-block .products-table td {
+            padding: 0.25rem;
         }
 
         @media (max-width: 768px) {
@@ -1880,7 +1869,7 @@
                     <div class="form-group">
                         <label>Precio Base (S/)</label>
                         <input type="number" id="productoPrecio" step="0.01" min="0" required>
-                        <div class="form-hint">Este es el precio si el producto no tiene variantes.</div>
+                        <div class="form-hint">Este es el precio si el producto no tiene variantes. Se usará si un grupo de variantes no tiene precio específico.</div>
                     </div>
                      <div class="form-group">
                         <label>Stock Base (Inventario)</label>
@@ -1890,10 +1879,30 @@
                     <div class="form-group">
                         <label>Variantes (Opcional)</label>
                         <div class="variants-manager">
-                            <p class="form-hint" style="margin-top: 0; margin-bottom: 1rem;">Define opciones como 'Talla' o 'Color', añade sus valores y la tabla de combinaciones se generará automáticamente.</p>
-                            <div id="productOptionsContainer"></div>
-                            <button type="button" class="btn-secondary" onclick="addOptionUI()" style="margin-top: 1rem;">+ Añadir Opción</button>
-                            <div id="generatedVariantsContainer"></div>
+                            <p class="form-hint" style="margin-top: 0; margin-bottom: 1rem;">
+                                Gestiona variantes por grupos. Ej: Opción Principal "Color", Opción Secundaria "Talla".
+                                Luego añade valores como "Negro" y dentro de él, las tallas con su precio y stock.
+                            </p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Opción Principal (ej. Color)</label>
+                                    <input type="text" id="primaryOptionName" placeholder="Color">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Opción Secundaria (ej. Talla)</label>
+                                    <input type="text" id="secondaryOptionName" placeholder="Talla">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Añadir un valor para la opción principal (ej. Negro, Blanco)</label>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <input type="text" id="newPrimaryValueInput" placeholder="Negro" style="flex-grow: 1;">
+                                    <button type="button" class="btn-secondary" onclick="addVariantGroupUI()">Añadir Grupo</button>
+                                </div>
+                            </div>
+                            <div id="variantGroupsContainer" style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                                <!-- Variant groups will be injected here -->
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -2341,11 +2350,15 @@
 
             grid.innerHTML = productosFiltrados.map(producto => {
                 const isOutOfStock = !producto.stock || producto.stock <= 0;
-                const hasVariants = producto.variantes && producto.variantes.variants && producto.variantes.variants.length > 0;
+                const hasVariants = producto.variantes && producto.variantes.groups && producto.variantes.groups.length > 0;
+                
                 let priceDisplay = `S/ ${parseFloat(producto.precio).toFixed(2)}`;
                 if (hasVariants) {
-                    const minPrice = Math.min(...producto.variantes.variants.map(v => v.precio));
-                    priceDisplay = `Desde S/ ${parseFloat(minPrice).toFixed(2)}`;
+                    const allVariantPrices = producto.variantes.groups.flatMap(g => g.variants.map(v => v.precio));
+                    if (allVariantPrices.length > 0) {
+                        const minPrice = Math.min(...allVariantPrices);
+                        priceDisplay = `Desde S/ ${parseFloat(minPrice).toFixed(2)}`;
+                    }
                 }
                 
                 return `
@@ -2368,7 +2381,7 @@
                         <div class="product-price">${priceDisplay}</div>
                     </div>
                     <div class="product-actions">
-                        <button class="btn-add-quick" title="${isOutOfStock ? 'Producto Agotado' : 'Agregar al carrito'}" onclick="event.stopPropagation(); quickAdd(${producto.id})" ${isOutOfStock ? 'disabled' : ''}>
+                        <button class="btn-add-quick" title="${isOutOfStock ? 'Producto Agotado' : 'Ver opciones'}" onclick="event.stopPropagation(); quickAdd(${producto.id})" ${isOutOfStock ? 'disabled' : ''}>
                              ${isOutOfStock ? '×' : (hasVariants ? '...' : '+')}
                         </button>
                     </div>
@@ -2378,7 +2391,7 @@
         
         function quickAdd(productoId) {
             const producto = productos.find(p => p.id === productoId);
-            const hasVariants = producto.variantes && producto.variantes.variants && producto.variantes.variants.length > 0;
+            const hasVariants = producto.variantes && producto.variantes.groups && producto.variantes.groups.length > 0;
             if (hasVariants) {
                 mostrarDetalleProducto(productoId);
             } else {
@@ -2394,20 +2407,29 @@
             const modalTitle = document.getElementById('productDetailTitle');
             const stockDisponible = producto.stock || 0;
             const isOutOfStock = stockDisponible <= 0;
-            const hasVariants = producto.variantes && producto.variantes.options && producto.variantes.options.length > 0;
+            const hasVariants = producto.variantes && producto.variantes.groups && producto.variantes.groups.length > 0;
             
             modalTitle.textContent = producto.nombre;
 
             let variantSelectorsHTML = '';
             if(hasVariants) {
-                variantSelectorsHTML = producto.variantes.options.map(option => `
+                const primaryOptionName = producto.variantes.primaryOptionName || 'Opción';
+                const secondaryOptionName = producto.variantes.secondaryOptionName || 'Variante';
+
+                variantSelectorsHTML = `
                     <div class="form-group">
-                        <label for="variantSelector_${option.name}">${option.name}:</label>
-                        <select id="variantSelector_${option.name}" class="form-group variant-selector" onchange="actualizarDetalleVariante(${producto.id})">
-                            ${option.values.map(value => `<option value="${value}">${value}</option>`).join('')}
+                        <label for="variantSelector_primary">${primaryOptionName}:</label>
+                        <select id="variantSelector_primary" class="form-group variant-selector" onchange="actualizarDetalleVariante(${producto.id})">
+                            ${producto.variantes.groups.map(group => `<option value="${group.primaryValue}">${group.primaryValue}</option>`).join('')}
                         </select>
                     </div>
-                `).join('');
+                    <div class="form-group">
+                        <label for="variantSelector_secondary">${secondaryOptionName}:</label>
+                        <select id="variantSelector_secondary" class="form-group variant-selector" onchange="actualizarDetalleVariante(${producto.id}, false)">
+                            <!-- Options populated dynamically -->
+                        </select>
+                    </div>
+                `;
             }
 
             modalContent.innerHTML = `
@@ -2429,7 +2451,7 @@
                             <div class="out-of-stock-badge" style="width: 100%; text-align: center; margin: 2rem 0; font-size: 1rem;">Producto Agotado</div>
                             <button class="btn-primary" disabled>Agregar al Carrito</button>
                         ` : ( hasVariants ? `
-                            ${variantSelectorsHTML}
+                            <div id="variantSelectorsContainer">${variantSelectorsHTML}</div>
                             <p class="form-hint" id="variantStockDisplay" style="margin-top: -1rem; margin-bottom: 1.5rem;"></p>
                             <button id="detailAddToCartBtn" class="btn-primary" onclick="agregarAlCarritoDesdeDetalle(${producto.id})">
                                 Agregar al Carrito
@@ -2451,26 +2473,33 @@
             `;
             
             if (hasVariants) {
-                actualizarDetalleVariante(productoId);
+                actualizarDetalleVariante(productoId, true); // Initial population
             }
 
             document.getElementById('productDetailModal').style.display = 'block';
         }
 
-        function actualizarDetalleVariante(productoId) {
+        function actualizarDetalleVariante(productoId, primaryChanged = true) {
             const producto = productos.find(p => p.id === productoId);
-            if (!producto || !producto.variantes) return;
+            if (!producto || !producto.variantes || !producto.variantes.groups) return;
 
-            const selectedAttributes = {};
-            producto.variantes.options.forEach(option => {
-                const selector = document.getElementById(`variantSelector_${option.name}`);
-                selectedAttributes[option.name] = selector.value;
-            });
+            const primarySelector = document.getElementById('variantSelector_primary');
+            const secondarySelector = document.getElementById('variantSelector_secondary');
+            const selectedPrimaryValue = primarySelector.value;
             
-            const variant = producto.variantes.variants.find(v => {
-                return Object.keys(selectedAttributes).every(key => v.attributes[key] === selectedAttributes[key]);
-            });
-
+            if (primaryChanged) {
+                const selectedGroup = producto.variantes.groups.find(g => g.primaryValue === selectedPrimaryValue);
+                if (selectedGroup) {
+                    secondarySelector.innerHTML = selectedGroup.variants.map(v => `<option value="${v.secondaryValue}">${v.secondaryValue}</option>`).join('');
+                } else {
+                    secondarySelector.innerHTML = '';
+                }
+            }
+            
+            const selectedSecondaryValue = secondarySelector.value;
+            const group = producto.variantes.groups.find(g => g.primaryValue === selectedPrimaryValue);
+            const variant = group ? group.variants.find(v => v.secondaryValue === selectedSecondaryValue) : null;
+            
             const priceEl = document.getElementById('detailPrice');
             const stockEl = document.getElementById('variantStockDisplay');
             const addToCartBtn = document.getElementById('detailAddToCartBtn');
@@ -2518,15 +2547,16 @@
 
         function agregarAlCarritoDesdeDetalle(productoId) {
             const producto = productos.find(p => p.id === productoId);
-            const hasVariants = producto.variantes && producto.variantes.options && producto.variantes.options.length > 0;
+            const hasVariants = producto.variantes && producto.variantes.groups && producto.variantes.groups.length > 0;
             
             if (hasVariants) {
-                const selectedAttributes = {};
-                producto.variantes.options.forEach(option => {
-                    const selector = document.getElementById(`variantSelector_${option.name}`);
-                    selectedAttributes[option.name] = selector.value;
-                });
-                agregarAlCarrito(productoId, 1, selectedAttributes);
+                const primarySelector = document.getElementById('variantSelector_primary');
+                const secondarySelector = document.getElementById('variantSelector_secondary');
+                const attributes = {
+                    primary: primarySelector.value,
+                    secondary: secondarySelector.value,
+                };
+                agregarAlCarrito(productoId, 1, attributes);
             } else {
                 const cantidad = parseInt(document.getElementById('quantityInput').value);
                 agregarAlCarrito(productoId, cantidad);
@@ -2545,17 +2575,18 @@
             let stockToCheck = producto.stock;
 
             if (attributes) {
-                selectedVariant = producto.variantes.variants.find(v => 
-                    Object.keys(attributes).every(key => v.attributes[key] === attributes[key])
-                );
+                const group = producto.variantes.groups.find(g => g.primaryValue === attributes.primary);
+                if(group) {
+                    selectedVariant = group.variants.find(v => v.secondaryValue === attributes.secondary);
+                }
 
                 if (!selectedVariant) {
                     mostrarNotificacion('Esta combinación de producto no está disponible.', 'error');
                     return;
                 }
                 
-                cartItemId = `${producto.id}-${Object.values(attributes).join('-')}`;
-                nameToUse = `${producto.nombre} (${Object.values(attributes).join(', ')})`;
+                cartItemId = `${producto.id}-${attributes.primary}-${attributes.secondary}`;
+                nameToUse = `${producto.nombre} (${attributes.primary}, ${attributes.secondary})`;
                 priceToUse = selectedVariant.precio;
                 stockToCheck = selectedVariant.stock;
             }
@@ -2583,8 +2614,10 @@
                     precio: priceToUse,
                     nombre: nameToUse,
                     stock: stockToCheck,
-                    selectedVariant: selectedVariant
+                    selectedVariant: attributes ? { primaryValue: attributes.primary, ...selectedVariant } : null,
+                    variante_info: attributes ? `${attributes.primary}, ${attributes.secondary}` : null
                 };
+                delete itemToAdd.variantes; // clean up
                 carrito.push(itemToAdd);
             }
             
@@ -2729,10 +2762,11 @@
 
                     if (productInDB) {
                         if (item.selectedVariant) {
-                            const variantInDB = productInDB.variantes.variants.find(v => 
-                                JSON.stringify(v.attributes) === JSON.stringify(item.selectedVariant.attributes)
-                            );
-                            currentStock = variantInDB ? variantInDB.stock : 0;
+                            const groupInDB = productInDB.variantes.groups.find(g => g.primaryValue === item.selectedVariant.primaryValue);
+                            if(groupInDB) {
+                                const variantInDB = groupInDB.variants.find(v => v.secondaryValue === item.selectedVariant.secondaryValue);
+                                currentStock = variantInDB ? variantInDB.stock : 0;
+                            }
                         } else {
                             currentStock = productInDB.stock;
                         }
@@ -2775,7 +2809,7 @@
                     cantidad: item.cantidad,
                     precio_unitario: parseFloat(item.precio),
                     subtotal: parseFloat(item.precio) * item.cantidad,
-                    variante: item.selectedVariant ? item.selectedVariant.attributes : null
+                    variante: item.variante_info || null
                 }));
 
                 const uniqueId = Math.random().toString(36).substring(2, 7).toUpperCase();
@@ -2809,13 +2843,14 @@
 
                     if (item.selectedVariant) {
                         const newVariantsData = { ...productInDB.variantes };
-                        const variantIndex = newVariantsData.variants.findIndex(v => 
-                            JSON.stringify(v.attributes) === JSON.stringify(item.selectedVariant.attributes)
-                        );
-                        if (variantIndex !== -1) {
-                            newVariantsData.variants[variantIndex].stock -= item.cantidad;
+                        const groupIndex = newVariantsData.groups.findIndex(g => g.primaryValue === item.selectedVariant.primaryValue);
+                        if (groupIndex !== -1) {
+                            const variantIndex = newVariantsData.groups[groupIndex].variants.findIndex(v => v.secondaryValue === item.selectedVariant.secondaryValue);
+                            if(variantIndex !== -1) {
+                                newVariantsData.groups[groupIndex].variants[variantIndex].stock -= item.cantidad;
+                            }
                         }
-                        const newTotalStock = newVariantsData.variants.reduce((sum, v) => sum + v.stock, 0);
+                        const newTotalStock = newVariantsData.groups.reduce((sum, group) => sum + group.variants.reduce((groupSum, variant) => groupSum + (variant.stock || 0), 0), 0);
                         return supabaseClient.from('productos').update({ variantes: newVariantsData, stock: newTotalStock }).eq('id', item.id);
                     } else {
                         const newStock = productInDB.stock - item.cantidad;
@@ -3332,7 +3367,7 @@
                     <tbody>
                         ${(data.productos || []).map(p => `
                             <tr>
-                                <td>${p.producto} ${p.variante ? `(${Object.values(p.variante).join(', ')})` : ''}</td>
+                                <td>${p.producto} ${p.variante ? `(${p.variante})` : ''}</td>
                                 <td>${p.marca}</td>
                                 <td>${p.cantidad}</td>
                                 <td>S/ ${parseFloat(p.precio_unitario).toFixed(2)}</td>
@@ -3363,7 +3398,7 @@
         function formatearProductosParaCSV(productos) {
             if (!productos || productos.length === 0) return '';
             return productos.map(p => 
-                `${p.cantidad} x ${p.producto || ''} ${p.variante ? `(${Object.values(p.variante).join('/')})` : ''} @ S/${(p.precio_unitario || 0).toFixed(2)}`
+                `${p.cantidad} x ${p.producto || ''} ${p.variante ? `(${p.variante})` : ''}`
             ).join('; ');
         }
 
@@ -3661,168 +3696,93 @@
             document.getElementById('productoId').value = '';
             document.getElementById('productoActivo').checked = true;
             document.getElementById('imagePreview').innerHTML = '<span class="image-preview-text">🖼️</span>';
-            renderizarOpcionesUI();
+            document.getElementById('variantGroupsContainer').innerHTML = '';
+            document.getElementById('productoStock').disabled = false;
             document.getElementById('productoModal').style.display = 'block';
         }
 
         function cerrarModalProducto() {
             document.getElementById('productoModal').style.display = 'none';
         }
-        
-        function renderizarOpcionesUI(options = []) {
-            const container = document.getElementById('productOptionsContainer');
-            container.innerHTML = '';
-            options.forEach(option => addOptionUI(option));
-            generateVariantsTable();
-        }
 
-        function addOptionUI(option = { name: '', values: [] }) {
-            const container = document.getElementById('productOptionsContainer');
-            const optionId = `option-${Date.now()}${Math.random()}`;
-            const div = document.createElement('div');
-            div.className = 'option-block';
-            div.id = optionId;
-            div.innerHTML = `
-                <div class="option-header">
-                    <input type="text" class="option-name" placeholder="Nombre de la opción (ej. Color)" value="${option.name}" style="flex-grow: 1; padding: 0.5rem;" oninput="generateVariantsTable()">
-                    <button type="button" class="btn-danger" onclick="this.closest('.option-block').remove(); generateVariantsTable();">Eliminar Opción</button>
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" class="option-value-input" placeholder="Añadir valor y presionar Enter" style="flex-grow: 1; padding: 0.5rem;" onkeydown="addOptionValue(event, '${optionId}')">
-                </div>
-                <div class="option-values-container">
-                    ${option.values.map(val => `
-                        <span class="option-value-tag" data-value="${val}">
-                            ${val}
-                            <button onclick="this.parentElement.remove(); generateVariantsTable();">&times;</button>
-                        </span>
-                    `).join('')}
-                </div>
-            `;
-            container.appendChild(div);
-        }
+        function addVariantGroupUI(group = { primaryValue: '', variants: [] }) {
+            const input = document.getElementById('newPrimaryValueInput');
+            const primaryValue = group.primaryValue || input.value.trim();
+            if (!primaryValue) return;
 
-        function addOptionValue(event, optionId) {
-             if (event.key !== 'Enter') return;
-             event.preventDefault();
-
-            const optionBlock = document.getElementById(optionId);
-            const input = optionBlock.querySelector('.option-value-input');
-            const value = input.value.trim();
-            if (!value) return;
-
-            const container = optionBlock.querySelector('.option-values-container');
-            const tag = document.createElement('span');
-            tag.className = 'option-value-tag';
-            tag.dataset.value = value;
-            tag.innerHTML = `${value} <button onclick="this.parentElement.remove(); generateVariantsTable();">&times;</button>`;
-            container.appendChild(tag);
-            input.value = '';
-            generateVariantsTable();
-        }
-        
-        function generateVariantsTable() {
-            const existingData = new Map();
-            document.querySelectorAll('#variantsTbody tr').forEach(row => {
-                const key = Array.from(row.cells).slice(0, -2).map(cell => cell.textContent).join('||');
-                const precio = row.querySelector('.variant-precio').value;
-                const stock = row.querySelector('.variant-stock').value;
-                if(precio || stock) {
-                    existingData.set(key, { precio, stock });
-                }
-            });
-
-            const options = readOptionsFromUI();
-            const container = document.getElementById('generatedVariantsContainer');
-
-            if (options.length === 0 || options.some(opt => opt.values.length === 0)) {
-                container.innerHTML = '';
-                actualizarStockTotalDesdeVariantes();
+            // Evitar duplicados
+            const container = document.getElementById('variantGroupsContainer');
+            if (Array.from(container.children).some(el => el.dataset.primaryValue.toLowerCase() === primaryValue.toLowerCase())) {
+                input.value = '';
                 return;
             }
 
-            const combinations = options.reduce((acc, option) => {
-                if (acc.length === 0) return option.values.map(v => ({ [option.name]: v }));
-                return acc.flatMap(combo => option.values.map(v => ({ ...combo, [option.name]: v })));
-            }, []);
+            const groupId = `group-${Date.now()}`;
+            const groupBlock = document.createElement('div');
+            groupBlock.className = 'variant-group-block';
+            groupBlock.id = groupId;
+            groupBlock.dataset.primaryValue = primaryValue;
 
-            if(combinations.length === 0) {
-                 container.innerHTML = '';
-                 actualizarStockTotalDesdeVariantes();
-                 return;
+            groupBlock.innerHTML = `
+                <div class="variant-group-header">
+                    <h4>${primaryValue}</h4>
+                    <button type="button" class="btn-danger" onclick="this.closest('.variant-group-block').remove(); actualizarStockTotalDesdeVariantes();">Eliminar Grupo</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th class="secondary-option-header">Variante</th>
+                                <th>Precio (S/)</th>
+                                <th>Stock</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn-secondary" onclick="addSecondaryVariantRow('${groupId}')" style="margin-top: 0.5rem;">+ Añadir Variante</button>
+            `;
+            container.appendChild(groupBlock);
+            const tbody = groupBlock.querySelector('tbody');
+            if (group.variants && group.variants.length > 0) {
+                group.variants.forEach(v => addSecondaryVariantRow(groupId, v));
+            } else {
+                addSecondaryVariantRow(groupId); // Add one empty row to start
             }
-
-            const tableHeaders = options.map(opt => `<th>${opt.name}</th>`).join('');
-            const tableRows = combinations.map(combo => {
-                const key = Object.values(combo).join('||');
-                const oldData = existingData.get(key) || { precio: '', stock: '' };
-                const rowAttrs = Object.entries(combo).map(([key, value]) => `<td>${value}</td>`).join('');
-                return `
-                    <tr>
-                        ${rowAttrs}
-                        <td><input type="number" class="variant-precio" placeholder="Precio" step="0.01" min="0" required value="${oldData.precio}"></td>
-                        <td><input type="number" class="variant-stock" placeholder="Stock" step="1" min="0" required oninput="actualizarStockTotalDesdeVariantes()" value="${oldData.stock}"></td>
-                    </tr>`;
-            }).join('');
-
-            container.innerHTML = `
-                <table class="products-table">
-                    <thead> <tr> ${tableHeaders} <th>Precio (S/)</th> <th>Stock</th> </tr> </thead>
-                    <tbody id="variantsTbody">${tableRows}</tbody>
-                </table>`;
+            input.value = '';
             actualizarStockTotalDesdeVariantes();
         }
-        
-        function readOptionsFromUI() {
-            const options = [];
-            document.querySelectorAll('.option-block').forEach(block => {
-                const name = block.querySelector('.option-name').value.trim();
-                const values = Array.from(block.querySelectorAll('.option-value-tag')).map(tag => tag.dataset.value);
-                if (name && values.length > 0) {
-                    options.push({ name, values });
-                }
-            });
-            return options;
-        }
 
-        function readGeneratedVariantsFromUI() {
-             const variants = [];
-             const options = readOptionsFromUI();
-             if (options.length === 0) return [];
-             document.querySelectorAll('#variantsTbody tr').forEach(row => {
-                const attributes = {};
-                let i = 0;
-                options.forEach(opt => {
-                    opt.values.forEach(() => {
-                        if (row.cells[i]) {
-                            attributes[opt.name] = row.cells[i].textContent;
-                        }
-                    });
-                    i++;
-                });
-
-                const combo = {};
-                Array.from(row.cells).slice(0, -2).forEach((cell, index) => {
-                    combo[options[index].name] = cell.textContent;
-                });
-                
-                const precio = parseFloat(row.querySelector('.variant-precio').value);
-                const stock = parseInt(row.querySelector('.variant-stock').value);
-                if (Object.keys(combo).length > 0) {
-                     variants.push({ attributes: combo, precio, stock });
-                }
-             });
-             return variants;
+        function addSecondaryVariantRow(groupId, variant = { secondaryValue: '', precio: '', stock: '' }) {
+            const groupBlock = document.getElementById(groupId);
+            if (!groupBlock) return;
+            const tbody = groupBlock.querySelector('tbody');
+            const secondaryOptionName = document.getElementById('secondaryOptionName').value.trim() || 'Variante';
+            groupBlock.querySelector('.secondary-option-header').textContent = secondaryOptionName;
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="form-group" placeholder="${secondaryOptionName}" value="${variant.secondaryValue || ''}"></td>
+                <td><input type="number" class="form-group" placeholder="Precio" step="0.01" min="0" value="${variant.precio || ''}"></td>
+                <td><input type="number" class="form-group" placeholder="Stock" step="1" min="0" oninput="actualizarStockTotalDesdeVariantes()" value="${variant.stock || ''}"></td>
+                <td><button type="button" class="btn-danger" style="padding: 0.25rem 0.5rem;" onclick="this.closest('tr').remove(); actualizarStockTotalDesdeVariantes();">&times;</button></td>
+            `;
+            tbody.appendChild(tr);
         }
 
         function actualizarStockTotalDesdeVariantes() {
             const stockInput = document.getElementById('productoStock');
-            const variantRows = document.querySelectorAll('#variantsTbody tr');
+            const variantGroups = document.querySelectorAll('#variantGroupsContainer .variant-group-block');
             
-            if (variantRows.length > 0) {
+            if (variantGroups.length > 0) {
                 let totalStock = 0;
-                document.querySelectorAll('.variant-stock').forEach(input => {
-                    totalStock += parseInt(input.value) || 0;
+                variantGroups.forEach(group => {
+                    group.querySelectorAll('tbody tr').forEach(row => {
+                        const stockVal = row.cells[2].querySelector('input').value;
+                        totalStock += parseInt(stockVal) || 0;
+                    });
                 });
                 stockInput.value = totalStock;
                 stockInput.disabled = true;
@@ -3830,12 +3790,13 @@
                 stockInput.disabled = false;
             }
         }
-
+        
         async function editarProducto(id) {
             try {
                 const { data, error } = await supabaseClient.from('productos').select('*, categorias(*)').eq('id', id).single();
                 if (error) throw error;
-                abrirModalProducto(); // Resets the form
+                
+                abrirModalProducto();
                 document.getElementById('productoModalTitle').textContent = 'Editar Producto';
                 document.getElementById('productoId').value = data.id;
                 document.getElementById('productoNombre').value = data.nombre;
@@ -3849,28 +3810,10 @@
                 document.getElementById('productoActivo').checked = data.activo;
                 document.getElementById('productoImagen').value = data.imagen_url || '';
                 
-                if (data.variantes && data.variantes.options) {
-                    renderizarOpcionesUI(data.variantes.options);
-                    // Populate generated table with existing data
-                    const rows = document.querySelectorAll('#variantsTbody tr');
-                    rows.forEach(row => {
-                        const currentAttrs = {};
-                        let i = 0;
-                        data.variantes.options.forEach(opt => {
-                           currentAttrs[opt.name] = row.cells[i++].textContent;
-                        });
-                        
-                        const matchingVariant = data.variantes.variants.find(v => 
-                            JSON.stringify(v.attributes) === JSON.stringify(currentAttrs)
-                        );
-                        if (matchingVariant) {
-                            row.querySelector('.variant-precio').value = matchingVariant.precio;
-                            row.querySelector('.variant-stock').value = matchingVariant.stock;
-                        }
-                    });
-                    actualizarStockTotalDesdeVariantes();
-                } else {
-                    renderizarOpcionesUI([]);
+                if (data.variantes && data.variantes.groups) {
+                    document.getElementById('primaryOptionName').value = data.variantes.primaryOptionName || '';
+                    document.getElementById('secondaryOptionName').value = data.variantes.secondaryOptionName || '';
+                    data.variantes.groups.forEach(group => addVariantGroupUI(group));
                 }
                 
                 previewImagen('imagePreview', data.imagen_url);
@@ -3884,18 +3827,36 @@
         async function guardarProducto(event) {
             event.preventDefault();
             
-            let variantesData = null;
+            const variantGroupsContainer = document.getElementById('variantGroupsContainer');
+            const hasVariants = variantGroupsContainer.children.length > 0;
             let totalStock = parseInt(document.getElementById('productoStock').value) || 0;
-            const generatedVariantRows = document.querySelectorAll('#variantsTbody tr');
+            let variantesData = null;
 
-            if (generatedVariantRows.length > 0) {
-                const options = readOptionsFromUI();
-                const variants = readGeneratedVariantsFromUI();
-                let valid = true;
-                if (variants.some(v => isNaN(v.precio) || isNaN(v.stock))) valid = false;
-                if (!valid) { alert("Todos los campos de precio y stock en las variantes generadas son obligatorios."); return; }
-                variantesData = { options, variants };
-                totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
+            if (hasVariants) {
+                const primaryOptionName = document.getElementById('primaryOptionName').value.trim() || 'Opción';
+                const secondaryOptionName = document.getElementById('secondaryOptionName').value.trim() || 'Variante';
+                const groups = [];
+
+                document.querySelectorAll('.variant-group-block').forEach(groupBlock => {
+                    const primaryValue = groupBlock.dataset.primaryValue;
+                    const variants = [];
+                    groupBlock.querySelectorAll('tbody tr').forEach(row => {
+                        const secondaryValue = row.cells[0].querySelector('input').value.trim();
+                        const precio = parseFloat(row.cells[1].querySelector('input').value);
+                        const stock = parseInt(row.cells[2].querySelector('input').value);
+                        if (secondaryValue && !isNaN(precio) && !isNaN(stock)) {
+                            variants.push({ secondaryValue, precio, stock });
+                        }
+                    });
+                    if (variants.length > 0) {
+                        groups.push({ primaryValue, variants });
+                    }
+                });
+
+                if (groups.length > 0) {
+                    variantesData = { primaryOptionName, secondaryOptionName, groups };
+                    totalStock = groups.reduce((sum, group) => sum + group.variants.reduce((groupSum, variant) => groupSum + (variant.stock || 0), 0), 0);
+                }
             }
 
             const id = document.getElementById('productoId').value;
