@@ -2971,9 +2971,8 @@
                     variante: item.variante_info || null
                 }));
 
-                const uniqueId = Math.random().toString(36).substring(2, 7).toUpperCase();
                 const timestamp = Date.now().toString().slice(-6);
-                const numero_pedido_generado = `R51-${timestamp}-${uniqueId}`;
+                const numero_pedido_generado = `R51-${timestamp}`;
 
                 const pedidoDB = {
                     numero_pedido: numero_pedido_generado,
