@@ -1590,6 +1590,35 @@
             border-radius: 10px;
             font-size: 0.8rem;
         }
+        
+        /* New simplified address input */
+        .address-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .address-input-group input {
+            flex-grow: 1;
+        }
+        .btn-gps {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--light);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-gps:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        .btn-gps:disabled {
+            cursor: wait;
+            background-color: #ccc;
+        }
 
         @media (max-width: 768px) {
             .hero-section h1 {
@@ -2216,6 +2245,7 @@
         let salesChartInstance = null;
         let currentChartType = 'line';
         let clientesMap = new Map();
+        let selectedLocation = null;
         
         const estadoPedidoConfig = {
             'pendiente_pago': { nombre: 'Pendiente Pago', clase: 'status-pendiente_pago' },
@@ -2578,7 +2608,7 @@
             `;
             
             if (hasVariants) {
-                actualizarDetalleVariante(productoId, true); // Initial population
+                actualizarDetalleVariante(producto.id, true); // Initial population
             }
 
             document.getElementById('productDetailModal').style.display = 'block';
@@ -2817,8 +2847,15 @@
                         <input type="email" id="emailCliente" placeholder="cliente@ejemplo.com">
                     </div>
                     <div class="form-group">
-                        <label>Direccion de Entrega</label>
-                        <textarea id="direccionCliente" required></textarea>
+                        <label>Dirección de Entrega</label>
+                        <div class="address-input-group">
+                            <input type="text" id="direccionCliente" required placeholder="Ej: Av. Arequipa 123, Miraflores">
+                            <button type="button" class="btn-gps" id="btnGps" onclick="obtenerUbicacionActual()" title="Usar mi ubicación actual">📍</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Referencias / Notas para el repartidor</label>
+                        <textarea id="notasCliente" placeholder="Ej: Casa de dos pisos, portón negro. Preguntar por Ana."></textarea>
                     </div>
                     <button type="submit" class="btn-primary" id="btnRealizarPedido">Realizar Pedido</button>
                 </form>
@@ -2853,8 +2890,14 @@
             event.preventDefault();
             
             if (isProcessing) return;
-            isProcessing = true;
 
+            const direccionInput = document.getElementById('direccionCliente');
+            if (!direccionInput.value.trim()) {
+                mostrarNotificacion('Por favor, ingresa tu dirección de entrega.', 'error');
+                return;
+            }
+
+            isProcessing = true;
             const btnPedido = document.getElementById('btnRealizarPedido');
             btnPedido.disabled = true;
             btnPedido.textContent = 'Verificando stock...';
@@ -2916,7 +2959,6 @@
                 const nombre = document.getElementById('nombreCliente').value;
                 const telefono = document.getElementById('telefonoCliente').value;
                 const email = document.getElementById('emailCliente').value;
-                const direccion = document.getElementById('direccionCliente').value;
                 const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
                 const cantidadItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
                 const productosPedido = carrito.map(item => ({
@@ -2938,7 +2980,10 @@
                     nombre_cliente: nombre,
                     telefono_cliente: telefono,
                     email_cliente: email || null,
-                    direccion: direccion,
+                    direccion: direccionInput.value.trim(),
+                    notas: document.getElementById('notasCliente').value || null,
+                    latitud: selectedLocation ? selectedLocation.lat : null,
+                    longitud: selectedLocation ? selectedLocation.lng : null,
                     productos: productosPedido,
                     total: parseFloat(total),
                     cantidad_items: cantidadItems,
@@ -3001,6 +3046,7 @@
 
         function cerrarYLimpiar() {
             carrito = [];
+            selectedLocation = null;
             actualizarContadorCarrito();
             cerrarCarrito();
         }
@@ -3488,6 +3534,23 @@
             const content = document.getElementById('orderDetailsContent');
             document.getElementById('orderDetailsTitle').textContent = `Detalles del Pedido ${data.numero_pedido || '#' + data.id.substring(0,6)}`;
 
+            let direccionHtml = '';
+            if (data.latitud && data.longitud) {
+                direccionHtml = `
+                    <p><strong>Dirección:</strong> ${data.direccion}</p>
+                    ${data.notas ? `<p><strong>Notas:</strong> ${data.notas}</p>` : ''}
+                    <a href="https://www.google.com/maps?q=${data.latitud},${data.longitud}" target="_blank" class="btn-secondary" style="margin-top: 0.5rem; text-decoration: none;">Ver en Google Maps (Preciso)</a>
+                `;
+            } else if (data.direccion) {
+                direccionHtml = `
+                    <p><strong>Dirección:</strong> ${data.direccion}</p>
+                    ${data.notas ? `<p><strong>Notas:</strong> ${data.notas}</p>` : ''}
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.direccion)}" target="_blank" class="btn-secondary" style="margin-top: 0.5rem; text-decoration: none;">Buscar en Google Maps</a>
+                `;
+            } else {
+                 direccionHtml = `<p><strong>Dirección:</strong> No provista</p>`;
+            }
+
             content.innerHTML = `
                 <div class="order-details-grid">
                     <div class="order-details-card">
@@ -3495,7 +3558,7 @@
                         <p><strong>Nombre:</strong> ${data.nombre_cliente}</p>
                         <p><strong>Teléfono:</strong> ${data.telefono_cliente}</p>
                         <p><strong>Email:</strong> ${data.email_cliente || 'No provisto'}</p>
-                        <p><strong>Dirección:</strong> ${data.direccion}</p>
+                        ${direccionHtml}
                     </div>
                     <div class="order-details-card">
                         <h4>Resumen del Pedido</h4>
@@ -3566,18 +3629,27 @@
                 return;
             }
 
-            const dataToExport = pedidosAExportar.map(pedido => ({
-                'Numero Pedido': pedido.numero_pedido || '',
-                'Fecha': new Date(pedido.fecha_pedido).toLocaleString('es-PE'),
-                'Cliente': pedido.nombre_cliente || '',
-                'Telefono': pedido.telefono_cliente,
-                'Email': pedido.email_cliente || '',
-                'Direccion': (pedido.direccion || '').replace(/\n/g, ' '),
-                'Estado': estadoPedidoConfig[pedido.estado]?.nombre || pedido.estado,
-                'Total': pedido.total,
-                'Cantidad Items': pedido.cantidad_items,
-                'Productos': formatearProductosParaCSV(pedido.productos)
-            }));
+            const dataToExport = pedidosAExportar.map(pedido => {
+                let direccionExport = '';
+                if (pedido.latitud && pedido.longitud) {
+                    direccionExport = `${pedido.direccion} (Lat: ${pedido.latitud}, Lng: ${pedido.longitud})`;
+                } else if (typeof pedido.direccion === 'string') {
+                    direccionExport = (pedido.direccion || '').replace(/\n/g, ' ');
+                }
+                return {
+                    'Numero Pedido': pedido.numero_pedido || '',
+                    'Fecha': new Date(pedido.fecha_pedido).toLocaleString('es-PE'),
+                    'Cliente': pedido.nombre_cliente || '',
+                    'Telefono': pedido.telefono_cliente,
+                    'Email': pedido.email_cliente || '',
+                    'Direccion': direccionExport,
+                    'Notas': pedido.notas || '',
+                    'Estado': estadoPedidoConfig[pedido.estado]?.nombre || pedido.estado,
+                    'Total': pedido.total,
+                    'Cantidad Items': pedido.cantidad_items,
+                    'Productos': formatearProductosParaCSV(pedido.productos)
+                };
+            });
             
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
@@ -4311,6 +4383,54 @@
                  listEl.innerHTML = '<li>No hay categorías creadas.</li>'; return;
             }
             listEl.innerHTML = categorias.map(cat => `<li><strong>ID: ${cat.id}</strong> - ${cat.nombre}</li>`).join('');
+        }
+        
+        async function obtenerUbicacionActual() {
+            const btn = document.getElementById('btnGps');
+            if (!navigator.geolocation) {
+                mostrarNotificacion('La geolocalización no es compatible con tu navegador.', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '...';
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    await reverseGeocode(latitude, longitude);
+                    btn.disabled = false;
+                    btn.textContent = '📍';
+                },
+                (error) => {
+                    let message = 'Error al obtener la ubicación.';
+                    if (error.code === 1) message = 'Permiso de ubicación denegado.';
+                    mostrarNotificacion(message, 'error');
+                    btn.disabled = false;
+                    btn.textContent = '📍';
+                }
+            );
+        }
+
+        async function reverseGeocode(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+            const addressInput = document.getElementById('direccionCliente');
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data && data.display_name) {
+                    selectedLocation = { lat, lng };
+                    addressInput.value = data.display_name;
+                    mostrarNotificacion('Ubicación encontrada y actualizada.');
+                } else {
+                    selectedLocation = null;
+                    mostrarNotificacion('No se pudo encontrar una dirección para tu ubicación.', 'error');
+                }
+            } catch (error) {
+                console.error("Error en reverse geocoding:", error);
+                selectedLocation = null;
+                mostrarNotificacion('Error al obtener la dirección.', 'error');
+            }
         }
 
         function mostrarNotificacion(mensaje, type = 'success') {
