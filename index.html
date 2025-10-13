@@ -1132,10 +1132,129 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
             z-index: 2000;
             overflow-y: auto;
         }
+        
+        .login-split-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            background: var(--light);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .login-branding-panel {
+            width: 45%;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #111315;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .login-branding-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 2rem 2rem;
+            animation: movePattern 20s linear infinite;
+        }
+        @keyframes movePattern {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-100px, 100px); }
+        }
+
+        .login-branding-panel .logo-container img {
+             max-height: 80px; max-width: 250px;
+        }
+        .login-branding-panel .logo-container .logo-text-default {
+            font-size: 3rem; color: #111315;
+        }
+        .login-branding-panel h2 {
+            font-size: 2rem;
+            margin-top: 2rem;
+            font-weight: 700;
+        }
+        .login-branding-panel p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+            max-width: 350px;
+        }
+
+        .login-form-panel {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            position: relative;
+        }
+        
+        .login-form-wrapper {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-form-wrapper h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        .login-form-wrapper p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+        .login-form-wrapper .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .login-form-wrapper .form-group.with-icon {
+            position: relative;
+        }
+        .login-form-wrapper .form-group.with-icon .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            pointer-events: none;
+            transition: color 0.2s;
+            width: 20px;
+            height: 20px;
+        }
+        .login-form-wrapper .form-group.with-icon input {
+            padding-left: 3.5rem;
+        }
+        .login-form-wrapper .form-group.with-icon input:focus + .input-icon {
+            color: var(--primary);
+        }
+
+        .forgot-password-link {
+            display: block;
+            text-align: right;
+            margin-top: -1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .forgot-password-link:hover {
+            text-decoration: underline;
+        }
+        
         .centered-card {
             background: var(--light);
             padding: 3rem;
@@ -1146,13 +1265,6 @@
             box-shadow: var(--shadow);
             animation: slideIn 0.4s ease-out;
             position: relative;
-        }
-        .centered-card-logo {
-            margin-bottom: 2rem;
-        }
-        .centered-card-logo img {
-            max-height: 60px;
-            max-width: 200px;
         }
         .centered-card h2 {
             font-size: 1.8rem;
@@ -1170,7 +1282,8 @@
         .centered-card .form-group input {
             padding: 1rem;
         }
-        .centered-card .error-message {
+        .centered-card .error-message,
+        .login-form-wrapper .error-message {
             margin-top: 1rem; 
             padding: 1rem; 
             border-radius: 8px; 
@@ -1179,6 +1292,7 @@
             color: #721c24;
             text-align: left;
         }
+        
         .btn-back-to-store {
             position: absolute;
             top: 1.5rem;
@@ -1188,6 +1302,7 @@
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--text-light);
+            z-index: 10;
         }
         
         .admin-tabs {
@@ -1871,6 +1986,15 @@
             padding: 0 0.5rem;
         }
 
+        @media (max-width: 900px) {
+            .login-branding-panel {
+                display: none;
+            }
+            .login-form-panel {
+                width: 100%;
+            }
+        }
+        
         @media (max-width: 768px) {
             .hero-section h1 {
                 font-size: 2.5rem;
@@ -1931,7 +2055,6 @@
         </div>
     </div>
 
-
     <header class="header">
         <nav class="nav-container">
             <div class="logo-container" onclick="mostrarTienda()">
@@ -1961,30 +2084,58 @@
     </header>
 
     <div id="loginView" class="fullscreen-view" style="display:none;">
-        <div class="centered-card">
-            <button class="btn-back-to-store" onclick="mostrarTienda()" title="Volver a la tienda">&times;</button>
-            <div class="centered-card-logo">
-                <img src="" alt="Logo" id="loginLogo" class="logo-image" style="display: none;">
-                <div id="defaultLoginLogo">
-                    <div class="logo-text-default" id="loginBusinessName">
-                        <span class="logo-red">Red</span><span class="logo-number">51</span>
+        <div class="login-split-container">
+            <div class="login-branding-panel">
+                <div class="logo-container">
+                    <img src="" alt="Logo" id="loginLogo" class="logo-image" style="display: none;">
+                    <div id="defaultLoginLogo">
+                        <div class="logo-text-default" id="loginBusinessName">
+                            <span class="logo-red">Red</span><span class="logo-number">51</span>
+                        </div>
                     </div>
                 </div>
+                <h2>Bienvenido de Nuevo</h2>
+                <p>Gestiona tu imperio digital desde un solo lugar.</p>
             </div>
-            <h2>Inicia Sesión en tu Panel</h2>
-            <p>Ingresa tus credenciales para administrar la tienda.</p>
-            <form id="loginForm" onsubmit="iniciarSesion(event)">
-                <div class="form-group">
-                    <label for="emailLogin">Email</label>
-                    <input type="email" id="emailLogin" required placeholder="admin@tienda.com">
-                </div>
-                <div class="form-group">
-                    <label for="passwordLogin">Contraseña</label>
-                    <input type="password" id="passwordLogin" required>
-                </div>
-                <button type="submit" class="btn-primary">Iniciar Sesión</button>
-                <div id="loginError" class="error-message"></div>
-            </form>
+            <div class="login-form-panel">
+                 <button class="btn-back-to-store" onclick="mostrarTienda()" title="Volver a la tienda">&times;</button>
+                 <div class="login-form-wrapper">
+                    <div id="loginFormContainer">
+                        <h2>Inicia Sesión</h2>
+                        <p>Ingresa tus credenciales para administrar la tienda.</p>
+                        <form id="loginForm" onsubmit="iniciarSesion(event)">
+                            <div class="form-group with-icon">
+                                <label for="emailLogin">Email</label>
+                                <input type="email" id="emailLogin" required placeholder="admin@tienda.com">
+                                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path></svg>
+                            </div>
+                            <div class="form-group with-icon">
+                                <label for="passwordLogin">Contraseña</label>
+                                <input type="password" id="passwordLogin" required>
+                                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3A5.25 5.25 0 0012 1.5zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z"></path></svg>
+                            </div>
+                            <a class="forgot-password-link" onclick="mostrarVistaReseteo(true)">¿Olvidaste tu contraseña?</a>
+                            <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                            <div id="loginError" class="error-message"></div>
+                        </form>
+                    </div>
+                    <div id="resetPasswordFormContainer" style="display:none;">
+                         <h2>Recuperar Contraseña</h2>
+                        <p>Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
+                        <form id="resetPasswordForm" onsubmit="solicitarReseteoPassword(event)">
+                            <div class="form-group with-icon">
+                                <label for="emailReset">Email</label>
+                                <input type="email" id="emailReset" required placeholder="admin@tienda.com">
+                                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path></svg>
+                            </div>
+                            <button type="submit" class="btn-primary">Enviar Enlace</button>
+                            <a class="forgot-password-link" style="text-align:center; margin-top: 1.5rem;" onclick="mostrarVistaReseteo(false)">Volver a Iniciar Sesión</a>
+                            <div id="resetError" class="error-message"></div>
+                            <div id="resetSuccess" class="error-message" style="background: #d4edda; color: #155724;"></div>
+                        </form>
+                    </div>
+                 </div>
+            </div>
         </div>
     </div>
 
@@ -2832,6 +2983,38 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
             } catch (error) {
                 errorDiv.style.display = 'block';
                 errorDiv.textContent = 'Error al iniciar sesion: ' + error.message;
+            }
+        }
+
+        function mostrarVistaReseteo(show) {
+            document.getElementById('loginFormContainer').style.display = show ? 'none' : 'block';
+            document.getElementById('resetPasswordFormContainer').style.display = show ? 'block' : 'none';
+        }
+
+        async function solicitarReseteoPassword(event) {
+            event.preventDefault();
+            const email = document.getElementById('emailReset').value;
+            const errorDiv = document.getElementById('resetError');
+            const successDiv = document.getElementById('resetSuccess');
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            if (!email) {
+                errorDiv.textContent = 'Por favor, ingresa tu correo electrónico.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin,
+                });
+                if (error) throw error;
+                successDiv.textContent = 'Se ha enviado un enlace de recuperación a tu correo. Por favor, revisa tu bandeja de entrada.';
+                successDiv.style.display = 'block';
+            } catch (error) {
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.style.display = 'block';
             }
         }
         
