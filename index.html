@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,52 +12,52 @@
         }
         
         :root {
-            --primary: #7B5C7E;
-            --secondary: #1B9AA8;
-            --accent: #168B97;
-            --dark: #1a1a2e;
-            --light: #f5f5f5;
-            --white: #FFFFFF;
-            --text-dark: #1a1a1a;
-            --text-light: #4a4a4a;
-            --success: #1B9AA8;
+            /* These are the ACCENT colors, controlled by themes like cyberpunk, tech, etc. */
+            --primary: #a45cff;
+            --secondary: #00f0b5;
+            --accent: #00f0b5;
+            --success: #10b981;
             --danger: #e94560;
             --warning-bg: #fffbeb;
             --warning-border: #f59e0b;
             --warning-text: #b45309;
+        }
+        
+        /* Light Mode Base Colors */
+        html[data-theme="light"] {
+            --dark: #ffffff; /* Page background */
+            --light: #f5f5f5; /* Card background */
+            --white: #ffffff;
+            --text-dark: #1a1a2e; /* Primary text */
+            --text-light: #4a4a4a; /* Secondary text */
             --border-color: #e0e0e0;
             --shadow: 0 4px 25px rgba(0,0,0,0.06);
+            color-scheme: light;
         }
 
-        .theme-mystic { /* Default Theme */
-            --primary: #7B5C7E; --secondary: #1B9AA8; --accent: #168B97; --dark: #1a1a2e;
-            --light: #f5f5f5; --white: #FFFFFF; --text-dark: #1a1a1a; --text-light: #4a4a4a;
-            --border-color: #e0e0e0;
-        }
-
-        .theme-tech {
-            --primary: #0d47a1; --secondary: #42a5f5; --accent: #1e88e5; --dark: #263238;
-            --light: #f5f5f5; --white: #FFFFFF; --text-dark: #212121; --text-light: #424242;
-            --border-color: #e0e0e0;
-        }
-
-        .theme-vibrant {
-            --primary: #e65100; --secondary: #ff9800; --accent: #fb8c00; --dark: #212121;
-            --light: #f5f5f5; --white: #FFFFFF; --text-dark: #212121; --text-light: #424242;
-            --border-color: #e0e0e0;
+        /* Dark Mode Base Colors */
+        html[data-theme="dark"] {
+            --dark: #111315; /* Page background */
+            --light: #2a2d32; /* Card background */
+            --white: #FFFFFF;
+            --text-dark: #f0f0f0; /* Primary text */
+            --text-light: #a0a0a0; /* Secondary text */
+            --border-color: #3a3d42;
+            --shadow: 0 4px 25px rgba(0, 240, 181, 0.1);
+            color-scheme: dark;
         }
 
         .theme-cyberpunk {
-            --primary: #a45cff;
-            --secondary: #00f0b5;
-            --accent: #00f0b5;
-            --dark: #111315;
-            --light: #2a2d32;
-            --white: #FFFFFF;
-            --text-dark: #f0f0f0;
-            --text-light: #a0a0a0;
-            --border-color: #3a3d42;
-            --shadow: 0 4px 25px rgba(0, 240, 181, 0.1);
+            --primary: #a45cff; --secondary: #00f0b5; --accent: #00f0b5;
+        }
+        .theme-mystic {
+            --primary: #7B5C7E; --secondary: #1B9AA8; --accent: #168B97;
+        }
+        .theme-tech {
+            --primary: #0d47a1; --secondary: #42a5f5; --accent: #1e88e5;
+        }
+        .theme-vibrant {
+            --primary: #e65100; --secondary: #ff9800; --accent: #fb8c00;
         }
         
         body {
@@ -65,6 +65,7 @@
             background: var(--dark);
             color: var(--text-dark);
             line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
         }
         
         .header {
@@ -73,6 +74,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: background-color 0.3s, border-color 0.3s;
         }
         
         .nav-container {
@@ -97,7 +99,7 @@
         }
         
         .logo-text-default {
-             font-size: 2rem;
+            font-size: 2rem;
             font-weight: 800;
             color: var(--text-dark);
             text-decoration: none;
@@ -129,7 +131,7 @@
             color: var(--text-dark);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s;
+            transition: color 0.3s, background-color 0.3s;
             background: none;
             border: none;
             cursor: pointer;
@@ -139,14 +141,14 @@
         }
         
         .nav-btn:hover {
-            color: var(--secondary);
+            color: var(--primary);
             background-color: var(--dark);
         }
         
         .cart-btn {
             position: relative;
             background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--dark);
+            color: #111315;
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             border: none;
@@ -186,6 +188,54 @@
             50% { transform: scale(1.4); }
             100% { transform: scale(1); }
         }
+
+        /* Theme Toggle */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 50px;
+        }
+        .theme-switch input {
+            display:none;
+        }
+        .slider {
+            background-color: var(--dark);
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+        }
+        .slider:before {
+            background-color: var(--light);
+            bottom: 3px;
+            content: "";
+            height: 16px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 16px;
+            border-radius: 50%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23a45cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" y2="3"></line><line x1="12" y1="21" y2="23"></line><line x1="4.22" y1="4.22" y2="5.64"></line><line x1="18.36" y1="18.36" y2="19.78"></line><line x1="1" y1="12" y2="3"></line><line x1="21" y1="12" y2="23"></line><line x1="4.22" y1="19.78" y2="5.64"></line><line x1="18.36" y1="5.64" y2="19.78"></line></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        input:checked + .slider {
+            background-color: var(--dark);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23a45cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>');
+        }
         
         .container {
             max-width: 1600px;
@@ -194,7 +244,10 @@
         }
         
         .hero-section {
-            background: var(--dark) url('https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center center/cover;
+            background-color: #000;
+            background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-position: center center;
+            background-size: cover;
             background-blend-mode: overlay;
             color: var(--white);
             text-align: center;
@@ -205,6 +258,12 @@
             justify-content: center;
         }
         
+        html[data-theme="light"] .hero-section {
+             background-blend-mode: soft-light;
+             background-color: rgba(255,255,255,0.3);
+             color: #111;
+        }
+
         .hero-section h1 {
             font-size: 3.5rem;
             font-weight: 800;
@@ -221,7 +280,7 @@
         
         .cta-btn {
             background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--dark);
+            color: #111315;
             padding: 1rem 2.5rem;
             border-radius: 12px;
             text-decoration: none;
@@ -288,11 +347,12 @@
             font-size: 2.5rem;
             background-size: cover;
             background-position: center;
+            color: var(--text-dark);
         }
         
         .category-item.active .category-icon-wrapper {
              background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-             color: var(--dark);
+             color: #111315;
         }
 
         .category-name {
@@ -419,7 +479,7 @@
 
         .btn-add-quick {
             background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--dark);
+            color: #111315;
             border: none;
             width: 50px;
             height: 50px;
@@ -581,7 +641,7 @@
         }
         .quantity-selector button:hover {
             background: var(--primary);
-            color: var(--dark);
+            color: #111315;
             border-color: var(--primary);
         }
         .quantity-selector input {
@@ -653,7 +713,7 @@
         
         .qty-btn:hover {
             background: var(--primary);
-            color: var(--dark);
+            color: #111315;
         }
         
         .qty-display {
@@ -713,7 +773,7 @@
             border-radius: 10px;
             font-size: 1rem;
             font-family: inherit;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
             background-color: var(--dark);
             color: var(--text-dark);
         }
@@ -740,7 +800,7 @@
         .btn-primary {
             width: 100%;
             background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--dark);
+            color: #111315;
             padding: 1.2rem;
             border: none;
             border-radius: 12px;
@@ -781,7 +841,7 @@
         
         .btn-secondary:hover {
             background: var(--primary);
-            color: var(--dark);
+            color: #111315;
         }
         
         .btn-danger {
@@ -984,7 +1044,7 @@
         
         .btn-edit {
             background: var(--secondary);
-            color: var(--dark);
+            color: #111315;
             padding: 0.5rem 1rem;
             border: none;
             border-radius: 6px;
@@ -996,7 +1056,7 @@
             padding: 0.5rem;
             border-radius: 6px;
             border: 2px solid #ccc;
-            background: #fff;
+            background: var(--white);
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
@@ -1021,9 +1081,13 @@
         
         .footer {
             background: var(--dark);
-            color: var(--white);
+            color: var(--text-dark);
             padding: 4rem 2rem;
             margin-top: 4rem;
+        }
+        
+        html[data-theme="dark"] .footer {
+            color: var(--white);
         }
 
         .footer-container {
@@ -1037,46 +1101,93 @@
         .footer-column h4 {
             font-size: 1.2rem;
             margin-bottom: 1.5rem;
-            color: var(--white);
+            color: var(--text-dark);
         }
-        .footer-column ul {
-            list-style: none;
-        }
-        .footer-column li {
-            margin-bottom: 0.8rem;
-        }
+        html[data-theme="dark"] .footer-column h4 { color: var(--white); }
+        .footer-column ul { list-style: none; }
+        .footer-column li { margin-bottom: 0.8rem; }
         .footer-column a {
-            color: rgba(255,255,255,0.7);
+            color: var(--text-light);
             text-decoration: none;
             transition: color 0.3s;
         }
-        .footer-column a:hover {
-            color: var(--white);
-        }
+        html[data-theme="dark"] .footer-column a { color: rgba(255,255,255,0.7); }
+        .footer-column a:hover { color: var(--primary); }
+        html[data-theme="dark"] .footer-column a:hover { color: var(--white); }
+
         .footer-bottom {
             margin-top: 3rem;
             padding-top: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid var(--border-color);
             text-align: center;
-            color: rgba(255,255,255,0.7);
+            color: var(--text-light);
         }
+        html[data-theme="dark"] .footer-bottom { border-top-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
         
-        .login-section {
-            background: var(--light);
+        /* New Login & Setup Views */
+        .fullscreen-view {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 2rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-            max-width: 500px;
-            margin: 0 auto;
+            z-index: 2000;
+            overflow-y: auto;
         }
-
-        .auth-info {
-            background: var(--dark);
+        .centered-card {
+            background: var(--light);
+            padding: 3rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.4s ease-out;
+            position: relative;
+        }
+        .centered-card-logo {
+            margin-bottom: 2rem;
+        }
+        .centered-card-logo img {
+            max-height: 60px;
+            max-width: 200px;
+        }
+        .centered-card h2 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        .centered-card p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+        .centered-card .form-group {
+            text-align: left;
+            margin-bottom: 1.2rem;
+        }
+        .centered-card .form-group input {
             padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            border-left: 4px solid var(--secondary);
+        }
+        .centered-card .error-message {
+            margin-top: 1rem; 
+            padding: 1rem; 
+            border-radius: 8px; 
+            display: none; 
+            background: #f8d7da; 
+            color: #721c24;
+            text-align: left;
+        }
+        .btn-back-to-store {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
         }
         
         .admin-tabs {
@@ -1659,7 +1770,7 @@
         }
         .btn-gps:hover {
             background-color: var(--primary);
-            color: var(--dark);
+            color: #111315;
         }
         .btn-gps:disabled {
             cursor: wait;
@@ -1699,7 +1810,7 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 4px var(--secondary);
         }
-        .theme-card h4 { margin-bottom: 1rem; }
+        .theme-card h4 { margin-bottom: 1rem; color: var(--text-dark); }
         .theme-palette { display: flex; justify-content: center; gap: 0.5rem; }
         .theme-color-dot {
             width: 30px; height: 30px; border-radius: 50%;
@@ -1796,6 +1907,31 @@
     </style>
 </head>
 <body class="theme-cyberpunk">
+
+    <!-- First Time Setup View -->
+    <div id="setupView" class="fullscreen-view" style="display:none;">
+        <div class="centered-card">
+            <h2>Configuración Inicial</h2>
+            <p>Bienvenido. Para comenzar, conecta tu tienda a tu proyecto de Supabase.</p>
+            <form id="setupForm" onsubmit="guardarCredencialesSupabase(event)">
+                <div class="form-group">
+                    <label for="setupSupabaseUrl">Supabase Project URL</label>
+                    <input type="url" id="setupSupabaseUrl" required placeholder="https://<project-id>.supabase.co">
+                </div>
+                <div class="form-group">
+                    <label for="setupSupabaseAnonKey">Supabase Anon (Public) Key</label>
+                    <input type="text" id="setupSupabaseAnonKey" required>
+                </div>
+                <div class="form-hint" style="text-align: left; margin-top: -1rem; margin-bottom: 1.5rem;">
+                    Encontrarás estas claves en tu panel de Supabase, en la sección <strong>Settings &rarr; API</strong>.
+                </div>
+                <button type="submit" class="btn-primary">Guardar y Continuar</button>
+                <div id="setupError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+
     <header class="header">
         <nav class="nav-container">
             <div class="logo-container" onclick="mostrarTienda()">
@@ -1809,7 +1945,13 @@
             </div>
             <div class="nav-links">
                 <button class="nav-btn" onclick="mostrarTienda()" id="btnTienda">Tienda</button>
-                <button class="nav-btn" onclick="mostrarAdmin()" id="btnAdmin">Admin</button>
+                <button class="nav-btn" onclick="handleAdminClick()" id="btnAdmin">Admin</button>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="theme-toggle">
+                        <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
                 <button class="cart-btn" onclick="abrirCarrito()">
                     Carrito
                     <span class="cart-count" id="cartCount">0</span>
@@ -1817,6 +1959,34 @@
             </div>
         </nav>
     </header>
+
+    <div id="loginView" class="fullscreen-view" style="display:none;">
+        <div class="centered-card">
+            <button class="btn-back-to-store" onclick="mostrarTienda()" title="Volver a la tienda">&times;</button>
+            <div class="centered-card-logo">
+                <img src="" alt="Logo" id="loginLogo" class="logo-image" style="display: none;">
+                <div id="defaultLoginLogo">
+                    <div class="logo-text-default" id="loginBusinessName">
+                        <span class="logo-red">Red</span><span class="logo-number">51</span>
+                    </div>
+                </div>
+            </div>
+            <h2>Inicia Sesión en tu Panel</h2>
+            <p>Ingresa tus credenciales para administrar la tienda.</p>
+            <form id="loginForm" onsubmit="iniciarSesion(event)">
+                <div class="form-group">
+                    <label for="emailLogin">Email</label>
+                    <input type="email" id="emailLogin" required placeholder="admin@tienda.com">
+                </div>
+                <div class="form-group">
+                    <label for="passwordLogin">Contraseña</label>
+                    <input type="password" id="passwordLogin" required>
+                </div>
+                <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
 
     <div id="tiendaView">
         <main>
@@ -1847,35 +2017,6 @@
 
     <div id="adminView" style="display:none;">
         <main class="container">
-            <div id="loginSection" class="login-section">
-                <h2 style="margin-bottom: 1rem; color: var(--primary);">Acceso Administrador</h2>
-                <div class="auth-info">
-                    <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 0.5rem; font-weight: 600;">
-                        El primer usuario que crees en tu panel de Supabase será tu cuenta 'root' con acceso total.
-                    </p>
-                    <ol style="color: var(--text-light); font-size: 0.9rem; margin-left: 1.5rem;">
-                        <li>Ve a tu proyecto en el Dashboard de Supabase.</li>
-                        <li>En el menú, ve a: Authentication → Users.</li>
-                        <li>Haz clic en "Add user" → "Create new user".</li>
-                        <li>Ingresa un email y una contraseña segura.</li>
-                        <li>(Opcional) Confirma el email del usuario.</li>
-                        <li>Vuelve aquí e inicia sesión con esas credenciales.</li>
-                    </ol>
-                </div>
-                <form id="loginForm" onsubmit="iniciarSesion(event)">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="emailLogin" required placeholder="admin@tienda.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña</label>
-                        <input type="password" id="passwordLogin" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Iniciar Sesion</button>
-                    <div id="loginError" style="margin-top: 1rem; padding: 1rem; border-radius: 8px; display: none; background: #f8d7da; color: #721c24;"></div>
-                </form>
-            </div>
-
             <div id="adminPanel" style="display:none;">
                 <div id="setupWarningBanner" class="warning-banner" style="display:none;">
                     <strong>¡Atención!</strong> Parece que esta es una nueva instalación. Para empezar, ve a la pestaña de<a href="#" onclick="event.preventDefault(); mostrarVistaAdmin('configuracion')">Configuración</a> y ejecuta el script SQL.
@@ -1964,10 +2105,10 @@
                         <div class="form-group">
                             <input type="search" id="productSearch" oninput="cargarProductosAdmin()" placeholder="🔍 Buscar por nombre o marca..." style="padding: 0.75rem;">
                         </div>
-                        <div class="auth-info" style="background: var(--dark); border-left-color: #3b82f6; margin-bottom: 2rem;">
-                            <p style="color: #60a5fa; font-weight: 600; margin-bottom: 0.5rem;">
+                        <div class="config-card" style="background: var(--dark); border-left: 4px solid #3b82f6; margin-bottom: 2rem;">
+                            <h4 style="color: #60a5fa; font-weight: 600; margin-bottom: 0.5rem; margin-top:0;">
                                 ¿Cómo importar productos?
-                            </p>
+                            </h4>
                             <ol style="font-size: 0.9rem; margin-left: 1.5rem; color: #93c5fd; padding-left: 1rem;">
                                 <li><strong>Descarga la plantilla Excel.</strong> Esto te dará el formato correcto.</li>
                                 <li><strong>Llena la plantilla</strong> con tus productos, incluyendo el stock. Usa el ID correcto de la categoría de la lista de abajo.</li>
@@ -2102,14 +2243,20 @@
                     </div>
                     
                     <div id="adminConfiguracionView" style="display: none;">
+                        <div class="config-card" style="border-left: 5px solid var(--success);">
+                            <h3>¡Bienvenido, Administrador!</h3>
+                            <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem; font-size: 1rem;">
+                                Esta es tu central de mando. Sigue estos pasos para lanzar tu tienda:
+                            </p>
+                        </div>
                         <div class="config-card">
-                            <h3>Setup de Base de Datos</h3>
+                            <h3>Paso 1: Setup de Base de Datos</h3>
                             <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem;">
-                                Si es la primera vez que configuras esta tienda, necesitas crear las tablas en tu base de datos Supabase.
-                                Ve a tu proyecto de Supabase &gt; SQL Editor &gt; "New query" y pega y ejecuta el siguiente script completo.
+                                Si es la primera vez que configuras la tienda, crea las tablas en tu base de datos.
+                                Ve a tu proyecto de Supabase &gt; SQL Editor &gt; "New query" y pega y ejecuta el siguiente script.
                             </p>
                             <details>
-                                <summary style="cursor: pointer; font-weight: 600; color: var(--primary);">📄 Ver/Ocultar Script SQL Completo</summary>
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--primary);">📄 Ver/Ocultar Script SQL</summary>
                                 <pre style="background-color: var(--dark); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-top: 1rem; white-space: pre-wrap; word-wrap: break-word; font-size: 0.85rem; max-height: 400px; overflow-y: auto;"><code id="setupSqlScript">-- 1. CREACIÓN DE TABLAS
 CREATE TABLE public.categorias ( 
   id bigint generated by default as identity primary key, 
@@ -2179,15 +2326,22 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                         </div>
 
                         <div class="config-card">
-                            <h3>Guía de Creación de Usuarios</h3>
+                            <h3>Paso 2: Creación de Usuarios Recomendada</h3>
                             <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem;">
-                                Después de iniciar sesión con tu cuenta 'root', debes crear las cuentas para el personal del negocio.
-                                Ve a tu proyecto de Supabase &gt; Authentication &gt; Users y crea los siguientes usuarios:
+                                <strong>Importante:</strong> Por seguridad, los usuarios deben crearse desde el panel de Supabase para que las contraseñas se almacenen de forma encriptada. No uses scripts SQL para esto.
                             </p>
-                            <ul style="list-style-position: inside; display: flex; flex-direction: column; gap: 0.5rem;">
-                                <li><strong>1x Dueño del Negocio (Admin):</strong> Ej: `admin@negocio.com`. Tendrá acceso a este panel.</li>
-                                <li><strong>2x Personal de Tienda:</strong> Ej: `user1@negocio.com`, `user2@negocio.com`. (Actualmente todos los usuarios tienen rol de admin, en el futuro se pueden diferenciar permisos).</li>
+                            <p class="form-hint" style="margin-bottom: 1.5rem;">
+                                Ve a tu panel de Supabase &gt; <strong>Authentication &gt; Users</strong> y crea las siguientes cuentas:
+                            </p>
+                            <ul style="list-style-position: inside; display: flex; flex-direction: column; gap: 0.75rem; background: var(--dark); padding: 1rem; border-radius: 8px;">
+                                <li><code style="background: var(--light); padding: 2px 5px; border-radius: 4px;">root@tienda.com</code> (Para tu acceso de super-administrador)</li>
+                                <li><code style="background: var(--light); padding: 2px 5px; border-radius: 4px;">admin@negocio.com</code> (Para el dueño del negocio)</li>
+                                <li><code style="background: var(--light); padding: 2px 5px; border-radius: 4px;">ventas1@negocio.com</code> (Personal de ventas 1)</li>
+                                <li><code style="background: var(--light); padding: 2px 5px; border-radius: 4px;">ventas2@negocio.com</code> (Personal de ventas 2)</li>
                             </ul>
+                            <p class="form-hint" style="margin-top: 1rem;">
+                                <strong>Nota:</strong> Actualmente, todas las cuentas creadas tienen los mismos permisos de administrador.
+                            </p>
                         </div>
                         
                         <div class="admin-actions" style="justify-content: flex-end; margin-bottom: 1.5rem;">
@@ -2468,7 +2622,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                 <button class="close-btn" onclick="cerrarModalPrevisualizacion()">&times;</button>
             </div>
             <div class="modal-body">
-                <div id="importSummary" class="auth-info" style="margin-bottom: 1.5rem;"></div>
+                <div id="importSummary" class="config-card" style="margin-bottom: 1.5rem; background-color: var(--dark);"></div>
                 <div class="import-preview-table-container">
                     <table class="products-table import-preview-table">
                         <thead>
@@ -2507,15 +2661,15 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
         <div class="footer-container">
             <div class="footer-column">
                 <div class="logo-container">
-                    <img src="" alt="Logo" id="footerLogo" class="logo-image" style="display: none; filter: brightness(0) invert(1);">
+                    <img src="" alt="Logo" id="footerLogo" class="logo-image" style="display: none;">
                     <div id="defaultFooterLogo">
-                         <div class="logo-text-default" style="color: var(--white);" id="footerBusinessName">
+                         <div class="logo-text-default" style="color: var(--text-dark);" id="footerBusinessName">
                             <span class="logo-red">Red</span><span class="logo-number">51</span>
                          </div>
                     </div>
                 </div>
-                 <span class="logo-subtitle" style="color: rgba(255,255,255,0.7); margin-left: 5px;" id="footerBusinessSubtitle">TECHNOLOGY</span>
-                <p style="margin-top: 1rem; color: rgba(255,255,255,0.7);">Innovación y calidad en cada producto que ofrecemos.</p>
+                 <span class="logo-subtitle" style="color: var(--text-light); margin-left: 5px;" id="footerBusinessSubtitle">TECHNOLOGY</span>
+                <p style="margin-top: 1rem; color: var(--text-light);">Innovación y calidad en cada producto que ofrecemos.</p>
             </div>
             <div class="footer-column">
                 <h4>Categorías</h4>
@@ -2550,8 +2704,6 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tinycolor2/dist/tinycolor.min.js"></script>
     <script>
-        const SUPABASE_URL = 'https://zejzrujrspeoszpfbjce.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplanpydWpyc3Blb3N6cGZiamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2MDMyNDMsImV4cCI6MjA3NTE3OTI0M30.UAi4jQ0BH1hphW7OEh4JWP4hdVJ4CmvX6x4CyP2ak-U';
         const CLOUDINARY_CLOUD_NAME = 'dvj68er8s';
         const CLOUDINARY_UPLOAD_PRESET = 'red51_productos';
         
@@ -2593,18 +2745,67 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
         };
 
         function inicializarSupabase() {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            verificarSesion();
+            const SUPABASE_URL = localStorage.getItem('SUPABASE_URL');
+            const SUPABASE_ANON_KEY = localStorage.getItem('SUPABASE_ANON_KEY');
+
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                document.getElementById('setupView').style.display = 'flex';
+                document.getElementById('tiendaView').style.display = 'none';
+                return false;
+            }
+
+            try {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                return true;
+            } catch (error) {
+                console.error("Error initializing Supabase:", error);
+                localStorage.removeItem('SUPABASE_URL');
+                localStorage.removeItem('SUPABASE_ANON_KEY');
+                document.getElementById('setupView').style.display = 'flex';
+                const errorDiv = document.getElementById('setupError');
+                errorDiv.textContent = 'Credenciales inválidas. Por favor, verifica y vuelve a intentarlo.';
+                errorDiv.style.display = 'block';
+                return false;
+            }
         }
+        
+        function guardarCredencialesSupabase(event) {
+            event.preventDefault();
+            const url = document.getElementById('setupSupabaseUrl').value.trim();
+            const key = document.getElementById('setupSupabaseAnonKey').value.trim();
+            const errorDiv = document.getElementById('setupError');
+            errorDiv.style.display = 'none';
+
+            if (!url || !key) {
+                errorDiv.textContent = 'Por favor, completa ambos campos.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            localStorage.setItem('SUPABASE_URL', url);
+            localStorage.setItem('SUPABASE_ANON_KEY', key);
+
+            // Test the connection immediately
+            try {
+                const testClient = supabase.createClient(url, key);
+                // If the client is created without errors, reload the page to start fresh
+                location.reload();
+            } catch (error) {
+                // If there's an error (e.g., malformed URL), show an error and clear the stored keys.
+                localStorage.removeItem('SUPABASE_URL');
+                localStorage.removeItem('SUPABASE_ANON_KEY');
+                errorDiv.textContent = 'Credenciales inválidas o mal formadas. Verifica la URL y la Clave.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
 
         async function verificarSesion() {
             if (!supabaseClient) return;
             
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                usuarioActual = session.user;
-                mostrarPanelAdmin();
-            }
+            usuarioActual = session ? session.user : null;
+            actualizarUIAutenticacion();
         }
 
         async function iniciarSesion(event) {
@@ -2625,16 +2826,25 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                 if (error) throw error;
                 
                 usuarioActual = data.user;
-                mostrarPanelAdmin();
+                actualizarUIAutenticacion();
+                mostrarAdmin();
                 
             } catch (error) {
                 errorDiv.style.display = 'block';
                 errorDiv.textContent = 'Error al iniciar sesion: ' + error.message;
             }
         }
+        
+        function actualizarUIAutenticacion() {
+            const btnAdmin = document.getElementById('btnAdmin');
+            if (usuarioActual) {
+                btnAdmin.textContent = 'Panel';
+            } else {
+                btnAdmin.textContent = 'Admin';
+            }
+        }
 
         function mostrarPanelAdmin() {
-            document.getElementById('loginSection').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('adminEmail').textContent = usuarioActual.email;
             cargarProductosAdmin();
@@ -2651,25 +2861,37 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
             }
             await supabaseClient.auth.signOut();
             usuarioActual = null;
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('adminPanel').style.display = 'none';
+            actualizarUIAutenticacion();
             mostrarTienda();
+        }
+        
+        function handleAdminClick() {
+            if (usuarioActual) {
+                mostrarAdmin();
+            } else {
+                mostrarLogin();
+            }
+        }
+        
+        function mostrarLogin() {
+            document.getElementById('tiendaView').style.display = 'none';
+            document.getElementById('adminView').style.display = 'none';
+            document.getElementById('loginView').style.display = 'flex';
         }
 
         function mostrarTienda() {
             document.getElementById('tiendaView').style.display = 'block';
             document.getElementById('adminView').style.display = 'none';
+            document.getElementById('loginView').style.display = 'none';
         }
 
         function mostrarAdmin() {
             document.getElementById('tiendaView').style.display = 'none';
+            document.getElementById('loginView').style.display = 'none';
             document.getElementById('adminView').style.display = 'block';
             
             if (usuarioActual) {
                 mostrarPanelAdmin();
-            } else {
-                document.getElementById('loginSection').style.display = 'block';
-                document.getElementById('adminPanel').style.display = 'none';
             }
         }
 
@@ -4125,8 +4347,10 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
 
         function initOrUpdateChart(labels, data, type = 'line') {
             const ctx = document.getElementById('salesChart').getContext('2d');
-            const gridColor = 'rgba(240, 240, 240, 0.1)';
-            const ticksColor = '#a0a0a0';
+            
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            const gridColor = isDarkMode ? 'rgba(240, 240, 240, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+            const ticksColor = isDarkMode ? '#a0a0a0' : '#4a4a4a';
 
             if (salesChartInstance) {
                 if (salesChartInstance.config.type !== type) {
@@ -4135,6 +4359,11 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                 } else {
                     salesChartInstance.data.labels = labels;
                     salesChartInstance.data.datasets[0].data = data;
+                    salesChartInstance.options.scales.y.grid.color = gridColor;
+                    salesChartInstance.options.scales.x.grid.color = gridColor;
+                    salesChartInstance.options.scales.y.ticks.color = ticksColor;
+                    salesChartInstance.options.scales.x.ticks.color = ticksColor;
+                    salesChartInstance.options.plugins.legend.labels.color = ticksColor;
                     salesChartInstance.update();
                     return;
                 }
@@ -4802,7 +5031,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
             notif.style.cssText = `
                 position: fixed; top: 100px; right: 20px; z-index: 10000;
                 background: ${type === 'error' ? 'var(--danger)' : 'linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)'};
-                color: ${type === 'error' ? 'white' : 'var(--dark)'}; padding: 1rem 2rem; border-radius: 10px; box-shadow: var(--shadow);
+                color: ${type === 'error' ? 'white' : '#111315'}; padding: 1rem 2rem; border-radius: 10px; box-shadow: var(--shadow);
                 font-weight: 600; transform: translateX(calc(100% + 20px)); transition: transform 0.4s ease-in-out;`;
             document.body.appendChild(notif);
             setTimeout(() => { notif.style.transform = 'translateX(0)'; }, 10);
@@ -4810,6 +5039,39 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                 notif.style.transform = 'translateX(calc(100% + 20px))';
                 notif.addEventListener('transitionend', () => notif.remove());
             }, 4000);
+        }
+        
+        // --- THEME SWITCHER LOGIC ---
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (theme === 'dark') {
+                document.getElementById('theme-toggle').checked = true;
+            } else {
+                document.getElementById('theme-toggle').checked = false;
+            }
+            // Re-render chart if it exists to update colors
+            if (salesChartInstance) {
+                renderizarDashboard();
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (prefersDark) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
         }
         
         // --- CONFIGURATION & THEME SCRIPT ---
@@ -4887,7 +5149,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
             n8nStatusUpdateWebhookUrl = currentSettings.n8nStatusWebhook;
 
             // Apply Theme
-            aplicarTema(currentSettings.theme, currentSettings.colors, false);
+            aplicarTemaColores(currentSettings.theme, currentSettings.colors, false);
 
             // Apply Business Name
             const businessName = currentSettings.businessName || "Tienda Online";
@@ -4897,13 +5159,11 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
             const mainName = nameParts.slice(0, -1).join(' ');
             const lastName = nameParts.slice(-1)[0] || '';
 
-            if (mainName) {
-                document.getElementById('headerBusinessName').innerHTML = `<span class="logo-red">${mainName}</span><span class="logo-number">${lastName}</span>`;
-                document.getElementById('footerBusinessName').innerHTML = `<span class="logo-red">${mainName}</span><span class="logo-number">${lastName}</span>`;
-            } else {
-                 document.getElementById('headerBusinessName').innerHTML = `<span class="logo-red">${lastName}</span>`;
-                 document.getElementById('footerBusinessName').innerHTML = `<span class="logo-red">${lastName}</span>`;
-            }
+            const businessNameHTML = mainName ? `<span class="logo-red">${mainName}</span><span class="logo-number">${lastName}</span>` : `<span class="logo-red">${lastName}</span>`;
+
+            document.getElementById('headerBusinessName').innerHTML = businessNameHTML;
+            document.getElementById('footerBusinessName').innerHTML = businessNameHTML;
+            document.getElementById('loginBusinessName').innerHTML = businessNameHTML;
 
             document.getElementById('headerBusinessSubtitle').textContent = 'TECHNOLOGY'; // Could be a setting later
             document.getElementById('footerBusinessSubtitle').textContent = 'TECHNOLOGY';
@@ -4915,21 +5175,20 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                 headerLogo: document.getElementById('headerLogo'),
                 defaultLogo: document.getElementById('defaultLogo'),
                 footerLogo: document.getElementById('footerLogo'),
-                defaultFooterLogo: document.getElementById('defaultFooterLogo')
+                defaultFooterLogo: document.getElementById('defaultFooterLogo'),
+                loginLogo: document.getElementById('loginLogo'),
+                defaultLoginLogo: document.getElementById('defaultLoginLogo')
             };
 
             if (logoUrl) {
-                elements.headerLogo.src = logoUrl;
-                elements.headerLogo.style.display = 'block';
-                elements.defaultLogo.style.display = 'none';
-                elements.footerLogo.src = logoUrl;
-                elements.footerLogo.style.display = 'block';
-                elements.defaultFooterLogo.style.display = 'none';
+                [elements.headerLogo, elements.footerLogo, elements.loginLogo].forEach(el => {
+                    el.src = logoUrl;
+                    el.style.display = 'block';
+                });
+                [elements.defaultLogo, elements.defaultFooterLogo, elements.defaultLoginLogo].forEach(el => el.style.display = 'none');
             } else {
-                elements.headerLogo.style.display = 'none';
-                elements.defaultLogo.style.display = 'flex';
-                elements.footerLogo.style.display = 'none';
-                elements.defaultFooterLogo.style.display = 'block';
+                [elements.headerLogo, elements.footerLogo, elements.loginLogo].forEach(el => el.style.display = 'none');
+                [elements.defaultLogo, elements.defaultFooterLogo, elements.defaultLoginLogo].forEach(el => el.style.display = 'flex');
             }
         }
 
@@ -4981,8 +5240,8 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
             }
         }
 
-        function aplicarTema(themeName, customColors = {}, triggerSave = true) {
-            document.body.className = '';
+        function aplicarTemaColores(themeName, customColors = {}, triggerSave = true) {
+            document.body.className = ''; // Clear previous theme classes
             const root = document.documentElement;
 
             if (themeName === 'custom' && Object.keys(customColors).length > 0) {
@@ -4991,7 +5250,8 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                 });
             } else {
                 document.body.classList.add(`theme-${themeName}`);
-                ['primary', 'secondary', 'accent', 'dark', 'light', 'white', 'text-dark', 'text-light', 'border-color'].forEach(prop => root.style.removeProperty(`--${prop}`));
+                // Clear any inline styles from custom themes
+                ['primary', 'secondary', 'accent'].forEach(prop => root.style.removeProperty(`--${prop}`));
             }
             
             if (triggerSave) {
@@ -5005,7 +5265,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
         }
         
         function seleccionarTema(themeName, triggerSave = true) {
-            aplicarTema(themeName, {}, triggerSave);
+            aplicarTemaColores(themeName, {}, triggerSave);
             document.getElementById('generatedPalette').innerHTML = '';
         }
         
@@ -5043,17 +5303,14 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                 
                 const primary = tinyPalette[0].toString();
                 const secondary = tinyPalette[1].isDark() ? tinyPalette[1].lighten(20).toString() : tinyPalette[1].toString();
-                const dark = tinyPalette.find(c => c.isDark())?.darken(10).toString() || '#1a1a2e';
                 
                 const customColors = {
                     primary: primary,
                     secondary: secondary,
-                    accent: tinycolor.mix(primary, secondary).toString(),
-                    dark: dark,
-                    'text-dark': tinycolor(dark).isLight() ? '#000' : dark,
+                    accent: tinycolor.mix(primary, secondary).toString()
                 };
                 
-                aplicarTema('custom', customColors);
+                aplicarTemaColores('custom', customColors);
                 
                 const paletteContainer = document.getElementById('generatedPalette');
                 paletteContainer.innerHTML = `
@@ -5068,24 +5325,31 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
             };
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            inicializarSupabase();
-            await cargarConfiguracionGeneral();
-            await cargarCategorias();
-            await cargarProductos();
-            
-            document.getElementById('chartTypeSwitcher').addEventListener('click', (e) => {
-                if(e.target.tagName === 'BUTTON') {
-                    const newType = e.target.dataset.type;
-                    if (newType !== currentChartType) {
-                        currentChartType = newType;
-                        document.querySelectorAll('#chartTypeSwitcher .view-btn').forEach(btn => btn.classList.remove('active'));
-                        e.target.classList.add('active');
-                        renderizarDashboard();
+        async function startApp() {
+            loadTheme();
+            const isInitialized = inicializarSupabase();
+
+            if (isInitialized) {
+                await verificarSesion();
+                await cargarConfiguracionGeneral();
+                await cargarCategorias();
+                await cargarProductos();
+                
+                document.getElementById('chartTypeSwitcher').addEventListener('click', (e) => {
+                    if(e.target.tagName === 'BUTTON') {
+                        const newType = e.target.dataset.type;
+                        if (newType !== currentChartType) {
+                            currentChartType = newType;
+                            document.querySelectorAll('#chartTypeSwitcher .view-btn').forEach(btn => btn.classList.remove('active'));
+                            e.target.classList.add('active');
+                            renderizarDashboard();
+                        }
                     }
-                }
-            });
-        });
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', startApp);
 
         window.onclick = function(event) {
             const modals = document.getElementsByClassName('modal');
