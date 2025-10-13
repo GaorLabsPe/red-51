@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Red51 Technology - Tienda Online</title>
+    <title>Tienda Online</title>
     <style>
         * {
             margin: 0;
@@ -32,27 +32,43 @@
         .theme-mystic { /* Default Theme */
             --primary: #7B5C7E; --secondary: #1B9AA8; --accent: #168B97; --dark: #1a1a2e;
             --light: #f5f5f5; --white: #FFFFFF; --text-dark: #1a1a1a; --text-light: #4a4a4a;
+            --border-color: #e0e0e0;
         }
 
         .theme-tech {
             --primary: #0d47a1; --secondary: #42a5f5; --accent: #1e88e5; --dark: #263238;
             --light: #f5f5f5; --white: #FFFFFF; --text-dark: #212121; --text-light: #424242;
+            --border-color: #e0e0e0;
         }
 
         .theme-vibrant {
             --primary: #e65100; --secondary: #ff9800; --accent: #fb8c00; --dark: #212121;
             --light: #f5f5f5; --white: #FFFFFF; --text-dark: #212121; --text-light: #424242;
+            --border-color: #e0e0e0;
+        }
+
+        .theme-cyberpunk {
+            --primary: #a45cff;
+            --secondary: #00f0b5;
+            --accent: #00f0b5;
+            --dark: #111315;
+            --light: #2a2d32;
+            --white: #FFFFFF;
+            --text-dark: #f0f0f0;
+            --text-light: #a0a0a0;
+            --border-color: #3a3d42;
+            --shadow: 0 4px 25px rgba(0, 240, 181, 0.1);
         }
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--white);
+            background: var(--dark);
             color: var(--text-dark);
             line-height: 1.6;
         }
         
         .header {
-            background: var(--white);
+            background: var(--light);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
@@ -124,13 +140,13 @@
         
         .nav-btn:hover {
             color: var(--secondary);
-            background-color: var(--light);
+            background-color: var(--dark);
         }
         
         .cart-btn {
             position: relative;
             background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--white);
+            color: var(--dark);
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             border: none;
@@ -141,7 +157,7 @@
         
         .cart-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(27, 154, 168, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 240, 181, 0.3);
         }
         
         .cart-count {
@@ -205,7 +221,7 @@
         
         .cta-btn {
             background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--white);
+            color: var(--dark);
             padding: 1rem 2.5rem;
             border-radius: 12px;
             text-decoration: none;
@@ -216,11 +232,11 @@
         
         .cta-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(27, 154, 168, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 240, 181, 0.4);
         }
 
         .category-section {
-            background-color: var(--light);
+            background-color: var(--dark);
             padding: 4rem 0;
         }
         
@@ -252,18 +268,18 @@
         }
         .category-item:hover {
             transform: translateY(-5px);
-            background-color: var(--white);
+            background-color: var(--light);
         }
         .category-item.active {
             border-color: var(--secondary);
-            background-color: var(--white);
+            background-color: var(--light);
         }
 
         .category-icon-wrapper {
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: var(--white);
+            background-color: var(--light);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
@@ -276,7 +292,7 @@
         
         .category-item.active .category-icon-wrapper {
              background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-             color: var(--white);
+             color: var(--dark);
         }
 
         .category-name {
@@ -303,7 +319,7 @@
         }
         
         .product-card {
-            background: var(--white);
+            background: var(--light);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             overflow: hidden;
@@ -314,13 +330,13 @@
         .product-card:hover {
             transform: translateY(-8px);
             box-shadow: var(--shadow);
-            border-color: transparent;
+            border-color: var(--secondary);
         }
         
         .product-image {
             width: 100%;
             height: 250px;
-            background: var(--light);
+            background: var(--dark);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -375,7 +391,7 @@
         }
         
         .product-brand {
-            color: #666;
+            color: var(--text-light);
             font-size: 0.9rem;
             margin-bottom: 1rem;
         }
@@ -403,7 +419,7 @@
 
         .btn-add-quick {
             background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--white);
+            color: var(--dark);
             border: none;
             width: 50px;
             height: 50px;
@@ -443,7 +459,8 @@
         }
         
         .modal-content {
-            background: var(--white);
+            background: var(--light);
+            color: var(--text-dark);
             max-width: 800px;
             margin: 2rem auto;
             border-radius: 20px;
@@ -452,6 +469,7 @@
             display: flex;
             flex-direction: column;
             animation: slideIn 0.4s ease-out;
+            border: 1px solid var(--border-color);
         }
 
         @keyframes slideIn {
@@ -467,7 +485,7 @@
             align-items: center;
             position: sticky;
             top: 0;
-            background: var(--white);
+            background: var(--light);
             z-index: 10;
         }
         
@@ -496,7 +514,7 @@
             display: flex;
             justify-content: flex-end;
             gap: 1rem;
-            background: #fafafa;
+            background: var(--dark);
             border-radius: 0 0 20px 20px;
         }
 
@@ -510,7 +528,7 @@
         .product-detail-image img {
             width: 100%;
             border-radius: 16px;
-            background: var(--light);
+            background: var(--dark);
         }
         
         .product-detail-info .product-name {
@@ -523,7 +541,7 @@
         }
 
         .product-detail-info .product-description {
-            color: #666;
+            color: var(--text-light);
             font-size: 1rem;
             line-height: 1.6;
             margin-bottom: 1.5rem;
@@ -554,15 +572,16 @@
             border: 1px solid var(--border-color);
             font-size: 1.2rem;
             font-weight: 600;
+            background-color: var(--dark);
+            color: var(--text-dark);
         }
         .quantity-selector button {
             cursor: pointer;
-            background: var(--light);
             transition: all 0.2s;
         }
         .quantity-selector button:hover {
             background: var(--primary);
-            color: var(--white);
+            color: var(--dark);
             border-color: var(--primary);
         }
         .quantity-selector input {
@@ -603,13 +622,13 @@
         }
         
         .cart-item-brand {
-            color: #999;
+            color: var(--text-light);
             font-size: 0.85rem;
             margin-bottom: 0.3rem;
         }
         
         .cart-item-price {
-            color: #666;
+            color: var(--text-light);
             font-size: 0.95rem;
         }
         
@@ -621,7 +640,7 @@
         }
         
         .qty-btn {
-            background: var(--white);
+            background: var(--dark);
             border: 1px solid var(--border-color);
             color: var(--text-dark);
             width: 32px;
@@ -634,7 +653,7 @@
         
         .qty-btn:hover {
             background: var(--primary);
-            color: var(--white);
+            color: var(--dark);
         }
         
         .qty-display {
@@ -657,7 +676,7 @@
         .cart-total {
             margin-top: 2rem;
             padding: 1.5rem;
-            background: var(--light);
+            background: var(--dark);
             border-radius: 12px;
             display: flex;
             justify-content: space-between;
@@ -695,6 +714,8 @@
             font-size: 1rem;
             font-family: inherit;
             transition: border-color 0.3s;
+            background-color: var(--dark);
+            color: var(--text-dark);
         }
         
         .form-group input:focus,
@@ -702,7 +723,7 @@
         .form-group select:focus {
             outline: none;
             border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(27, 154, 168, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 240, 181, 0.1);
         }
         
         .form-group textarea {
@@ -712,14 +733,14 @@
 
         .form-hint {
             font-size: 0.85rem;
-            color: #666;
+            color: var(--text-light);
             margin-top: 0.25rem;
         }
         
         .btn-primary {
             width: 100%;
             background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--white);
+            color: var(--dark);
             padding: 1.2rem;
             border: none;
             border-radius: 12px;
@@ -732,7 +753,7 @@
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(27, 154, 168, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 240, 181, 0.3);
         }
         
         .btn-primary:disabled {
@@ -744,7 +765,7 @@
         }
         
         .btn-secondary {
-            background: var(--white);
+            background: var(--dark);
             border: 1px solid var(--primary);
             color: var(--primary);
             padding: 0.75rem 1.5rem;
@@ -760,7 +781,7 @@
         
         .btn-secondary:hover {
             background: var(--primary);
-            color: var(--white);
+            color: var(--dark);
         }
         
         .btn-danger {
@@ -777,7 +798,7 @@
         .empty-cart {
             text-align: center;
             padding: 3rem 2rem;
-            color: #999;
+            color: var(--text-light);
         }
         
         .empty-cart-icon {
@@ -804,12 +825,12 @@
         }
         
         .success-message p {
-            color: #666;
+            color: var(--text-light);
             margin-bottom: 2rem;
         }
         
         .admin-section {
-            background: var(--white);
+            background: var(--light);
             padding: 2rem;
             border-radius: 16px;
             margin-bottom: 2rem;
@@ -874,7 +895,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--light);
+            background: var(--dark);
             margin-top: 0.5rem;
             overflow: hidden;
             position: relative;
@@ -943,13 +964,13 @@
         }
         
         .products-table th {
-            background: var(--light);
+            background: var(--dark);
             font-weight: 700;
             color: var(--primary);
         }
         
         .products-table tr:hover {
-            background: var(--light);
+            background: var(--dark);
         }
 
         .products-table tr[onclick] {
@@ -963,7 +984,7 @@
         
         .btn-edit {
             background: var(--secondary);
-            color: var(--white);
+            color: var(--dark);
             padding: 0.5rem 1rem;
             border: none;
             border-radius: 6px;
@@ -995,7 +1016,7 @@
         .loading {
             text-align: center;
             padding: 3rem;
-            color: #999;
+            color: var(--text-light);
         }
         
         .footer {
@@ -1041,7 +1062,7 @@
         }
         
         .login-section {
-            background: var(--white);
+            background: var(--light);
             padding: 2rem;
             border-radius: 16px;
             margin-bottom: 2rem;
@@ -1051,7 +1072,7 @@
         }
 
         .auth-info {
-            background: #f0f9ff;
+            background: var(--dark);
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
@@ -1073,7 +1094,7 @@
             cursor: pointer;
             font-size: 1.1rem;
             font-weight: 600;
-            color: #999;
+            color: var(--text-light);
             position: relative;
             top: 2px;
             transition: all 0.2s;
@@ -1093,7 +1114,7 @@
         }
 
         .order-details-card {
-            background: var(--light);
+            background: var(--dark);
             padding: 1.5rem;
             border-radius: 12px;
         }
@@ -1108,10 +1129,10 @@
 
         .order-details-card p {
             margin-bottom: 0.5rem;
-            color: #333;
+            color: var(--text-dark);
         }
         .order-details-card p strong {
-            color: #555;
+            color: var(--text-light);
         }
         
         .admin-view-controls {
@@ -1126,7 +1147,7 @@
         .view-switcher {
             display: flex;
             gap: 0.5rem;
-            background-color: var(--light);
+            background-color: var(--dark);
             padding: 5px;
             border-radius: 8px;
         }
@@ -1139,10 +1160,11 @@
             font-weight: 600;
             border-radius: 6px;
             transition: all 0.2s;
+            color: var(--text-dark);
         }
 
         .view-btn.active {
-            background: var(--white);
+            background: var(--light);
             color: var(--primary);
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
@@ -1174,6 +1196,8 @@
             padding: 0.5rem;
             border-radius: 6px;
             border: 1px solid var(--border-color);
+            background-color: var(--dark);
+            color: var(--text-dark);
         }
 
         .kanban-board-container {
@@ -1187,7 +1211,7 @@
         .kanban-column {
             flex-shrink: 0;
             width: 250px;
-            background: var(--light);
+            background: var(--dark);
             border-radius: 12px;
             display: flex;
             flex-direction: column;
@@ -1195,7 +1219,7 @@
         }
 
         .kanban-column.drag-over {
-            background-color: #e0e7ff;
+            background-color: #3a3d42;
         }
 
         .kanban-column-header {
@@ -1217,7 +1241,7 @@
         }
 
         .kanban-card {
-            background: var(--white);
+            background: var(--light);
             border-radius: 8px;
             padding: 0.6rem;
             margin-bottom: 0.5rem;
@@ -1265,7 +1289,7 @@
 
         .kanban-card-fecha {
             font-size: 0.7rem;
-            color: #666;
+            color: var(--text-light);
         }
         
         .import-preview-table-container {
@@ -1292,7 +1316,7 @@
         #import-categories-list {
             max-height: 150px;
             overflow-y: auto;
-            background: #f8fafc;
+            background: var(--dark);
             padding: 0.75rem;
             border-radius: 8px;
             border: 1px solid var(--border-color);
@@ -1317,7 +1341,7 @@
         }
         
         .widget-card {
-            background-color: var(--white);
+            background-color: var(--light);
             padding: 1.5rem;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -1343,12 +1367,12 @@
             align-items: center;
             gap: 1rem;
             padding: 0.75rem;
-            background-color: var(--light);
+            background-color: var(--dark);
             border-radius: 8px;
             transition: background-color 0.2s, transform 0.2s;
         }
         .top-item:hover {
-            background-color: #e9e9e9;
+            background-color: #3a3d42;
             transform: translateX(5px);
         }
 
@@ -1356,7 +1380,7 @@
             font-weight: 700;
             font-size: 1rem;
             color: var(--primary);
-            background-color: #f5f3ff;
+            background-color: var(--dark);
             width: 32px;
             height: 32px;
             flex-shrink: 0;
@@ -1383,11 +1407,11 @@
 
         .top-item-metric {
             font-size: 0.85rem;
-            color: #666;
+            color: var(--text-light);
         }
 
         .kpi-card {
-            background-color: var(--white);
+            background-color: var(--light);
             padding: 1.5rem;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -1397,7 +1421,7 @@
         .kpi-card-title {
             font-size: 1rem;
             font-weight: 600;
-            color: #666;
+            color: var(--text-light);
             margin-bottom: 0.5rem;
         }
 
@@ -1408,7 +1432,7 @@
         }
         
         .chart-container {
-            background-color: var(--white);
+            background-color: var(--light);
             padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -1445,7 +1469,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(42, 45, 50, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1456,23 +1480,23 @@
         .out-of-stock-badge {
             font-weight: 700;
             color: var(--text-dark);
-            background: rgba(230, 230, 230, 0.95);
+            background: rgba(20, 22, 25, 0.95);
             padding: 0.5rem 1.5rem;
             border-radius: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border-color);
         }
         
         /* Variants UI Styles */
         .variants-manager {
-            background: #f8fafc;
+            background: var(--dark);
             padding: 1.5rem;
             border-radius: 8px;
             border: 1px solid var(--border-color);
         }
 
         .variant-group-block {
-            background: var(--white);
-            border: 1px solid #d1d5db;
+            background: var(--light);
+            border: 1px solid var(--border-color);
             padding: 1rem;
             border-radius: 8px;
         }
@@ -1522,7 +1546,7 @@
             width: 40px;
             height: 40px;
             flex-shrink: 0;
-            background: var(--light);
+            background: var(--dark);
             border: 1px solid var(--border-color);
             border-radius: 6px;
             display: flex;
@@ -1546,7 +1570,7 @@
             transition: background-color 0.2s;
         }
         .stock-summary:hover {
-            background-color: #e9ecef;
+            background-color: #3a3d42;
         }
         .stock-toggle-icon {
             transition: transform 0.2s;
@@ -1558,7 +1582,7 @@
         }
         .stock-details-breakdown {
             position: absolute;
-            background: var(--white);
+            background: var(--light);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
@@ -1599,14 +1623,14 @@
             transition: background-color 0.2s;
         }
         .stock-details-breakdown li:hover {
-            background-color: var(--light);
+            background-color: var(--dark);
         }
         .stock-details-breakdown .variant-name {
             color: var(--text-dark);
         }
         .stock-details-breakdown .variant-stock {
             font-weight: 700;
-            background-color: #e9ecef;
+            background-color: var(--dark);
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 0.8rem;
@@ -1628,117 +1652,29 @@
             font-size: 1.5rem;
             border-radius: 10px;
             border: 1px solid var(--border-color);
-            background-color: var(--light);
+            background-color: var(--dark);
+            color: var(--text-dark);
             cursor: pointer;
             transition: all 0.2s;
         }
         .btn-gps:hover {
             background-color: var(--primary);
-            color: var(--white);
+            color: var(--dark);
         }
         .btn-gps:disabled {
             cursor: wait;
             background-color: #ccc;
         }
         
-        /* Admin Checklist / Operations Styles */
-        #adminOperacionesView .card {
-            background-color: var(--white);
+        /* CONFIGURATION VIEW STYLES */
+        .config-card {
+            background-color: var(--light);
             padding: 2rem;
             border-radius: 16px;
             box-shadow: var(--shadow);
             margin-bottom: 2rem;
         }
-        #adminOperacionesView .card h2 {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--secondary);
-        }
-        #adminOperacionesView .btn {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: var(--white);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        #adminOperacionesView .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(27, 154, 168, 0.3); }
-        #adminOperacionesView .btn-secondary { background: #6c757d; }
-        #adminOperacionesView .btn-danger { background: var(--danger); }
-        #adminOperacionesView .btn-copy {
-            background-color: #e2e8f0;
-            color: #475569;
-            border: none;
-            padding: 0.25rem 0.75rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-left: 1rem;
-            font-size: 0.8rem;
-        }
-        #adminOperacionesView .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        #adminOperacionesView #projectList { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-        #adminOperacionesView .project-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; cursor: pointer; transition: all 0.2s; }
-        #adminOperacionesView .project-card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.08); transform: translateY(-4px); }
-        #adminOperacionesView .project-card-header h3 { margin: 0; color: #333; }
-        #adminOperacionesView .project-card-header p { font-size: 0.9rem; color: #666; }
-        #adminOperacionesView .progress-bar-container { background-color: var(--light); border-radius: 20px; height: 10px; margin: 1rem 0; overflow: hidden; }
-        #adminOperacionesView .progress-bar { background: linear-gradient(90deg, var(--secondary) 0%, var(--primary) 100%); height: 100%; width: 0%; border-radius: 20px; transition: width 0.5s ease-in-out; }
-        #adminOperacionesView .project-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #555; }
-        #adminOperacionesView .project-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
-        #adminOperacionesView .project-tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 2rem; }
-        #adminOperacionesView .project-tab-btn { padding: 1rem 1.5rem; border: none; background: none; cursor: pointer; font-size: 1.1rem; font-weight: 600; color: #999; position: relative; top: 2px; transition: all 0.2s; }
-        #adminOperacionesView .project-tab-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
-        #adminOperacionesView .checklist ul { list-style: none; padding-left: 0; }
-        #adminOperacionesView .checklist li { margin-bottom: 1.5rem; }
-        #adminOperacionesView .checklist .main-task { font-weight: 700; font-size: 1.2rem; color: var(--dark); display: flex; align-items: center; }
-        #adminOperacionesView .checklist .sub-task { padding-left: 2.5rem; margin-top: 1rem; color: #555; font-size: 0.95rem; }
-        #adminOperacionesView .checklist .sub-task-header { display: flex; align-items: center; }
-        #adminOperacionesView .checklist input[type="checkbox"] { margin-right: 0.8rem; width: 20px; height: 20px; accent-color: var(--secondary); cursor: pointer; flex-shrink: 0; }
-        #adminOperacionesView .checklist label { cursor: pointer; }
-        #adminOperacionesView .checklist .input-group { margin-top: 0.75rem; padding-left: 2.5rem; }
-        #adminOperacionesView .checklist .input-group label { display: block; font-weight: 600; color: #444; margin-bottom: 0.25rem; }
-        #adminOperacionesView .checklist .input-group input, #adminOperacionesView .checklist .input-group textarea { width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 8px; }
-        #adminOperacionesView .details { margin-top: 0.75rem; }
-        #adminOperacionesView .details summary { cursor: pointer; font-weight: 600; color: var(--secondary); margin-bottom: 0.5rem; display: flex; align-items: center; }
-        #adminOperacionesView .details-content { background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-size: 0.9rem; }
-        #adminOperacionesView .details-content pre, #adminOperacionesView code { background-color: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; font-family: 'Courier New', Courier, monospace; max-height: 400px;}
-        #adminOperacionesView code.inline { padding: 2px 6px; display: inline-block; white-space: normal;}
-        #adminOperacionesView #n8nGuideTabContent h3 { font-size: 1.3rem; color: var(--primary); margin-top: 2rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
-        #adminOperacionesView .guide-section { margin-bottom: 2rem; }
-        #adminOperacionesView .guide-card { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
-        #adminOperacionesView .guide-card h4 { margin: 0 0 1rem 0; font-size: 1.1rem; color: #333; }
-        #adminOperacionesView .guide-card strong { color: var(--dark); }
-        #adminOperacionesView .priority-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
-        #adminOperacionesView .priority-dot.critical { background-color: #dc3545; }
-        #adminOperacionesView .priority-dot.high { background-color: #f59e0b; }
-        #adminOperacionesView .priority-dot.low { background-color: #10b981; }
-        #adminOperacionesView .guide-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        #adminOperacionesView .guide-table th, #adminOperacionesView .guide-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-        #adminOperacionesView .guide-table th { background-color: var(--light); font-weight: 700; }
-        #adminOperacionesView .guide-table tr:hover { background-color: #f8fafc; }
-        #projectModal .modal-content { background-color: var(--white); margin: 10% auto; padding: 2.5rem; border-radius: 16px; width: 90%; max-width: 500px; }
-        #projectModal .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        #projectModal .close-btn { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
-        #projectModal .form-group { margin-bottom: 1rem; }
-        #projectModal .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
-        #projectModal .form-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; }
-
-        /* THEME CUSTOMIZER STYLES */
-        .theme-customizer-card {
-             background-color: var(--white);
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            margin-bottom: 2rem;
-        }
-        .theme-customizer-card h3 {
+        .config-card h3 {
             font-size: 1.5rem; color: var(--primary); margin-bottom: 1.5rem; padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--secondary);
         }
@@ -1795,6 +1731,35 @@
             border: 2px solid var(--border-color);
         }
 
+        .warning-banner {
+            background-color: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning-text);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        .warning-banner a {
+            color: var(--warning-text);
+            font-weight: 600;
+            text-decoration: underline;
+            margin: 0 0.25rem;
+        }
+        .warning-banner button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--warning-text);
+            opacity: 0.7;
+            padding: 0 0.5rem;
+        }
+
         @media (max-width: 768px) {
             .hero-section h1 {
                 font-size: 2.5rem;
@@ -1830,16 +1795,16 @@
         }
     </style>
 </head>
-<body class="theme-mystic">
+<body class="theme-cyberpunk">
     <header class="header">
         <nav class="nav-container">
             <div class="logo-container" onclick="mostrarTienda()">
                 <img src="" alt="Logo" id="headerLogo" class="logo-image" style="display: none;">
                 <div id="defaultLogo">
-                    <div class="logo-text-default">
+                    <div class="logo-text-default" id="headerBusinessName">
                         <span class="logo-red">Red</span><span class="logo-number">51</span>
                     </div>
-                    <span class="logo-subtitle">TECHNOLOGY</span>
+                    <span class="logo-subtitle" id="headerBusinessSubtitle">TECHNOLOGY</span>
                 </div>
             </div>
             <div class="nav-links">
@@ -1885,22 +1850,22 @@
             <div id="loginSection" class="login-section">
                 <h2 style="margin-bottom: 1rem; color: var(--primary);">Acceso Administrador</h2>
                 <div class="auth-info">
-                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                        Para acceder al panel de administracion, primero debes crear un usuario en tu proyecto de Supabase:
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 0.5rem; font-weight: 600;">
+                        El primer usuario que crees en tu panel de Supabase será tu cuenta 'root' con acceso total.
                     </p>
-                    <ol style="color: #666; font-size: 0.9rem; margin-left: 1.5rem;">
-                        <li>Ve a tu proyecto Supabase Dashboard</li>
-                        <li>Menu: Authentication → Users</li>
-                        <li>Click "Add user" → "Create new user"</li>
-                        <li>Ingresa email y contraseña</li>
-                        <li>Confirma el email del usuario</li>
-                        <li>Vuelve aqui e inicia sesion</li>
+                    <ol style="color: var(--text-light); font-size: 0.9rem; margin-left: 1.5rem;">
+                        <li>Ve a tu proyecto en el Dashboard de Supabase.</li>
+                        <li>En el menú, ve a: Authentication → Users.</li>
+                        <li>Haz clic en "Add user" → "Create new user".</li>
+                        <li>Ingresa un email y una contraseña segura.</li>
+                        <li>(Opcional) Confirma el email del usuario.</li>
+                        <li>Vuelve aquí e inicia sesión con esas credenciales.</li>
                     </ol>
                 </div>
                 <form id="loginForm" onsubmit="iniciarSesion(event)">
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="email" id="emailLogin" required placeholder="admin@red51.com">
+                        <input type="email" id="emailLogin" required placeholder="admin@tienda.com">
                     </div>
                     <div class="form-group">
                         <label>Contraseña</label>
@@ -1912,11 +1877,15 @@
             </div>
 
             <div id="adminPanel" style="display:none;">
+                <div id="setupWarningBanner" class="warning-banner" style="display:none;">
+                    <strong>¡Atención!</strong> Parece que esta es una nueva instalación. Para empezar, ve a la pestaña de<a href="#" onclick="event.preventDefault(); mostrarVistaAdmin('configuracion')">Configuración</a> y ejecuta el script SQL.
+                    <button onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
                 <div class="admin-section">
                     <div class="admin-header">
                         <h2>Panel de Administracion</h2>
                         <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                            <span id="adminEmail" style="color: #666; font-size: 0.9rem;"></span>
+                            <span id="adminEmail" style="color: var(--text-light); font-size: 0.9rem;"></span>
                              <button class="btn-danger" onclick="cerrarSesion()">Cerrar Sesion</button>
                         </div>
                     </div>
@@ -1927,8 +1896,7 @@
                         <button id="tabProductos" class="tab-btn" onclick="mostrarVistaAdmin('productos')">Productos</button>
                         <button id="tabCategorias" class="tab-btn" onclick="mostrarVistaAdmin('categorias')">Categorías</button>
                         <button id="tabClientes" class="tab-btn" onclick="mostrarVistaAdmin('clientes')">Clientes</button>
-                        <button id="tabApariencia" class="tab-btn" onclick="mostrarVistaAdmin('apariencia')">Apariencia</button>
-                        <button id="tabOperaciones" class="tab-btn" onclick="mostrarVistaAdmin('operaciones')">Operaciones</button>
+                        <button id="tabConfiguracion" class="tab-btn" onclick="mostrarVistaAdmin('configuracion')">Configuración</button>
                     </div>
 
                     <div id="adminDashboardView">
@@ -1996,18 +1964,18 @@
                         <div class="form-group">
                             <input type="search" id="productSearch" oninput="cargarProductosAdmin()" placeholder="🔍 Buscar por nombre o marca..." style="padding: 0.75rem;">
                         </div>
-                        <div class="auth-info" style="background: #eff6ff; border-left-color: #3b82f6; margin-bottom: 2rem;">
-                            <p style="color: #1e40af; font-weight: 600; margin-bottom: 0.5rem;">
+                        <div class="auth-info" style="background: var(--dark); border-left-color: #3b82f6; margin-bottom: 2rem;">
+                            <p style="color: #60a5fa; font-weight: 600; margin-bottom: 0.5rem;">
                                 ¿Cómo importar productos?
                             </p>
-                            <ol style="font-size: 0.9rem; margin-left: 1.5rem; color: #1d4ed8; padding-left: 1rem;">
+                            <ol style="font-size: 0.9rem; margin-left: 1.5rem; color: #93c5fd; padding-left: 1rem;">
                                 <li><strong>Descarga la plantilla Excel.</strong> Esto te dará el formato correcto.</li>
                                 <li><strong>Llena la plantilla</strong> con tus productos, incluyendo el stock. Usa el ID correcto de la categoría de la lista de abajo.</li>
                                 <li>Guarda tu archivo en formato <strong>.xlsx</strong>.</li>
                                 <li>Haz clic en <strong>"Importar Excel"</strong>. Se abrirá una previsualización.</li>
                                 <li>Verifica los datos y confirma la importación.</li>
                             </ol>
-                            <p style="font-size: 0.85rem; color: #1e40af; margin-top: 1rem; margin-bottom: 0.5rem;">
+                            <p style="font-size: 0.85rem; color: #93c5fd; margin-top: 1rem; margin-bottom: 0.5rem;">
                                 <strong>IDs de Categorías Disponibles:</strong>
                             </p>
                             <ul id="import-categories-list"></ul>
@@ -2114,7 +2082,7 @@
                             </div>
                             <button class="btn-export" onclick="exportarClientesExcel()">📊 Exportar a Excel</button>
                         </div>
-                        <p style="color: #666; margin-bottom: 1.5rem;">Aquí se agrupan los clientes por su número de teléfono. Haz clic en el nombre para ver su historial de pedidos.</p>
+                        <p style="color: var(--text-light); margin-bottom: 1.5rem;">Aquí se agrupan los clientes por su número de teléfono. Haz clic en el nombre para ver su historial de pedidos.</p>
                         <div style="overflow-x: auto;">
                             <table class="products-table">
                                 <thead>
@@ -2133,12 +2101,106 @@
                         <div id="loadingAdminClients" class="loading" style="display:none;">Cargando clientes...</div>
                     </div>
                     
-                    <div id="adminAparienciaView" style="display: none;">
-                        <div class="admin-actions" style="justify-content: flex-end; margin-bottom: 1.5rem;">
-                            <button class="btn-primary" onclick="guardarConfiguracionTema()">💾 Guardar Cambios</button>
+                    <div id="adminConfiguracionView" style="display: none;">
+                        <div class="config-card">
+                            <h3>Setup de Base de Datos</h3>
+                            <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem;">
+                                Si es la primera vez que configuras esta tienda, necesitas crear las tablas en tu base de datos Supabase.
+                                Ve a tu proyecto de Supabase &gt; SQL Editor &gt; "New query" y pega y ejecuta el siguiente script completo.
+                            </p>
+                            <details>
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--primary);">📄 Ver/Ocultar Script SQL Completo</summary>
+                                <pre style="background-color: var(--dark); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-top: 1rem; white-space: pre-wrap; word-wrap: break-word; font-size: 0.85rem; max-height: 400px; overflow-y: auto;"><code id="setupSqlScript">-- 1. CREACIÓN DE TABLAS
+CREATE TABLE public.categorias ( 
+  id bigint generated by default as identity primary key, 
+  nombre text not null, 
+  slug text not null unique, 
+  icon text, 
+  imagen_url text 
+);
+
+CREATE TABLE public.productos ( 
+  id bigint generated by default as identity primary key, 
+  nombre text not null, 
+  marca text not null, 
+  categoria_id bigint references public.categorias(id) on delete set null, 
+  descripcion text, 
+  precio numeric not null, 
+  stock integer not null default 0, 
+  icon text, 
+  badge text, 
+  activo boolean default true, 
+  imagen_url text, 
+  variantes jsonb 
+);
+
+CREATE TABLE public.pedidos ( 
+  id uuid default gen_random_uuid() primary key, 
+  fecha_pedido timestamp with time zone default timezone('utc'::text, now()) not null, 
+  numero_pedido text, 
+  nombre_cliente text not null, 
+  telefono_cliente text not null, 
+  email_cliente text, 
+  direccion text, 
+  notas text, 
+  latitud double precision, 
+  longitud double precision, 
+  productos jsonb, 
+  total numeric not null, 
+  cantidad_items integer, 
+  estado text default 'pendiente_pago'::text not null 
+);
+
+CREATE TABLE public.settings (
+  id bigint PRIMARY KEY,
+  config jsonb
+);
+
+-- 2. HABILITAR ROW LEVEL SECURITY (RLS) - ¡MUY IMPORTANTE PARA LA SEGURIDAD!
+ALTER TABLE public.categorias ENABLE ROW LEVEL SECURITY; 
+ALTER TABLE public.productos ENABLE ROW LEVEL SECURITY; 
+ALTER TABLE public.pedidos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
+
+-- 3. POLÍTICAS DE ACCESO PÚBLICO (PERMITEN QUE CUALQUIER VISITANTE VEA LA TIENDA Y HAGA PEDIDOS)
+CREATE POLICY "Public categories are viewable" ON public.categorias FOR SELECT USING (true);
+CREATE POLICY "Public active products are viewable" ON public.productos FOR SELECT USING (activo = true);
+CREATE POLICY "Allow public insert for orders" ON public.pedidos FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public settings are viewable" ON public.settings FOR SELECT USING (true);
+
+-- 4. POLÍTICAS DE ACCESO PARA ADMIN (ACCESO TOTAL PARA USUARIOS AUTENTICADOS)
+CREATE POLICY "Allow full access for authenticated users" ON public.categorias FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Allow full access for authenticated users" ON public.productos FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Allow full access for authenticated users" ON public.pedidos FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR ALL USING (auth.role() = 'authenticated');
+                                </code></pre>
+                                <button class="btn-secondary" style="margin-top: 1rem;" onclick="copySetupSql()">Copiar Script</button>
+                            </details>
                         </div>
-                        <div class="theme-customizer-card">
-                            <h3>Logo y Marca</h3>
+
+                        <div class="config-card">
+                            <h3>Guía de Creación de Usuarios</h3>
+                            <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem;">
+                                Después de iniciar sesión con tu cuenta 'root', debes crear las cuentas para el personal del negocio.
+                                Ve a tu proyecto de Supabase &gt; Authentication &gt; Users y crea los siguientes usuarios:
+                            </p>
+                            <ul style="list-style-position: inside; display: flex; flex-direction: column; gap: 0.5rem;">
+                                <li><strong>1x Dueño del Negocio (Admin):</strong> Ej: `admin@negocio.com`. Tendrá acceso a este panel.</li>
+                                <li><strong>2x Personal de Tienda:</strong> Ej: `user1@negocio.com`, `user2@negocio.com`. (Actualmente todos los usuarios tienen rol de admin, en el futuro se pueden diferenciar permisos).</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="admin-actions" style="justify-content: flex-end; margin-bottom: 1.5rem;">
+                            <button class="btn-primary" onclick="guardarConfiguracionGeneral()">💾 Guardar Cambios</button>
+                        </div>
+
+                        <div class="config-card">
+                            <h3>Datos del Negocio</h3>
+                            <div class="form-group">
+                                <label>Nombre del Negocio</label>
+                                <input type="text" id="settingBusinessName" placeholder="Ej: Mi Tienda Online">
+                                <div class="form-hint">Este nombre aparecerá en el logo, título de la página y pie de página.</div>
+                            </div>
                             <div class="form-group">
                                 <label>Sube el logo de tu negocio</label>
                                 <input type="file" id="logoUpload" accept="image/png, image/jpeg, image/svg+xml" onchange="handleLogoUpload(event)" style="display: none;">
@@ -2150,11 +2212,32 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="config-card">
+                            <h3>Configuración de Webhooks (n8n)</h3>
+                             <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem;">Pega aquí las URLs de los webhooks generados en tu instancia de n8n.</p>
+                            <div class="form-group">
+                                <label>Webhook de Nuevo Pedido</label>
+                                <input type="url" id="settingN8nWebhook" placeholder="https://tu-n8n.com/webhook/nuevo-pedido">
+                            </div>
+                             <div class="form-group">
+                                <label>Webhook de Actualización de Estado</label>
+                                <input type="url" id="settingN8nStatusWebhook" placeholder="https://tu-n8n.com/webhook/actualizar-estado">
+                            </div>
+                        </div>
 
-                        <div class="theme-customizer-card">
-                            <h3>Temas Predefinidos</h3>
+                        <div class="config-card">
+                            <h3>Apariencia y Temas</h3>
                             <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem;">Selecciona una paleta de colores base para tu tienda.</p>
                             <div class="theme-options-grid" id="themeSelector">
+                                <div class="theme-card" data-theme="cyberpunk" onclick="seleccionarTema('cyberpunk')">
+                                    <h4>Cyberpunk Glow</h4>
+                                    <div class="theme-palette">
+                                        <div class="theme-color-dot" style="background-color: #a45cff;"></div>
+                                        <div class="theme-color-dot" style="background-color: #00f0b5;"></div>
+                                        <div class="theme-color-dot" style="background-color: #111315;"></div>
+                                    </div>
+                                </div>
                                 <div class="theme-card" data-theme="mystic" onclick="seleccionarTema('mystic')">
                                     <h4>Mystic Twilight</h4>
                                     <div class="theme-palette">
@@ -2182,186 +2265,11 @@
                             </div>
                         </div>
 
-                        <div class="theme-customizer-card">
+                        <div class="config-card">
                             <h3>Tema Automático desde Logo</h3>
                              <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem;">Extrae los colores de tu logo para crear una paleta de marca única. Primero, sube un logo.</p>
                             <button class="btn-secondary" id="generateFromLogoBtn" onclick="generarTemaDesdeLogo()" disabled>🎨 Generar desde Logo</button>
                             <div id="generatedPalette" style="margin-top: 1.5rem;"></div>
-                        </div>
-                    </div>
-
-                    <div id="adminOperacionesView" style="display:none;">
-                        <!-- DASHBOARD VIEW: Shows all projects -->
-                        <div id="dashboardView">
-                            <div class="card">
-                                <div class="dashboard-header">
-                                    <h2>Mis Proyectos de Onboarding</h2>
-                                    <button class="btn" onclick="openProjectModal()">+ Crear Nuevo Proyecto</button>
-                                </div>
-                                <div id="projectList"></div>
-                            </div>
-                        </div>
-
-                        <!-- PROJECT VIEW: Shows the checklist for a specific project -->
-                        <div id="projectView" style="display:none;">
-                            <div class="card">
-                                <div class="project-header">
-                                    <h2 id="projectNameHeader"></h2>
-                                    <div>
-                                        <button class="btn btn-secondary" onclick="showDashboard()">← Volver</button>
-                                        <button class="btn btn-danger" onclick="deleteCurrentProject()">Eliminar</button>
-                                    </div>
-                                </div>
-
-                                <div class="project-tabs">
-                                    <button class="project-tab-btn active" onclick="showProjectTab('checklist')">Checklist de Onboarding</button>
-                                    <button class="project-tab-btn" onclick="showProjectTab('n8n')">Guía n8n</button>
-                                </div>
-
-                                <div id="checklistTabContent">
-                                    <ul id="onboardingChecklist" class="checklist">
-                                        <!-- Paso 1: Supabase -->
-                                        <li>
-                                            <div class="main-task"><input type="checkbox" id="task1" disabled>Paso 1: Configurar Supabase</div>
-                                            <div class="sub-task">
-                                                <div class="sub-task-header"><input type="checkbox" id="task1_1"><label for="task1_1">Crear nuevo proyecto en Supabase</label></div>
-                                                <div class="input-group">
-                                                    <label for="field_supabaseProjectName">Nombre del Proyecto en Supabase</label>
-                                                    <input type="text" id="field_supabaseProjectName" placeholder="tienda-de-ana">
-                                                </div>
-                                            </div>
-                                            <div class="sub-task">
-                                                <div class="sub-task-header"><input type="checkbox" id="task1_2"><label for="task1_2">Ejecutar script SQL de tablas</label></div>
-                                                <details class="details">
-                                                    <summary>📄 Ver Script SQL <button class="btn-copy" onclick="copySqlScript(this, 'sqlScript')">Copiar Script</button></summary>
-                                                    <div class="details-content"><pre id="sqlScript"><code>-- SCRIPT SQL PARA CREAR TABLAS Y POLÍTICAS...</code></pre></div>
-                                                </details>
-                                            </div>
-                                            <div class="sub-task">
-                                                <div class="sub-task-header"><input type="checkbox" id="task1_3"><label for="task1_3">Registrar credenciales de Supabase</label></div>
-                                                <div class="input-group">
-                                                    <label for="field_supabaseUrl">Project URL</label>
-                                                    <input type="url" id="field_supabaseUrl" placeholder="https://xxxxxxxx.supabase.co">
-                                                </div>
-                                                <div class="input-group">
-                                                    <label for="field_supabaseKey">Project Anon Key</label>
-                                                    <input type="text" id="field_supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <!-- Paso 2: n8n -->
-                                        <li>
-                                            <div class="main-task"><input type="checkbox" id="task2" disabled>Paso 2: Configurar n8n</div>
-                                            <div class="sub-task">
-                                                <div class="sub-task-header"><input type="checkbox" id="task2_1"><label for="task2_1">Importar y configurar Master Workflow</label></div>
-                                                <div style="padding-left: 2.5rem; margin-top: 0.5rem;">
-                                                    <button class="btn" style="background: var(--info);" onclick="showProjectTab('n8n')">Abrir Guía Detallada de n8n →</button>
-                                                </div>
-                                            </div>
-                                            <div class="sub-task">
-                                                <div class="sub-task-header"><input type="checkbox" id="task2_2"><label for="task2_2">Registrar Webhooks de n8n</label></div>
-                                                <div class="input-group">
-                                                    <label for="field_n8nUrl">Webhook URL (del Flujo 1: Nuevo Pedido)</label>
-                                                    <input type="url" id="field_n8nUrl" placeholder="https://n8n.tudominio.com/webhook/...">
-                                                </div>
-                                                <div class="input-group">
-                                                    <label for="field_n8nStatusUrl">Webhook URL (del Flujo 2: Actualizar Estado)</label>
-                                                    <input type="url" id="field_n8nStatusUrl" placeholder="https://n8n.tudominio.com/webhook/...">
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <!-- Paso 3: Código y Vercel -->
-                                        <li>
-                                            <div class="main-task"><input type="checkbox" id="task3" disabled>Paso 3: Desplegar en Vercel</div>
-                                            <div class="sub-task">
-                                                <div class="sub-task-header"><input type="checkbox" id="task3_1"><label for="task3_1">Duplicar repositorio Git y desplegar</label></div>
-                                            </div>
-                                            <div class="sub-task">
-                                                <div class="sub-task-header"><input type="checkbox" id="task3_2"><label for="task3_2">Configurar Variables de Entorno en Vercel</label></div>
-                                            </div>
-                                            <div class="sub-task">
-                                                <div class="sub-task-header"><input type="checkbox" id="task3_3"><label for="task3_3">Registrar URL final</label></div>
-                                                <div class="input-group">
-                                                    <label for="field_vercelUrl">Vercel Deployed URL</label>
-                                                    <input type="url" id="field_vercelUrl" placeholder="https://nombre-proyecto.vercel.app">
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                                
-                                <div id="n8nGuideTabContent" style="display:none;">
-                                     <div class="guide-section">
-                                        <h2>🚀 Herramientas n8n</h2>
-                                        <div class="guide-card">
-                                            <h4>1. Importar el Master Workflow</h4>
-                                            <p>Copia todo el código JSON de abajo. En n8n, ve a un canvas vacío y presiona <strong>Ctrl+V</strong> (o Cmd+V) para pegar los 4 flujos de una sola vez. Las notas amarillas en el canvas te guiarán.</p>
-                                            <button class="btn-copy" onclick="copySqlScript(this, 'n8nMasterWorkflow')">Copiar Master Workflow</button>
-                                            <details class="details"><summary>Ver/Ocultar JSON del Workflow</summary><pre id="n8nMasterWorkflow"></pre></details>
-                                        </div>
-                                    </div>
-                                    <div class="guide-section">
-                                        <h3>🔴 Cambios Críticos (Obligatorios)</h3>
-                                        <div class="guide-card">
-                                            <h4>1. Evolution API (EN TODOS LOS NODOS DE WHATSAPP)</h4>
-                                            <p>Nodos afectados: <code class="inline">Enviar WhatsApp Admin</code>, <code class="inline">Confirmación al Cliente</code>, etc.</p>
-                                            <p><strong>Qué cambiar:</strong> URL de tu API, API Key y seleccionar tus credenciales.</p>
-                                        </div>
-                                        <div class="guide-card">
-                                            <h4>2. Número de WhatsApp del Administrador</h4>
-                                            <p>Nodo: <code class="inline">Enviar WhatsApp Admin</code></p>
-                                            <p><strong>Qué cambiar:</strong> En Body Parameters → number, reemplazar <code class="inline">51905820448</code> por el número del admin.</p>
-                                        </div>
-                                         <div class="guide-card">
-                                            <h4>3. Datos de Pago (EN 5 LUGARES)</h4>
-                                            <p>Nodos: <code class="inline">Formatear Mensaje</code>, <code class="inline">Mensaje 6h</code>, <code class="inline">Mensaje 24h</code>, <code class="inline">Mensaje 48h</code>.</p>
-                                            <p><strong>Qué cambiar:</strong> Reemplazar el número de Yape/Plin <code class="inline">975615244</code> y agregar otras cuentas bancarias.</p>
-                                        </div>
-                                        <div class="guide-card">
-                                            <h4>4. URLs de Webhooks y Credenciales Supabase</h4>
-                                             <p>Asegúrate de copiar las URLs de los webhooks a Vercel y seleccionar las credenciales de Supabase en los nodos correspondientes.</p>
-                                        </div>
-                                         <div class="guide-card">
-                                            <h4>5. URL de la Tienda</h4>
-                                            <p>Nodo: <code class="inline">Preparar Mensaje de Cancelación</code></p>
-                                            <p><strong>Qué cambiar:</strong> Reemplazar la URL por defecto <code class="inline">https://red-51.vercel.app/</code> por la URL de la nueva tienda.</p>
-                                        </div>
-                                    </div>
-                                     <div class="guide-section">
-                                        <h3>🟡 Cambios Recomendados (Alta Prioridad)</h3>
-                                        <div class="guide-card">
-                                            <h4>Nombre del Negocio y Código de País</h4>
-                                            <p>Busca y reemplaza <code class="inline">"RED51 TECHNOLOGY"</code> y el código de país <code class="inline">'51'</code> en los nodos de mensajes y formato de teléfono si no es para Perú.</p>
-                                        </div>
-                                    </div>
-                                    <div class="guide-section">
-                                        <h3>📊 Tabla Resumen: Prioridad de Cambios</h3>
-                                        <table class="guide-table">
-                                            <thead><tr><th>#</th><th>Cambio</th><th>Prioridad</th><th>¿Falla sin esto?</th></tr></thead>
-                                            <tbody>
-                                                <tr><td>1</td><td>Configuración Evolution API</td><td><span class="priority-dot critical"></span>Crítico</td><td>✅ SÍ</td></tr>
-                                                <tr><td>2</td><td>Número de WhatsApp del Admin</td><td><span class="priority-dot critical"></span>Crítico</td><td>✅ SÍ</td></tr>
-                                                <tr><td>3</td><td>Datos de Pago</td><td><span class="priority-dot critical"></span>Crítico</td><td>⚠️ Datos incorrectos</td></tr>
-                                                <tr><td>4</td><td>URLs de Webhooks</td><td><span class="priority-dot critical"></span>Crítico</td><td>✅ SÍ</td></tr>
-                                                <tr><td>5</td><td>URL de la Tienda</td><td><span class="priority-dot critical"></span>Crítico</td><td>⚠️ Link incorrecto</td></tr>
-                                                <tr><td>6</td><td>Credenciales de Supabase</td><td><span class="priority-dot critical"></span>Crítico</td><td>✅ SÍ</td></tr>
-                                                <tr><td>7</td><td>Nombre del Negocio</td><td><span class="priority-dot high"></span>Alta</td><td>❌ NO</td></tr>
-                                                <tr><td>8</td><td>Código de País</td><td><span class="priority-dot high"></span>Alta</td><td>⚠️ Si no es Perú</td></tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="guide-section">
-                                        <h3>🧪 Pruebas Recomendadas</h3>
-                                        <div class="guide-card">
-                                             <ol>
-                                                <li><strong>Flujo Nuevo Pedido:</strong> Crear un pedido y verificar que admin y cliente reciben los mensajes correctos.</li>
-                                                <li><strong>Flujo Cambio de Estado:</strong> Cambiar el estado de un pedido en el panel y verificar que el cliente recibe la notificación.</li>
-                                                <li><strong>Flujo Recordatorios y Cancelación:</strong> Modificar la fecha de un pedido en la base de datos para simular el paso del tiempo y ejecutar los flujos manualmente para probar los recordatorios y la cancelación.</li>
-                                             </ol>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -2594,8 +2502,6 @@
             <div class="modal-body" id="clientHistoryContent"></div>
         </div>
     </div>
-    
-    <div id="projectModal" class="modal"><div class="modal-content">...</div></div>
 
     <footer class="footer">
         <div class="footer-container">
@@ -2603,12 +2509,12 @@
                 <div class="logo-container">
                     <img src="" alt="Logo" id="footerLogo" class="logo-image" style="display: none; filter: brightness(0) invert(1);">
                     <div id="defaultFooterLogo">
-                         <div class="logo-text-default" style="color: var(--white);">
+                         <div class="logo-text-default" style="color: var(--white);" id="footerBusinessName">
                             <span class="logo-red">Red</span><span class="logo-number">51</span>
                          </div>
                     </div>
                 </div>
-                 <span class="logo-subtitle" style="color: rgba(255,255,255,0.7); margin-left: 5px;">TECHNOLOGY</span>
+                 <span class="logo-subtitle" style="color: rgba(255,255,255,0.7); margin-left: 5px;" id="footerBusinessSubtitle">TECHNOLOGY</span>
                 <p style="margin-top: 1rem; color: rgba(255,255,255,0.7);">Innovación y calidad en cada producto que ofrecemos.</p>
             </div>
             <div class="footer-column">
@@ -2634,7 +2540,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 Red51 Technology. Todos los derechos reservados.</p>
+            <p>&copy; 2025 <span id="footerCopyrightName"></span>. Todos los derechos reservados.</p>
         </div>
     </footer>
 
@@ -2646,11 +2552,12 @@
     <script>
         const SUPABASE_URL = 'https://zejzrujrspeoszpfbjce.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplanpydWpyc3Blb3N6cGZiamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2MDMyNDMsImV4cCI6MjA3NTE3OTI0M30.UAi4jQ0BH1hphW7OEh4JWP4hdVJ4CmvX6x4CyP2ak-U';
-        const N8N_WEBHOOK_URL = 'https://webhook.red51.site/webhook/pedidos_red51';
-        const N8N_STATUS_UPDATE_WEBHOOK_URL = 'https://webhook.red51.site/webhook/pedidos-webhook';
         const CLOUDINARY_CLOUD_NAME = 'dvj68er8s';
         const CLOUDINARY_UPLOAD_PRESET = 'red51_productos';
         
+        let n8nWebhookUrl = 'https://webhook.red51.site/webhook/pedidos_red51';
+        let n8nStatusUpdateWebhookUrl = 'https://webhook.red51.site/webhook/pedidos-webhook';
+
         let carrito = [];
         let supabaseClient = null;
         let categoriaActual = 'todos';
@@ -2667,9 +2574,12 @@
         let currentChartType = 'line';
         let clientesMap = new Map();
         let selectedLocation = null;
-        let currentThemeSettings = {
-            theme: 'mystic',
+        let currentSettings = {
+            theme: 'cyberpunk',
             logoUrl: '',
+            businessName: 'Red51 Technology',
+            n8nWebhook: n8nWebhookUrl,
+            n8nStatusWebhook: n8nStatusUpdateWebhookUrl,
             colors: {}
         };
         
@@ -2764,13 +2674,13 @@
         }
 
         async function mostrarVistaAdmin(vista) {
-            const vistas = ['dashboard', 'productos', 'categorias', 'pedidos', 'clientes', 'apariencia', 'operaciones'];
+            const vistas = ['dashboard', 'productos', 'categorias', 'pedidos', 'clientes', 'configuracion'];
             vistas.forEach(v => {
                 const viewEl = document.getElementById(`admin${v.charAt(0).toUpperCase() + v.slice(1)}View`);
                 if (viewEl) viewEl.style.display = vista === v ? 'block' : 'none';
             });
 
-            const tabs = ['Dashboard', 'Productos', 'Categorias', 'Pedidos', 'Clientes', 'Apariencia', 'Operaciones'];
+            const tabs = ['Dashboard', 'Productos', 'Categorias', 'Pedidos', 'Clientes', 'Configuracion'];
             tabs.forEach(t => {
                 const tabEl = document.getElementById(`tab${t}`);
                 if (tabEl) tabEl.classList.toggle('active', vista === t.toLowerCase());
@@ -2782,10 +2692,8 @@
                 renderizarDashboard();
             } else if (vista === 'clientes') {
                 renderizarClientes();
-            } else if (vista === 'operaciones') {
-                loadProjects();
-            } else if (vista === 'apariencia') {
-                renderizarVistaApariencia();
+            } else if (vista === 'configuracion') {
+                renderizarVistaConfiguracion();
             }
         }
 
@@ -3326,6 +3234,11 @@
                 mostrarNotificacion('Por favor, ingresa tu dirección de entrega.', 'error');
                 return;
             }
+            
+            if (!n8nWebhookUrl) {
+                mostrarNotificacion('Error de configuración: El webhook para nuevos pedidos no está definido. Contacta al administrador.', 'error');
+                return;
+            }
 
             isProcessing = true;
             const btnPedido = document.getElementById('btnRealizarPedido');
@@ -3452,7 +3365,7 @@
                 await Promise.all(updatePromises);
 
                 // 5. Enviar Webhook y mostrar éxito
-                fetch(N8N_WEBHOOK_URL, {
+                fetch(n8nWebhookUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ...pedidoDB, fecha_pedido: new Date().toISOString() })
@@ -3930,19 +3843,21 @@
                     schema: 'public'
                 };
                 
-                fetch(N8N_STATUS_UPDATE_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Webhook de actualización de estado enviado a N8N.');
-                    } else {
-                        console.error('Error al enviar webhook a N8N. Estado:', response.status);
-                    }
-                })
-                .catch(err => console.error('Error de red al enviar webhook a N8N:', err));
+                if (n8nStatusUpdateWebhookUrl) {
+                    fetch(n8nStatusUpdateWebhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Webhook de actualización de estado enviado a N8N.');
+                        } else {
+                            console.error('Error al enviar webhook a N8N. Estado:', response.status);
+                        }
+                    })
+                    .catch(err => console.error('Error de red al enviar webhook a N8N:', err));
+                }
                 
                 const orderDetailsModal = document.getElementById('orderDetailsModal');
                 if (orderDetailsModal.style.display === 'block') {
@@ -4210,6 +4125,9 @@
 
         function initOrUpdateChart(labels, data, type = 'line') {
             const ctx = document.getElementById('salesChart').getContext('2d');
+            const gridColor = 'rgba(240, 240, 240, 0.1)';
+            const ticksColor = '#a0a0a0';
+
             if (salesChartInstance) {
                 if (salesChartInstance.config.type !== type) {
                     salesChartInstance.destroy();
@@ -4228,8 +4146,8 @@
                     datasets: [{
                         label: 'Ingresos por Día',
                         data: data,
-                        borderColor: 'rgba(123, 92, 126, 1)',
-                        backgroundColor: 'rgba(123, 92, 126, 0.2)',
+                        borderColor: 'rgba(164, 92, 255, 1)',
+                        backgroundColor: 'rgba(164, 92, 255, 0.2)',
                         fill: type === 'line',
                         tension: 0.3,
                         borderWidth: 2
@@ -4238,7 +4156,23 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, ticks: { callback: (value) => 'S/ ' + value } } }
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { 
+                                callback: (value) => 'S/ ' + value,
+                                color: ticksColor 
+                            },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                             ticks: { color: ticksColor },
+                             grid: { color: gridColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: ticksColor } }
+                    }
                 }
             });
         }
@@ -4868,7 +4802,7 @@
             notif.style.cssText = `
                 position: fixed; top: 100px; right: 20px; z-index: 10000;
                 background: ${type === 'error' ? 'var(--danger)' : 'linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)'};
-                color: white; padding: 1rem 2rem; border-radius: 10px; box-shadow: var(--shadow);
+                color: ${type === 'error' ? 'white' : 'var(--dark)'}; padding: 1rem 2rem; border-radius: 10px; box-shadow: var(--shadow);
                 font-weight: 600; transform: translateX(calc(100% + 20px)); transition: transform 0.4s ease-in-out;`;
             document.body.appendChild(notif);
             setTimeout(() => { notif.style.transform = 'translateX(0)'; }, 10);
@@ -4878,37 +4812,294 @@
             }, 4000);
         }
         
-        // --- START OF OPERATIONS CHECKLIST SCRIPT ---
-        const projectModal = document.getElementById('projectModal');
-        const projectList = document.getElementById('projectList');
-        const dashboardView = document.getElementById('dashboardView');
-        const projectView = document.getElementById('projectView');
+        // --- CONFIGURATION & THEME SCRIPT ---
+        function copySetupSql() {
+            const scriptText = document.getElementById('setupSqlScript').textContent.trim();
+            navigator.clipboard.writeText(scriptText).then(() => {
+                mostrarNotificacion('Script SQL copiado al portapapeles.');
+            }).catch(err => {
+                console.error('Error al copiar el script:', err);
+                alert('No se pudo copiar el script. Por favor, cópialo manualmente.');
+            });
+        }
         
-        let projects = [];
-        let currentProjectId = null;
-        const TOTAL_TASKS = 8;
+        async function inicializarConfiguracionPorDefecto() {
+            console.log("La tabla 'settings' está vacía. Inicializando con valores por defecto...");
+            const defaultConfig = {
+                theme: 'cyberpunk',
+                logoUrl: '',
+                businessName: 'Red51 Technology',
+                n8nWebhook: n8nWebhookUrl,
+                n8nStatusWebhook: n8nStatusUpdateWebhookUrl,
+                colors: {}
+            };
+            try {
+                const { error } = await supabaseClient.from('settings').upsert({ id: 1, config: defaultConfig });
+                if (error) throw error;
+                currentSettings = defaultConfig;
+                console.log("Configuración por defecto guardada exitosamente en la base de datos.");
+                return true;
+            } catch (dbError) {
+                console.error("Error al inicializar la configuración por defecto en la BD:", dbError);
+                return false;
+            }
+        }
+
+        async function cargarConfiguracionGeneral() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('config')
+                    .eq('id', 1)
+                    .single();
+
+                if (data && data.config) {
+                    currentSettings = { ...currentSettings, ...data.config };
+                } else if (error && error.code === 'PGRST116') {
+                    // La tabla existe pero está vacía. Este es el momento perfecto para inicializarla.
+                    await inicializarConfiguracionPorDefecto();
+                } else if (error) {
+                    // Ocurrió un error diferente e inesperado.
+                    throw error;
+                }
+                
+                aplicarConfiguracionUI();
+
+            } catch (error) {
+                const isTableNotFoundError = error.code === '42P01' || (error.message && (error.message.includes("relation \"public.settings\" does not exist") || error.message.includes("Could not find the table")));
+
+                if (isTableNotFoundError) {
+                    console.warn("Tabla 'settings' no encontrada. Aplicando configuración por defecto. Por favor, ejecuta el script SQL de setup desde la pestaña Configuración.");
+                    const warningBanner = document.getElementById('setupWarningBanner');
+                    if (warningBanner) {
+                        warningBanner.style.display = 'flex';
+                    }
+                } else {
+                    console.error("Error al cargar la configuración:", error.message || error);
+                }
+                aplicarConfiguracionUI(); 
+            }
+        }
+
+        function aplicarConfiguracionUI() {
+            // Apply Webhooks
+            n8nWebhookUrl = currentSettings.n8nWebhook;
+            n8nStatusUpdateWebhookUrl = currentSettings.n8nStatusWebhook;
+
+            // Apply Theme
+            aplicarTema(currentSettings.theme, currentSettings.colors, false);
+
+            // Apply Business Name
+            const businessName = currentSettings.businessName || "Tienda Online";
+            document.title = businessName;
+            
+            const nameParts = businessName.split(' ');
+            const mainName = nameParts.slice(0, -1).join(' ');
+            const lastName = nameParts.slice(-1)[0] || '';
+
+            if (mainName) {
+                document.getElementById('headerBusinessName').innerHTML = `<span class="logo-red">${mainName}</span><span class="logo-number">${lastName}</span>`;
+                document.getElementById('footerBusinessName').innerHTML = `<span class="logo-red">${mainName}</span><span class="logo-number">${lastName}</span>`;
+            } else {
+                 document.getElementById('headerBusinessName').innerHTML = `<span class="logo-red">${lastName}</span>`;
+                 document.getElementById('footerBusinessName').innerHTML = `<span class="logo-red">${lastName}</span>`;
+            }
+
+            document.getElementById('headerBusinessSubtitle').textContent = 'TECHNOLOGY'; // Could be a setting later
+            document.getElementById('footerBusinessSubtitle').textContent = 'TECHNOLOGY';
+            document.getElementById('footerCopyrightName').textContent = businessName;
+            
+            // Apply Logo
+            const { logoUrl } = currentSettings;
+            const elements = {
+                headerLogo: document.getElementById('headerLogo'),
+                defaultLogo: document.getElementById('defaultLogo'),
+                footerLogo: document.getElementById('footerLogo'),
+                defaultFooterLogo: document.getElementById('defaultFooterLogo')
+            };
+
+            if (logoUrl) {
+                elements.headerLogo.src = logoUrl;
+                elements.headerLogo.style.display = 'block';
+                elements.defaultLogo.style.display = 'none';
+                elements.footerLogo.src = logoUrl;
+                elements.footerLogo.style.display = 'block';
+                elements.defaultFooterLogo.style.display = 'none';
+            } else {
+                elements.headerLogo.style.display = 'none';
+                elements.defaultLogo.style.display = 'flex';
+                elements.footerLogo.style.display = 'none';
+                elements.defaultFooterLogo.style.display = 'block';
+            }
+        }
+
+        function renderizarVistaConfiguracion() {
+            document.getElementById('settingBusinessName').value = currentSettings.businessName || '';
+            document.getElementById('settingN8nWebhook').value = currentSettings.n8nWebhook || '';
+            document.getElementById('settingN8nStatusWebhook').value = currentSettings.n8nStatusWebhook || '';
+            
+            const { logoUrl, theme } = currentSettings;
+            const logoPreview = document.getElementById('logoPreview');
+            const logoPlaceholder = document.getElementById('logoPreviewPlaceholder');
+            const generateBtn = document.getElementById('generateFromLogoBtn');
+
+            if (logoUrl) {
+                logoPreview.src = logoUrl;
+                logoPreview.style.display = 'block';
+                logoPlaceholder.style.display = 'none';
+                generateBtn.disabled = false;
+            } else {
+                logoPreview.style.display = 'none';
+                logoPlaceholder.style.display = 'block';
+                generateBtn.disabled = true;
+            }
+            
+            seleccionarTema(theme, false);
+        }
+
+        async function guardarConfiguracionGeneral() {
+            const newConfig = {
+                businessName: document.getElementById('settingBusinessName').value,
+                n8nWebhook: document.getElementById('settingN8nWebhook').value,
+                n8nStatusWebhook: document.getElementById('settingN8nStatusWebhook').value,
+                logoUrl: currentSettings.logoUrl,
+                theme: currentSettings.theme,
+                colors: currentSettings.colors
+            };
+
+            try {
+                const { error } = await supabaseClient.from('settings').upsert({ id: 1, config: newConfig });
+                if (error) throw error;
+                
+                currentSettings = { ...currentSettings, ...newConfig };
+                aplicarConfiguracionUI();
+                mostrarNotificacion('Configuración guardada con éxito.');
+
+            } catch (error) {
+                console.error('Error al guardar la configuración:', error);
+                mostrarNotificacion('Error al guardar: ' + error.message, 'error');
+            }
+        }
+
+        function aplicarTema(themeName, customColors = {}, triggerSave = true) {
+            document.body.className = '';
+            const root = document.documentElement;
+
+            if (themeName === 'custom' && Object.keys(customColors).length > 0) {
+                 Object.keys(customColors).forEach(key => {
+                    root.style.setProperty(`--${key}`, customColors[key]);
+                });
+            } else {
+                document.body.classList.add(`theme-${themeName}`);
+                ['primary', 'secondary', 'accent', 'dark', 'light', 'white', 'text-dark', 'text-light', 'border-color'].forEach(prop => root.style.removeProperty(`--${prop}`));
+            }
+            
+            if (triggerSave) {
+                 currentSettings.theme = themeName;
+                 currentSettings.colors = themeName === 'custom' ? customColors : {};
+            }
+
+            document.querySelectorAll('.theme-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.theme === themeName);
+            });
+        }
         
-        const sqlScriptContent = `-- 1. TABLA DE CATEGORIAS
-CREATE TABLE public.categorias ( id bigint generated by default as identity primary key, nombre text not null, slug text not null unique, icon text, imagen_url text );
--- 2. TABLA DE PRODUCTOS
-CREATE TABLE public.productos ( id bigint generated by default as identity primary key, nombre text not null, marca text not null, categoria_id bigint references public.categorias(id) on delete set null, descripcion text, precio numeric not null, stock integer not null default 0, icon text, badge text, activo boolean default true, imagen_url text, variantes jsonb );
--- 3. TABLA DE PEDIDOS
-CREATE TABLE public.pedidos ( id uuid default gen_random_uuid() primary key, fecha_pedido timestamp with time zone default timezone('utc'::text, now()) not null, numero_pedido text, nombre_cliente text not null, telefono_cliente text not null, email_cliente text, direccion text, notas text, latitud double precision, longitud double precision, productos jsonb, total numeric not null, cantidad_items integer, estado text default 'pendiente_pago'::text not null );
--- 4. TABLA DE CONFIGURACIÓN DE TEMA
-CREATE TABLE public.settings ( id bigint primary key default 1, config jsonb not null, constraint single_row_check check (id = 1) );
--- 5. HABILITAR ROW LEVEL SECURITY (RLS)
-alter table public.categorias enable row level security; alter table public.productos enable row level security; alter table public.pedidos enable row level security; alter table public.settings enable row level security;
--- 6. CREAR POLÍTICAS DE ACCESO PÚBLICO
-CREATE POLICY "Public categories are viewable" ON public.categorias FOR SELECT USING (true);
-CREATE POLICY "Public active products are viewable" ON public.productos FOR SELECT USING (activo = true);
-CREATE POLICY "Allow public insert for orders" ON public.pedidos FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public settings are viewable" ON public.settings FOR SELECT USING (true);
--- 7. POLÍTICAS DE ACCESO PARA ADMIN AUTENTICADO
-CREATE POLICY "Allow full access for authenticated users" ON public.categorias FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow full access for authenticated users" ON public.productos FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow full access for authenticated users" ON public.pedidos FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR ALL USING (auth.role() = 'authenticated');
--- 8. INSERTAR CONFIGURACIÓN INICIAL (OPCIONAL)
-insert into public.settings(id, config) values (1, '{"theme": "mystic", "logoUrl": "", "colors": {}}');`;
+        function seleccionarTema(themeName, triggerSave = true) {
+            aplicarTema(themeName, {}, triggerSave);
+            document.getElementById('generatedPalette').innerHTML = '';
+        }
         
-        const n8nMasterWorkflowJSON = { "nodes": [ { "parameters": { "jsCode": "// Formatear teléfono agregando código de país si no lo tiene\nconst body = $input.item.json.body;\nconst telefono = body.record.telefono_cliente;\nconst telefonoFormateado = telefono.startsWith('51') ? telefono : '51' + telefono;\n\nreturn {\n  type: body.type,\n  table: body.table,\n  record: {\n    ...body.record,\n    telefono_cliente: telefonoFormateado\n  },\n  old_record: body.old_record,\n  schema: body.schema\n};" }, "id": "51216484-c68e-4304-8266-0afdbd18b26a", "name": "Formatear Teléfono", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [ -1456, 768 ] }, { "parameters": { "method": "POST", "url": "=https://api.red51.site/message/sendText/chatbot", "authentication": "predefinedCredentialType", "nodeCredentialType": "evolutionApi", "sendHeaders": true, "headerParameters": { "parameters": [ { "name": "Content-Type", "value": "application/json" }, { "name": "apikey", "value": "D55E32A4EB2D-4770-B385-B750BD86D958" } ] }, "sendBody": true, "bodyParameters": { "parameters": [ { "name": "number", "value": "={{ $('Formatear Teléfono').item.json.record.telefono_cliente }}" }, { "name": "text", "value": "={{$json.mensaje}}" } ] }, "options": {} }, "id": "47ce47da-86e4-47f2-abfc-af30a1471e34", "name": "Enviar WhatsApp al Cliente", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.1, "position": [ -352, 800 ], "notes": "ANOTACIÓN: Este nodo envía el mensaje de cambio de estado al cliente final.\n\nACCIÓN: Asegúrate de que tus credenciales de la API de WhatsApp (Evolution API, etc.) están seleccionadas en la sección 'Credential'." }, { "parameters": { "httpMethod": "POST", "path": "pedidos-webhook", "options": {} }, "id": "8bab1888-a43a-4f58-a32f-b9233f117f5d", "name": "Webhook - Recibir desde Supabase1", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [ -1680, 768 ], "notes": "FLUJO 2: ACTUALIZACIÓN DE ESTADO\n\nPropósito: Notificar al cliente final cuando el estado de su pedido cambia en el panel de administración.\n\nACCIÓN: Copia la URL de este webhook (Test o Production URL) y pégala en la variable de entorno VITE_N8N_STATUS_UPDATE_WEBHOOK_URL de Vercel." }, { "parameters": { "conditions": { "string": [ { "value1": "={{$json.record.estado}}", "operation": "notEqual", "value2": "={{$json.old_record.estado}}" } ] } }, "id": "13ecdeea-f28e-4a76-8fb9-c95c4b2f7dcd", "name": "IF Estado Cambió1", "type": "n8n-nodes-base.if", "typeVersion": 1, "position": [ -1232, 768 ] }, { "parameters": { "value1": "={{ $json.record.estado }}", "rules": { "rules": [ { "operation": "equal", "value2": "=pago_confirmado" }, { "operation": "equal", "value2": "=en_preparacion", "output": 1 }, { "operation": "equal", "value2": "=enviado", "output": 2 }, { "operation": "equal", "value2": "=entregado", "output": 3 } ] } }, "id": "a82d32e6-253d-42a7-845b-337457944f08", "name": "Switch por Estado1", "type": "n8n-nodes-base.switch", "typeVersion": 1, "position": [ -944, 720 ] }, { "parameters": { "assignments": { "assignments": [ { "id": "2a59c8b8-09d8-4da3-944f-3ec81b5878cc", "name": "mensaje", "value": "=🎉 ¡Genial! Tu pago fue confirmado\n\nHola {{$json.record.nombre_cliente}}, acabamos de recibir tu pago del pedido #{{$json.record.numero_pedido}} 💚\n\nNuestro equipo ya está preparando tu pedido con mucho cariño. Te avisaremos en cuanto salga rumbo a ti.\n\n¡Gracias por confiar en nosotros!\n\n_Red51 Technology_", "type": "string" } ] }, "options": {} }, "id": "b82c134b-193a-4448-a13a-ec87a4b4d292", "name": "Set Msg: Pago Confirmado1", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [ -656, 528 ], "notes": "ACCIÓN (Opcional): Personaliza el mensaje que recibe el cliente cuando su pago es confirmado." }, { "parameters": { "assignments": { "assignments": [ { "id": "msg2", "name": "mensaje", "value": "=👨‍💻 ¡Tu pedido ya está en proceso!\n\nHola ,nuestro equipo está preparando tu pedido #{{ $('IF Estado Cambió1').item.json.record.numero_pedido }}{{$json.record.numero_pedido}} con todo el cuidado del mundo 💚\n\nEn cuanto esté listo para enviarse, te avisamos de inmediato.\n\n¡Gracias por tu paciencia!\n\nRed51 Technology", "type": "string" }, { "id": "tel2", "name": "telefono_cliente", "value": "={{$json.record.telefono_cliente}}", "type": "string" } ] }, "options": {} }, "id": "0d8acff5-d26f-429e-8026-5e8c9ac01f40", "name": "Set Msg: En Preparación1", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [ -656, 704 ], "notes": "ACCIÓN (Opcional): Personaliza el mensaje para el estado 'En Preparación'." }, { "parameters": { "assignments": { "assignments": [ { "id": "msg3", "name": "mensaje", "value": "=¡Tu pedido está en camino! 🚚\n\nHola {{$json.record.nombre_cliente}}, tu pedido N° {{$json.record.numero_pedido}} ha sido enviado y va en camino a tu dirección.\n\n¡Ya falta poco!\n\n*Red51 Technology*", "type": "string" }, { "id": "tel3", "name": "telefono_cliente", "value": "={{$json.record.telefono_cliente}}", "type": "string" } ] }, "options": {} }, "id": "27cabae9-1c3a-4d0b-99f7-813c9434c8ed", "name": "Set Msg: Enviado1", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [ -656, 896 ], "notes": "ACCIÓN (Opcional): Personaliza el mensaje para el estado 'Enviado'." }, { "parameters": { "assignments": { "assignments": [ { "id": "msg4", "name": "mensaje", "value": "=¡Pedido entregado! ✅\n\nConfirmamos que tu pedido N° {{$json.record.numero_pedido}} ha sido entregado.\n\nEsperamos que disfrutes de tus nuevos productos. ¡Gracias por confiar en nosotros y hasta la próxima!\n\n*Red51 Technology*", "type": "string" }, { "id": "tel4", "name": "telefono_cliente", "value": "={{$json.record.telefono_cliente}}", "type": "string" } ] }, "options": {} }, "id": "767c17dd-cb02-4cf8-91b0-82e433b01886", "name": "Set Msg: Entregado1", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [ -656, 1088 ], "notes": "ACCIÓN (Opcional): Personaliza el mensaje para el estado 'Entregado'." }, { "parameters": { "httpMethod": "POST", "path": "pedidos_red51", "responseMode": "responseNode", "options": {} }, "id": "a286eedf-b94c-4ea1-bc9d-f72a140f7eec", "name": "Webhook Pedidos", "type": "n8n-nodes-base.webhook", "typeVersion": 1, "position": [ -1760, -192 ], "notes": "FLUJO 1: NUEVO PEDIDO\n\nPropósito: Recibir nuevos pedidos desde la tienda, notificar al administrador y enviar una confirmación al cliente.\n\nACCIÓN: Copia la URL de este webhook (Test o Production URL) y pégala en la variable de entorno VITE_N8N_WEBHOOK_URL de Vercel." }, { "parameters": { "jsCode": "// Obtiene los datos del pedido que la aplicación web envió\nconst webhookData = $input.first().json.body;\n\n// Extrae todos los datos, incluyendo el NÚMERO DE PEDIDO CORRECTO\nconst nombre_cliente = webhookData.nombre_cliente;\nconst telefono_cliente_raw = webhookData.telefono_cliente;\nconst email_cliente = webhookData.email_cliente;\nconst direccion_cliente = webhookData.direccion;\nconst productos_pedido = webhookData.productos;\nconst total_pedido = webhookData.total;\nconst numero_pedido_oficial = webhookData.numero_pedido; // <-- ¡Aquí está la clave!\n\n// Agregar prefijo 51 para Perú\nconst telefono_cliente = '51' + telefono_cliente_raw;\n\nlet detalleProductos = '';\nlet cantidad_items = 0;\n\nproductos_pedido.forEach(item => {\n    // Aseguramos que el nombre del producto se obtenga correctamente\n    const nombreProducto = item.nombre || item.producto;\n    detalleProductos += `• ${item.cantidad} x ${nombreProducto} (S/ ${item.precio_unitario.toFixed(2)} c/u) = S/ ${item.subtotal.toFixed(2)}\\n`;\n    cantidad_items += item.cantidad;\n});\n\nconst mensaje_admin = `\n🛒 *NUEVO PEDIDO - RED51 TECHNOLOGY* 📱\n\n📋 Pedido: *${numero_pedido_oficial}*\n\n👤 *Cliente:* ${nombre_cliente}\n📞 *Teléfono:* ${telefono_cliente}\n📧 *Email:* ${email_cliente || 'No especificado'}\n📍 *Dirección:* ${direccion_cliente}\n\n📦 *DETALLE DEL PEDIDO:*\n${detalleProductos}\n───────────────────\n💰 *TOTAL A PAGAR:* S/ ${total_pedido.toFixed(2)}\n🗓️ *Fecha:* ${new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' })}\n\n⚠️ *ESPERANDO PAGO DEL CLIENTE*\n\n💡 Para confirmar el pago, responde:\n*confirmar ${numero_pedido_oficial}*\n`;\n\nconst mensaje_cliente = `\n¡Hola *${nombre_cliente.split(' ')[0]}*! 👋\n\n✅ Tu pedido ha sido recibido exitosamente en *Red51 Technology*.\n\n📋 *Número de Pedido:* ${numero_pedido_oficial}\n\n📦 *Resumen:*\n${detalleProductos}\n───────────────────\n💰 *TOTAL:* S/ ${total_pedido.toFixed(2)}\n\n📍 *Dirección de entrega:*\n${direccion_cliente}\n\n💳 *DATOS PARA TU PAGO:*\n- *Yape/Plin:* 975615244\n- *Monto exacto:* S/ ${total_pedido.toFixed(2)}\n\n📸 *IMPORTANTE:* Envía tu comprobante de pago respondiendo a este mensaje.\n\n⏰ Confirmaremos tu pago y coordinaremos la entrega inmediatamente.\n\n📱 ¡Gracias por confiar en Red51 Technology!\n\n_Tecnología de Vanguardia_\n`;\n\n// Devolvemos todos los datos originales del pedido, MÁS los mensajes formateados\nreturn [{\n    json: {\n        ...webhookData, // Pasamos todos los datos originales\n        telefono_cliente: telefono_cliente, // Pasamos el teléfono formateado\n        mensaje_admin: mensaje_admin,\n        mensaje_cliente: mensaje_cliente,\n        // Ya no necesitamos numero_pedido_temp\n    }\n}];" }, "id": "14183a0e-d0e4-49a8-900e-42cff716f29d", "name": "Formatear Mensaje", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [ -1552, -192 ], "notes": "¡ACCIÓN REQUERIDA!\n\nEdita este código para personalizar los mensajes.\n\n1.  **`mensaje_admin`**: Cambia el nombre del negocio 'RED51 TECHNOLOGY'.\n2.  **`mensaje_cliente`**: Cambia el nombre del negocio y, MUY IMPORTANTE, actualiza los datos de pago (Yape/Plin, cuentas bancarias, etc.)." }, { "parameters": { "method": "POST", "url": "=https://api.red51.site/message/sendText/chatbot", "authentication": "predefinedCredentialType", "nodeCredentialType": "evolutionApi", "sendHeaders": true, "headerParameters": { "parameters": [ { "name": "Content-Type", "value": "application/json" }, { "name": "apikey", "value": "D55E32A4EB2D-4770-B385-B750BD86D958" } ] }, "sendBody": true, "bodyParameters": { "parameters": [ { "name": "number", "value": "=51905820448" }, { "name": "text", "value": "={{ $json.mensaje_admin }}" } ] }, "options": {} }, "id": "a2238709-2862-4e95-a5ae-1b98faffac66", "name": "Enviar WhatsApp Admin", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.1, "position": [ -1264, -304 ], "notes": "¡ACCIÓN REQUERIDA!\n\n1.  En 'Body Parameters', reemplaza '51905820448' con el número de WhatsApp del dueño de la tienda.\n2.  En 'Credential', selecciona tus credenciales para la API de WhatsApp." }, { "parameters": { "method": "POST", "url": "=https://api.red51.site/message/sendText/chatbot", "authentication": "predefinedCredentialType", "nodeCredentialType": "evolutionApi", "sendHeaders": true, "headerParameters": { "parameters": [ { "name": "Content-Type", "value": "application/json" }, { "name": "apikey", "value": "D55E32A4EB2D-4770-B385-B750BD86D958" } ] }, "sendBody": true, "bodyParameters": { "parameters": [ { "name": "number", "value": "={{ $json.telefono_cliente }}" }, { "name": "text", "value": "={{ $json.mensaje_cliente }}" } ] }, "options": {} }, "id": "245de41a-a147-4108-b91a-d41cacc12198", "name": "Confirmación al Cliente", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.1, "position": [ -1280, -96 ] }, { "parameters": { "respondWith": "json", "responseBody": "={{ { \"success\": true, \"message\": \"Pedido recibido correctamente.\", \"pedido_id\": $now.format('YYYYMMDDHHmmss'), \"total\": $json.total } }}", "options": {} }, "id": "8c95423e-9545-42e2-a4f3-90c79908cdf9", "name": "Responder al Webhook", "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1, "position": [ -1008, -304 ] }, { "parameters": { "jsCode": "const items = $input.all();\nconst now = new Date();\nconst results = [];\n\nfor (const item of items) {\n  const pedido = item.json;\n  const createdAt = new Date(pedido.created_at);\n  const horasTranscurridas = (now - createdAt) / (1000 * 60 * 60);\n  \n  let tipoRecordatorio = null;\n  let prioridad = 'baja';\n  \n  // Verificar recordatorios ya enviados\n  const recordatoriosEnviados = pedido.recordatorios_enviados || [];\n  \n  // Solo 3 recordatorios: 6h, 24h, 48h (prioriza los más urgentes)\n  if (horasTranscurridas >= 48 && !recordatoriosEnviados.includes('recordatorio_48h')) {\n    tipoRecordatorio = 'recordatorio_48h';\n    prioridad = 'urgente';\n  } else if (horasTranscurridas >= 24 && !recordatoriosEnviados.includes('recordatorio_24h')) {\n    tipoRecordatorio = 'recordatorio_24h';\n    prioridad = 'alta';\n  } else if (horasTranscurridas >= 6 && !recordatoriosEnviados.includes('recordatorio_6h')) {\n    tipoRecordatorio = 'recordatorio_6h';\n    prioridad = 'media';\n  }\n  \n  // Solo incluir si corresponde enviar recordatorio\n  if (tipoRecordatorio) {\n    results.push({\n      json: {\n        ...pedido,\n        tipoRecordatorio,\n        prioridad,\n        horasTranscurridas: Math.floor(horasTranscurridas)\n      }\n    });\n  }\n}\n\nreturn results;" }, "id": "a82aa815-45c1-4a3e-ae92-c9c18d78b49d", "name": "Filtrar por Tiempo", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [ -1184, 1760 ] }, { "parameters": { "conditions": { "string": [ { "value1": "={{ $json.tipoRecordatorio }}", "value2": "recordatorio_6h" } ] } }, "id": "52e72e41-30a2-4266-a5d7-7eeee7658044", "name": "Es 6h?", "type": "n8n-nodes-base.if", "typeVersion": 1, "position": [ -736, 1568 ] }, { "parameters": { "conditions": { "string": [ { "value1": "={{ $json.tipoRecordatorio }}", "value2": "recordatorio_24h" } ] } }, "id": "0e2429b9-5ad0-41fe-9393-2612b904836a", "name": "Es 24h?", "type": "n8n-nodes-base.if", "typeVersion": 1, "position": [ -736, 1760 ] }, { "parameters": { "conditions": { "string": [ { "value1": "={{ $json.tipoRecordatorio }}", "value2": "recordatorio_48h" } ] } }, "id": "593d9b39-1f77-44b5-96b4-e0b22358d4fb", "name": "Es 48h?", "type": "n8n-nodes-base.if", "typeVersion": 1, "position": [ -736, 1952 ] }, { "parameters": { "assignments": { "assignments": [ { "id": "msg6h", "name": "mensaje", "value": "=Hola {{ $json.nombre_cliente }} 😊\n\nTu pedido *{{$json.numero_pedido}}* está esperando por ti.\n\n🎯 *¿Sabías que?*\nTenemos stock limitado y tu pedido está reservado por 72 horas.\n\n💰 Total: S/ {{$json.total}}\n\n💳 Paga fácilmente con:\n• Yape/Plin: 975615244\n\nSi tienes dudas, ¡escríbenos! Estamos para ayudarte.\n\n_Red51 Technology_", "type": "string" }, { "id": "tel6h", "name": "telefono_cliente", "value": "={{$json.telefono_cliente}}", "type": "string" }, { "id": "pedido_id", "name": "pedido_id", "value": "={{$json.id}}", "type": "string" }, { "id": "tipo_rec", "name": "tipo_recordatorio", "value": "recordatorio_6h", "type": "string" } ] }, "options": {} }, "id": "7d8acfca-23d7-4c9e-aba6-48e3ca90003d", "name": "Mensaje 6h (Amigable)", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [ -512, 1552 ], "notes": "ACCIÓN (Opcional): Personaliza el primer recordatorio. Actualiza el nombre del negocio y los datos de pago." }, { "parameters": { "assignments": { "assignments": [ { "id": "msg24h", "name": "mensaje", "value": "={{$json.nombre_cliente.split(' ')[0]}}, no queremos que pierdas tu pedido 🙏\n\n⏰ *Tu reserva vence en 48 horas*\n\n📦 Pedido: {{$json.numero_pedido}}\n💰 Total: S/ {{$json.total}}\n\n🎁 *Beneficio especial:* Si completas tu pago hoy, incluimos envío express GRATIS en Lima.\n\n💳 Datos de pago:\n• Yape/Plin: 975615244\n\n¿Necesitas ayuda? Estamos disponibles.\n\n_Red51 Technology_", "type": "string" }, { "id": "tel24h", "name": "telefono_cliente", "value": "={{$json.telefono_cliente}}", "type": "string" }, { "id": "pedido_id", "name": "pedido_id", "value": "={{$json.id}}", "type": "string" }, { "id": "tipo_rec", "name": "tipo_recordatorio", "value": "recordatorio_24h", "type": "string" } ] }, "options": {} }, "id": "2d6b1747-aac5-44b5-ad59-230e4cc57f69", "name": "Mensaje 24h (Incentivo)", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [ -512, 1744 ], "notes": "ACCIÓN (Opcional): Personaliza el segundo recordatorio. Actualiza el nombre del negocio y los datos de pago." }, { "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 10,16,20 * * *" } ] } }, "id": "07af6a90-4eb3-4dcf-8e42-d9b518814b71", "name": "Programacion (10AM, 4PM, 8PM)1", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.1, "position": [ -1632, 1760 ], "notes": "FLUJO 3: RECORDATORIOS DE PAGO\n\nPropósito: Enviar recordatorios a clientes que no han pagado su pedido.\n\nACCIÓN (Opcional): Si quieres cambiar los horarios, edita la 'Cron Expression'. Actualmente se ejecuta a las 10AM, 4PM (16:00) y 8PM (20:00)." }, { "parameters": { "operation": "getAll", "tableId": "pedidos", "matchType": "allFilters", "filters": { "conditions": [ { "keyName": "estado", "condition": "eq", "keyValue": "pendiente_pago" } ] } }, "id": "58f1e5fd-1d1f-4ecd-a57e-32948e9e9203", "name": "Obtener Pedidos Pendientes1", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [ -1408, 1760 ], "notes": "ACCIÓN: Selecciona tus credenciales de Supabase en la sección 'Credential'." }, { "parameters": { "jsCode": "const items = $input.all();\nconst results = [];\n\nfunction normalizarTelefono(telefono) {\n  if (!telefono) return null;\n  \n  // Convertir a string y limpiar espacios\n  let numero = String(telefono).trim().replace(/\\s+/g, '');\n  \n  // Remover caracteres especiales (guiones, paréntesis, etc)\n  numero = numero.replace(/[^\\d]/g, '');\n  \n  // Casos:\n  // 1. Si empieza con 51 y tiene 11 dígitos -> ya está bien\n  if (numero.startsWith('51') && numero.length === 11) {\n    return numero;\n  }\n  \n  // 2. Si tiene 9 dígitos y empieza con 9 -> agregar 51\n  if (numero.length === 9 && numero.startsWith('9')) {\n    return '51' + numero;\n  }\n  \n  // 3. Si tiene 11 dígitos pero NO empieza con 51 -> posible error\n  if (numero.length === 11 && !numero.startsWith('51')) {\n    return numero;\n  }\n  \n  // 4. Si tiene 10 dígitos -> remover el primer 0 y agregar 51\n  if (numero.length === 10 && numero.startsWith('0')) {\n    return '51' + numero.substring(1);\n  }\n  \n  // 5. Cualquier otro caso: intentar agregar 51\n  if (numero.length === 9) {\n    return '51' + numero;\n  }\n  \n  // Si no coincide con ningún patrón, devolver null\n  console.log(`⚠️ Número no válido: ${telefono}`);\n  return null;\n}\n\nfor (const item of items) {\n  const telefonoOriginal = item.json.telefono_cliente;\n  const telefonoNormalizado = normalizarTelefono(telefonoOriginal);\n  \n  if (telefonoNormalizado) {\n    results.push({\n      json: {\n        ...item.json,\n        telefono_cliente: telefonoNormalizado,\n        telefono_original: telefonoOriginal\n      }\n    });\n  } else {\n    console.log(`❌ Pedido ${item.json.numero_pedido} tiene número inválido: ${telefonoOriginal}`);\n  }\n}\n\nreturn results;" }, "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [ -960, 1760 ], "id": "8ae803f2-9c43-43d1-a437-dc4818353c71", "name": "Normalizar Telefono1" }, { "parameters": { "assignments": { "assignments": [ { "id": "msg48h", "name": "mensaje", "value": "={{$json.nombre_cliente.split(' ')[0]}}, último recordatorio ⏰\n\n*Tu pedido será cancelado en 24 horas*\n\n📦 Pedido: {{$json.numero_pedido}}\n💰 Total: S/ {{$json.total}}\n\nDespués de ese tiempo:\n• Se liberará la reserva de stock\n• Tendrás que crear un nuevo pedido\n• Los precios pueden variar\n\n💳 Completa tu pago:\n• Yape/Plin: 975615244\n\nSi decidiste no continuar, está bien. Gracias por tu interés ❤️\n\n_Red51 Technology_", "type": "string" }, { "id": "tel48h", "name": "telefono_cliente", "value": "={{$json.telefono_cliente}}", "type": "string" }, { "id": "pedido_id", "name": "pedido_id", "value": "={{$json.id}}", "type": "string" }, { "id": "tipo_rec", "name": "tipo_recordatorio", "value": "recordatorio_48h", "type": "string" } ] }, "options": {} }, "id": "0b240188-0ffb-484d-98b3-4138d4c30362", "name": "Mensaje 48h (Ultimo aviso)1", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [ -512, 1936 ], "notes": "ACCIÓN (Opcional): Personaliza el último recordatorio. Actualiza el nombre del negocio y los datos de pago." }, { "parameters": { "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  // Obtener el array actual desde Supabase\n  let recordatoriosActuales = [];\n  \n  // Si viene de Supabase como string JSON, parsearlo\n  if (typeof item.json.recordatorios_enviados === 'string') {\n    try {\n      recordatoriosActuales = JSON.parse(item.json.recordatorios_enviados);\n    } catch (e) {\n      recordatoriosActuales = [];\n    }\n  } else if (Array.isArray(item.json.recordatorios_enviados)) {\n    recordatoriosActuales = item.json.recordatorios_enviados;\n  }\n  \n  const nuevoRecordatorio = item.json.tipo_recordatorio;\n  \n  // Crear array actualizado\n  const recordatoriosNuevos = [...recordatoriosActuales, nuevoRecordatorio];\n  \n  results.push({\n    json: {\n      pedido_id: item.json.pedido_id,\n      recordatorios_enviados_json: recordatoriosNuevos\n    }\n  });\n}\n\nreturn results;" }, "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [ -64, 1744 ], "id": "7fc9359b-e14c-4875-8262-771ae935d6eb", "name": "Preparar Recordatorio1" }, { "parameters": { "operation": "update", "tableId": "pedidos", "matchType": "allFilters", "filters": { "conditions": [ { "keyName": "numero_pedido", "condition": "eq", "keyValue": "={{ $json.pedido_id }}" } ] }, "fieldsUi": { "fieldValues": [ { "fieldId": "recordatorios_enviados", "fieldValue": "={{ $json.recordatorios_enviados_json }}" } ] } }, "id": "d39bd2c3-67a7-4acd-8ed5-e3f82e7789f1", "name": "Registrar Envio1", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [ 160, 1744 ] }, { "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 2 * * *" } ] } }, "id": "7e064805-f526-4562-83d4-5e82608614db", "name": "Ejecutar Diario 2AM", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.1, "position": [ -1632, 2176 ], "notes": "FLUJO 4: CANCELACIÓN AUTOMÁTICA\n\nPropósito: Cancelar automáticamente los pedidos que tienen más de 72 horas sin ser pagados.\n\nACCIÓN
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentSettings.logoUrl = e.target.result;
+                const logoPreview = document.getElementById('logoPreview');
+                const logoPlaceholder = document.getElementById('logoPreviewPlaceholder');
+                logoPreview.src = e.target.result;
+                logoPreview.style.display = 'block';
+                logoPlaceholder.style.display = 'none';
+                document.getElementById('generateFromLogoBtn').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function generarTemaDesdeLogo() {
+            if (!currentSettings.logoUrl) {
+                alert('Por favor, sube un logo primero.');
+                return;
+            }
+            
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.src = currentSettings.logoUrl;
+            img.onload = () => {
+                const colorThief = new ColorThief();
+                const palette = colorThief.getPalette(img, 5);
+                
+                const tinyPalette = palette.map(rgb => tinycolor({ r: rgb[0], g: rgb[1], b: rgb[2] }));
+                
+                const primary = tinyPalette[0].toString();
+                const secondary = tinyPalette[1].isDark() ? tinyPalette[1].lighten(20).toString() : tinyPalette[1].toString();
+                const dark = tinyPalette.find(c => c.isDark())?.darken(10).toString() || '#1a1a2e';
+                
+                const customColors = {
+                    primary: primary,
+                    secondary: secondary,
+                    accent: tinycolor.mix(primary, secondary).toString(),
+                    dark: dark,
+                    'text-dark': tinycolor(dark).isLight() ? '#000' : dark,
+                };
+                
+                aplicarTema('custom', customColors);
+                
+                const paletteContainer = document.getElementById('generatedPalette');
+                paletteContainer.innerHTML = `
+                    <p class="form-hint">Paleta generada. ¡Guarda los cambios para aplicarla!</p>
+                    ${Object.entries(customColors).map(([name, color]) => `
+                        <div class="color-swatch">
+                            <div class="color-swatch-dot" style="background-color: ${color};"></div>
+                            <span>${name}</span>
+                        </div>
+                    `).join('')}
+                `;
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            inicializarSupabase();
+            await cargarConfiguracionGeneral();
+            await cargarCategorias();
+            await cargarProductos();
+            
+            document.getElementById('chartTypeSwitcher').addEventListener('click', (e) => {
+                if(e.target.tagName === 'BUTTON') {
+                    const newType = e.target.dataset.type;
+                    if (newType !== currentChartType) {
+                        currentChartType = newType;
+                        document.querySelectorAll('#chartTypeSwitcher .view-btn').forEach(btn => btn.classList.remove('active'));
+                        e.target.classList.add('active');
+                        renderizarDashboard();
+                    }
+                }
+            });
+        });
+
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = 'none';
+                }
+            }
+            // Close all open stock breakdowns if clicking outside
+            if (!event.target.closest('.stock-details-container')) {
+                document.querySelectorAll('.stock-details-breakdown').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.stock-summary.open').forEach(el => el.classList.remove('open'));
+            }
+        }
+    </script>
+</body>
+</html>
