@@ -1293,6 +1293,21 @@
             text-align: left;
         }
         
+        .login-form-wrapper .credit {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        .login-form-wrapper .credit a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-form-wrapper .credit a:hover {
+            text-decoration: underline;
+        }
+
         .btn-back-to-store {
             position: absolute;
             top: 1.5rem;
@@ -2062,6 +2077,7 @@
                         <button type="submit" class="btn-primary">Conectar y Finalizar</button>
                         <div id="setupError" class="error-message"></div>
                     </form>
+                    <p class="credit">Desarrollado por <a href="https://labs51.site" target="_blank">Labs51</a></p>
                 </div>
             </div>
         </div>
@@ -2146,6 +2162,7 @@
                             <div id="resetSuccess" class="error-message" style="background: #d4edda; color: #155724;"></div>
                         </form>
                     </div>
+                    <p class="credit">Desarrollado por <a href="https://labs51.site" target="_blank">Labs51</a></p>
                  </div>
             </div>
         </div>
@@ -2467,7 +2484,7 @@ ALTER TABLE public.productos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pedidos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
 
--- 3. POLÍTICAS DE ACCESO PÚBLICO (PERMITEN QUE CUALQUIER VISITANTE VEA LA TIENDA Y HAGA PEDIDOS)
+-- 3. POLÍTICAS DE ACCESO PÚBLICO (PERMITEN QUE CUALQUIER VISITANTE VEA LA TIENDA E HAGA PEDIDOS)
 CREATE POLICY "Public categories are viewable" ON public.categorias FOR SELECT USING (true);
 CREATE POLICY "Public active products are viewable" ON public.productos FOR SELECT USING (activo = true);
 CREATE POLICY "Allow public insert for orders" ON public.pedidos FOR INSERT WITH CHECK (true);
@@ -5426,7 +5443,13 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
 
             } catch (error) {
                 console.error('Error al guardar la configuración:', error);
-                mostrarNotificacion('Error al guardar: ' + error.message, 'error');
+                const isTableNotFoundError = error.code === '42P01' || (error.message && (error.message.includes("relation \"public.settings\" does not exist") || error.message.includes("Could not find the table")));
+
+                if (isTableNotFoundError) {
+                    mostrarNotificacion('Error: La tabla de configuración no existe. Por favor, ejecuta primero el script SQL del "Paso 1" en esta misma página.', 'error');
+                } else {
+                    mostrarNotificacion('Error al guardar: ' + error.message, 'error');
+                }
             }
         }
 
