@@ -2029,29 +2029,41 @@
             }
         }
     </style>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body class="theme-cyberpunk">
 
     <!-- First Time Setup View -->
     <div id="setupView" class="fullscreen-view" style="display:none;">
-        <div class="centered-card">
-            <h2>Configuración Inicial</h2>
-            <p>Bienvenido. Para comenzar, conecta tu tienda a tu proyecto de Supabase.</p>
-            <form id="setupForm" onsubmit="guardarCredencialesSupabase(event)">
-                <div class="form-group">
-                    <label for="setupSupabaseUrl">Supabase Project URL</label>
-                    <input type="url" id="setupSupabaseUrl" required placeholder="https://<project-id>.supabase.co">
+        <div class="login-split-container">
+            <div class="login-branding-panel">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#111315" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.8; margin-bottom: 2rem;"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <h2>¡Casi Listo!</h2>
+                <p>Un último paso para lanzar tu nueva tienda. Conecta tu proyecto de Supabase para empezar.</p>
+            </div>
+            <div class="login-form-panel">
+                <div class="login-form-wrapper">
+                    <h2>Configuración Inicial</h2>
+                    <p>Ingresa las credenciales de tu proyecto de Supabase.</p>
+                    <form id="setupForm" onsubmit="guardarCredencialesSupabase(event)">
+                        <div class="form-group with-icon">
+                            <label for="setupSupabaseUrl">Supabase Project URL</label>
+                            <input type="url" id="setupSupabaseUrl" required placeholder="https://<project-id>.supabase.co">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg>
+                        </div>
+                        <div class="form-group with-icon">
+                            <label for="setupSupabaseAnonKey">Supabase Anon (Public) Key</label>
+                            <input type="password" id="setupSupabaseAnonKey" required placeholder="Pega tu clave pública aquí">
+                             <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></svg>
+                        </div>
+                        <div class="form-hint" style="text-align: left; margin-top: -1rem; margin-bottom: 1.5rem;">
+                            Encontrarás estas claves en tu panel de Supabase: <strong>Settings &rarr; API</strong>.
+                        </div>
+                        <button type="submit" class="btn-primary">Conectar y Finalizar</button>
+                        <div id="setupError" class="error-message"></div>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="setupSupabaseAnonKey">Supabase Anon (Public) Key</label>
-                    <input type="text" id="setupSupabaseAnonKey" required>
-                </div>
-                <div class="form-hint" style="text-align: left; margin-top: -1rem; margin-bottom: 1.5rem;">
-                    Encontrarás estas claves en tu panel de Supabase, en la sección <strong>Settings &rarr; API</strong>.
-                </div>
-                <button type="submit" class="btn-primary">Guardar y Continuar</button>
-                <div id="setupError" class="error-message"></div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -2061,7 +2073,7 @@
                 <img src="" alt="Logo" id="headerLogo" class="logo-image" style="display: none;">
                 <div id="defaultLogo">
                     <div class="logo-text-default" id="headerBusinessName">
-                        <span class="logo-red">Red</span><span class="logo-number">51</span>
+                        <span class="logo-red">Labs</span><span class="logo-number">51</span>
                     </div>
                     <span class="logo-subtitle" id="headerBusinessSubtitle">TECHNOLOGY</span>
                 </div>
@@ -2090,7 +2102,7 @@
                     <img src="" alt="Logo" id="loginLogo" class="logo-image" style="display: none;">
                     <div id="defaultLoginLogo">
                         <div class="logo-text-default" id="loginBusinessName">
-                            <span class="logo-red">Red</span><span class="logo-number">51</span>
+                            <span class="logo-red">Labs</span><span class="logo-number">51</span>
                         </div>
                     </div>
                 </div>
@@ -2394,20 +2406,15 @@
                     </div>
                     
                     <div id="adminConfiguracionView" style="display: none;">
-                        <div class="config-card" style="border-left: 5px solid var(--success);">
-                            <h3>¡Bienvenido, Administrador!</h3>
-                            <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem; font-size: 1rem;">
-                                Esta es tu central de mando. Sigue estos pasos para lanzar tu tienda:
-                            </p>
-                        </div>
+                        
                         <div class="config-card">
-                            <h3>Paso 1: Setup de Base de Datos</h3>
+                            <h3>Paso 1: Setup de Base de Datos (Solo una vez)</h3>
                             <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem;">
-                                Si es la primera vez que configuras la tienda, crea las tablas en tu base de datos.
-                                Ve a tu proyecto de Supabase &gt; SQL Editor &gt; "New query" y pega y ejecuta el siguiente script.
+                                Para una nueva tienda, primero debes crear las tablas en tu base de datos.
+                                Ve a tu proyecto de Supabase &gt; <strong>SQL Editor</strong> &gt; <strong>"New query"</strong>, pega el siguiente script completo y haz clic en <strong>"RUN"</strong>.
                             </p>
                             <details>
-                                <summary style="cursor: pointer; font-weight: 600; color: var(--primary);">📄 Ver/Ocultar Script SQL</summary>
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--primary);">📄 Ver/Ocultar Script SQL Completo</summary>
                                 <pre style="background-color: var(--dark); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-top: 1rem; white-space: pre-wrap; word-wrap: break-word; font-size: 0.85rem; max-height: 400px; overflow-y: auto;"><code id="setupSqlScript">-- 1. CREACIÓN DE TABLAS
 CREATE TABLE public.categorias ( 
   id bigint generated by default as identity primary key, 
@@ -2477,18 +2484,18 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                         </div>
 
                         <div class="config-card">
-                            <h3>Paso 2: Creación de Usuarios Recomendada</h3>
+                            <h3>Paso 2: Creación de Usuarios (Método Seguro)</h3>
                             <p class="form-hint" style="margin-top:-1rem; margin-bottom: 1.5rem;">
-                                <strong>Importante:</strong> Por seguridad, los usuarios deben crearse desde el panel de Supabase para que las contraseñas se almacenen de forma encriptada. No uses scripts SQL para esto.
+                                <strong>Importante:</strong> Por seguridad, los usuarios deben crearse desde el panel de Supabase para que las contraseñas se almacenen de forma encriptada. <strong>No uses scripts SQL para esto.</strong>
                             </p>
                             <p class="form-hint" style="margin-bottom: 1.5rem;">
                                 Ve a tu panel de Supabase &gt; <strong>Authentication &gt; Users</strong> y crea las siguientes cuentas:
                             </p>
                             <ul style="list-style-position: inside; display: flex; flex-direction: column; gap: 0.75rem; background: var(--dark); padding: 1rem; border-radius: 8px;">
-                                <li><code style="background: var(--light); padding: 2px 5px; border-radius: 4px;">root@tienda.com</code> (Para tu acceso de super-administrador)</li>
-                                <li><code style="background: var(--light); padding: 2px 5px; border-radius: 4px;">admin@negocio.com</code> (Para el dueño del negocio)</li>
-                                <li><code style="background: var(--light); padding: 2px 5px; border-radius: 4px;">ventas1@negocio.com</code> (Personal de ventas 1)</li>
-                                <li><code style="background: var(--light); padding: 2px 5px; border-radius: 4px;">ventas2@negocio.com</code> (Personal de ventas 2)</li>
+                                <li><strong>Usuario Root:</strong> <code>root@tienda.com</code> (Para tu acceso de super-administrador).</li>
+                                <li><strong>Dueño del Negocio:</strong> <code>admin@negocio.com</code></li>
+                                <li><strong>Personal de Ventas 1:</strong> <code>ventas1@negocio.com</code></li>
+                                <li><strong>Personal de Ventas 2:</strong> <code>ventas2@negocio.com</code></li>
                             </ul>
                             <p class="form-hint" style="margin-top: 1rem;">
                                 <strong>Nota:</strong> Actualmente, todas las cuentas creadas tienen los mismos permisos de administrador.
@@ -2815,7 +2822,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                     <img src="" alt="Logo" id="footerLogo" class="logo-image" style="display: none;">
                     <div id="defaultFooterLogo">
                          <div class="logo-text-default" style="color: var(--text-dark);" id="footerBusinessName">
-                            <span class="logo-red">Red</span><span class="logo-number">51</span>
+                            <span class="logo-red">Labs</span><span class="logo-number">51</span>
                          </div>
                     </div>
                 </div>
@@ -2856,10 +2863,10 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
     <script src="https://cdn.jsdelivr.net/npm/tinycolor2/dist/tinycolor.min.js"></script>
     <script>
         const CLOUDINARY_CLOUD_NAME = 'dvj68er8s';
-        const CLOUDINARY_UPLOAD_PRESET = 'red51_productos';
+        const CLOUDINARY_UPLOAD_PRESET = 'labs51_productos';
         
-        let n8nWebhookUrl = 'https://webhook.red51.site/webhook/pedidos_red51';
-        let n8nStatusUpdateWebhookUrl = 'https://webhook.red51.site/webhook/pedidos-webhook';
+        let n8nWebhookUrl = 'https://webhook.labs51.site/webhook/pedidos_labs51';
+        let n8nStatusUpdateWebhookUrl = 'https://webhook.labs51.site/webhook/pedidos-webhook';
 
         let carrito = [];
         let supabaseClient = null;
@@ -2880,7 +2887,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
         let currentSettings = {
             theme: 'cyberpunk',
             logoUrl: '',
-            businessName: 'Red51 Technology',
+            businessName: 'Labs51 Technology',
             n8nWebhook: n8nWebhookUrl,
             n8nStatusWebhook: n8nStatusUpdateWebhookUrl,
             colors: {}
@@ -3720,7 +3727,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                 }));
 
                 const timestamp = Date.now().toString().slice(-6);
-                const numero_pedido_generado = `R51-${timestamp}`;
+                const numero_pedido_generado = `L51-${timestamp}`;
 
                 const pedidoDB = {
                     numero_pedido: numero_pedido_generado,
@@ -5028,7 +5035,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                 formData.append('file', file);
                 formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
                 formData.append('cloud_name', CLOUDINARY_CLOUD_NAME);
-                formData.append('folder', `red51/${type}s`);
+                formData.append('folder', `labs51/${type}s`);
 
                 const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
                 if (!response.ok) throw new Error('Error al subir la imagen');
@@ -5064,7 +5071,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
             const worksheet = XLSX.utils.json_to_sheet(data);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos');
-            XLSX.writeFile(workbook, 'plantilla_productos_red51.xlsx');
+            XLSX.writeFile(workbook, 'plantilla_productos_labs51.xlsx');
         }
 
         async function importarProductos(event) {
@@ -5273,7 +5280,7 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
             const defaultConfig = {
                 theme: 'cyberpunk',
                 logoUrl: '',
-                businessName: 'Red51 Technology',
+                businessName: 'Labs51 Technology',
                 n8nWebhook: n8nWebhookUrl,
                 n8nStatusWebhook: n8nStatusUpdateWebhookUrl,
                 colors: {}
@@ -5541,12 +5548,8 @@ CREATE POLICY "Allow full access for authenticated users" ON public.settings FOR
                     modals[i].style.display = 'none';
                 }
             }
-            // Close all open stock breakdowns if clicking outside
-            if (!event.target.closest('.stock-details-container')) {
-                document.querySelectorAll('.stock-details-breakdown').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('.stock-summary.open').forEach(el => el.classList.remove('open'));
-            }
         }
     </script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
